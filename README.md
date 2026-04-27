@@ -10,6 +10,9 @@ A generative AI-powered web application for profiling and analyzing Kubeflow wor
 - **Incremental Updates**: Efficient processing of only changed files
 - **Audit Logging**: Complete compliance tracking for ingestion decisions
 - **CLI Interface**: Command-line tool for easy pipeline execution
+- **Vector Retrieval System**: FastAPI-based API for semantic search and workspace profiling
+- **Workspace Profiling**: AI-powered insights into tools, topics, and collaboration patterns
+- **Hybrid Search**: Combine vector similarity with keyword matching for better results
 
 ### 🔮 Upcoming Features
 - **Langchain Orchestration**: Intelligent workflow analysis and chaining
@@ -18,7 +21,101 @@ A generative AI-powered web application for profiling and analyzing Kubeflow wor
 - **Langfuse Observability**: Comprehensive monitoring and tracing
 - **Next.js Frontend**: Modern React-based user interface
 
-## Prerequisites
+## Retrieval API
+
+The retrieval system provides RESTful APIs for semantic search and workspace profiling.
+
+### Quick Start
+
+1. **Set environment variables:**
+   ```bash
+   export MILVUS_HOST=localhost
+   export MILVUS_PORT=19530
+   export INGESTION_CATALOG_PATH=./data/catalog.json
+   export EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+   ```
+
+2. **Start the API server:**
+   ```bash
+   cd src/retrieval
+   python -m uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+3. **Access the API documentation:**
+   - OpenAPI docs: http://localhost:8000/docs
+   - Alternative docs: http://localhost:8000/redoc
+
+### API Endpoints
+
+#### Health Check
+```bash
+GET /health
+```
+Returns system health status including vector store and embedding service status.
+
+#### Vector Search
+```bash
+POST /query
+Content-Type: application/json
+
+{
+  "query": "machine learning classification",
+  "top_k": 10,
+  "use_hybrid": false
+}
+```
+Performs semantic search across workspace artifacts.
+
+#### Workspace Profiling
+```bash
+GET /profile/workspace/{workspace_id}
+```
+Returns AI-generated insights about a workspace including:
+- Tool usage statistics
+- Topic analysis
+- Collaboration patterns
+- Code metrics
+
+#### System Metrics
+```bash
+GET /metrics
+```
+Returns performance metrics including query times, error rates, and memory usage.
+
+#### Data Synchronization
+```bash
+POST /admin/sync
+```
+Triggers synchronization with the latest ingestion catalog.
+
+### Example Usage
+
+**Search for machine learning code:**
+```python
+import requests
+
+response = requests.post("http://localhost:8000/query", json={
+    "query": "neural network implementation",
+    "top_k": 5,
+    "use_hybrid": True
+})
+
+results = response.json()
+for result in results["results"]:
+    print(f"Artifact: {result['artifact_id']}")
+    print(f"Content: {result['content'][:200]}...")
+    print(f"Score: {result['score']}")
+```
+
+**Get workspace profile:**
+```python
+response = requests.get("http://localhost:8000/profile/workspace/ajay11.yadav")
+profile = response.json()
+
+print(f"Workspace: {profile['workspace_id']}")
+print(f"Artifacts: {profile['artifact_count']}")
+print("Top tools:", profile['top_tools'])
+```
 
 - Python 3.11+
 - pip (Python package manager)
