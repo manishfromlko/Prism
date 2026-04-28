@@ -1,5 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { queryClient } from '@/lib/api'
+import { Sidebar } from '@/components/layout/sidebar'
+import { Header } from '@/components/layout/header'
+import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -15,8 +21,22 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className={inter.className}>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <QueryClientProvider client={queryClient}>
+          <div className="flex h-screen">
+            <Sidebar />
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <Header />
+              <main className="flex-1 overflow-auto p-6">
+                {children}
+              </main>
+            </div>
+          </div>
+          <Toaster />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </body>
     </html>
   )
 }
