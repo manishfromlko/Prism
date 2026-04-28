@@ -26,7 +26,7 @@ export default function WorkspaceDetailPage() {
   const workspace = workspaceData?.data
   const profile = profileData?.data
 
-  if (workspaceError || profileError) {
+  if (workspaceError) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
@@ -37,7 +37,7 @@ export default function WorkspaceDetailPage() {
     )
   }
 
-  if (workspaceLoading || profileLoading) {
+  if (workspaceLoading) {
     return (
       <div className="space-y-4">
         <Card className="animate-pulse">
@@ -71,6 +71,15 @@ export default function WorkspaceDetailPage() {
         <h1 className="text-3xl font-bold tracking-tight">{workspace.name}</h1>
         <p className="text-muted-foreground">Workspace profile and artifact analytics.</p>
       </div>
+
+      {profileError && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Workspace metrics are unavailable right now. The core workspace profile is still shown.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {selectedFile && (
         <Card>
