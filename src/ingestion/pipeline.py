@@ -117,6 +117,7 @@ class IngestionPipeline:
             )
 
             if classification["decision"] == "skipped":
+                artifact.ingestion_status = IngestionStatus.SKIPPED
                 audit = IngestionAudit(
                     audit_id=f"audit_{workspace_id}:{artifact.relative_path}",
                     artifact_id=artifact.artifact_id,

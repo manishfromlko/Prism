@@ -13,6 +13,9 @@ class IngestionStatus(str, Enum):
     SKIPPED = "skipped"
     ERROR = "error"
 
+    def __str__(self) -> str:
+        return self.value
+
 
 class FileType(str, Enum):
     NOTEBOOK = "notebook"

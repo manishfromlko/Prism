@@ -114,9 +114,15 @@ class Storage:
         else:
             health = "ok"
 
+        artifact_count = sum(
+            1
+            for artifact in self._catalog.get("artifacts", {}).values()
+            if artifact.get("ingestion_status") != "skipped"
+        )
+
         return {
             "workspaces": len(self._catalog.get("workspaces", {})),
-            "artifacts": len(self._catalog.get("artifacts", {})),
+            "artifacts": artifact_count,
             "audit_records": len(self._audit),
             "audit_summary": audit_summary,
             "pipeline_health": health,
