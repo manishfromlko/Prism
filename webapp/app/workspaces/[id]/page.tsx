@@ -1,14 +1,19 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useWorkspace, useWorkspaceProfile, useArtifactSummary, useWorkspaceArtifactSummaries } from '@/hooks/use-api'
 import { ProfileCard } from '@/components/workspace/ProfileCard'
-import { ToolChart } from '@/components/workspace/ToolChart'
 import { ArtifactList } from '@/components/workspace/ArtifactList'
 import { InsightPanel } from '@/components/workspace/InsightPanel'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
+
+const ToolChart = dynamic(
+  () => import('@/components/workspace/ToolChart').then((mod) => mod.ToolChart),
+  { ssr: false }
+)
 
 export default function WorkspaceDetailPage() {
   const params = useParams()
