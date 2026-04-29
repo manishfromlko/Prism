@@ -1,0 +1,31 @@
+# Python files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.venv/
+venv/
+env/
+ENV/
+.venv
+*.log
+*.tmp
+*.db
+*.sqlite3
+
+# Node files
+node_modules/
+webapp/node_modules/
+.next/
+out/
+dist/
+build/
+
+# Local project state
+dataset/
+.tmp
+.pytest_cache/
+.vscode/
+.idea/
+.DS_Store
+.git

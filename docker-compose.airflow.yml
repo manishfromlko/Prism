@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  airflow:
+    image: apache/airflow:2.10.2
+    container_name: kubeflow-airflow
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW_UID=50000
+      - AIRFLOW_GID=50000
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags:ro
+      - ./:/opt/airflow/repo:ro
+    ports:
+      - "8080:8080"
+    command: ["bash", "-lc", "airflow db init && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com --force || true && exec airflow standalone"]

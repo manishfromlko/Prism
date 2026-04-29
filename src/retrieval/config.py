@@ -30,6 +30,10 @@ class RetrievalConfig(BaseModel):
     similarity_metric: str = Field(default="COSINE", description="Similarity metric for search")
     default_top_k: int = Field(default=10, description="Default number of results")
     index_type: str = Field(default="HNSW", description="Vector index type")
+    ingestion_catalog_path: str = Field(
+        default="./data/catalog.json",
+        description="Path to the ingestion catalog JSON file"
+    )
 
     @classmethod
     def from_env(cls) -> "RetrievalConfig":
@@ -42,6 +46,7 @@ class RetrievalConfig(BaseModel):
             chunk_size=int(os.getenv("CHUNK_SIZE", "1000")),
             chunk_overlap=int(os.getenv("CHUNK_OVERLAP", "200")),
             batch_size=int(os.getenv("BATCH_SIZE", "32")),
+            ingestion_catalog_path=os.getenv("INGESTION_CATALOG_PATH", "./data/catalog.json"),
         )
 
 

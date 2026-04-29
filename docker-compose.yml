@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  milvus:
+    image: milvusdb/milvus:v2.2.6
+    container_name: kubeflow-milvus
+    ports:
+      - "19530:19530"
+    environment:
+      TZ: UTC
+    command: ["milvus", "run", "standalone"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:19121/healthz"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kubeflow-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+      - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - INGESTION_CATALOG_PATH=/data/catalog.json
+    depends_on:
+      - milvus
+    volumes:
+      - ./src:/app/src:ro
+      - ./requirements.txt:/app/requirements.txt:ro
+      - ./dataset:/data:ro
+
+  webapp:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+    container_name: kubeflow-webapp
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend

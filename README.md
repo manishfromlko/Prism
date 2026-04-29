@@ -232,6 +232,48 @@ export NEXT_PUBLIC_API_URL=http://localhost:8000
    npm run dev
    ```
 
+## Docker Deployment
+
+This repository includes Docker packaging for the backend API and the Next.js frontend.
+
+### Build and run with Docker Compose
+```bash
+docker compose up --build
+```
+
+Access:
+- API: http://localhost:8000
+- Webapp: http://localhost:3000
+
+The `docker-compose.yml` file also includes a Milvus service for vector storage.
+
+### Run the ingestion pipeline in the backend container
+```bash
+docker compose exec backend python -m src.ingestion.cli --root /data --mode full
+```
+
+### Environment override
+Set the ingestion catalog path for the backend container:
+```bash
+export INGESTION_CATALOG_PATH=/data/catalog.json
+```
+
+## Airflow Orchestration
+
+A dedicated Airflow packaging configuration is available at `docker-compose.airflow.yml`.
+The DAG file is located at `airflow/dags/ingestion_dag.py`.
+
+### Start Airflow
+```bash
+docker compose -f docker-compose.airflow.yml up --build
+```
+
+Then open Airflow at http://localhost:8080 with credentials:
+- Username: `admin`
+- Password: `admin`
+
+The DAG executes the ingestion CLI against the repository dataset at `/opt/airflow/repo/dataset`.
+
 ## Testing
 
 ### Run All Tests

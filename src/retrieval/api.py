@@ -145,9 +145,11 @@ async def get_metrics():
     except Exception as e:
         logger.error(f"Metrics retrieval failed: {e}")
         raise HTTPException(status_code=500, detail="Metrics retrieval failed")
+
+@app.get("/health", response_model=HealthResponse)
+async def get_health():
     """Check system health and status."""
     try:
-        # Check vector store
         vector_status = {"connected": False, "collection_count": 0, "total_vectors": 0}
         if vector_store:
             try:
@@ -160,7 +162,6 @@ async def get_metrics():
             except Exception:
                 vector_status["connected"] = False
 
-        # Check embedding service
         embedding_status = {"model_loaded": False, "model_name": None}
         if embedding_service:
             embedding_status = {
@@ -168,12 +169,10 @@ async def get_metrics():
                 "model_name": config.embedding_model if config else None
             }
 
-        # Get cache stats
         cache_stats = {"cached_embeddings": 0, "cache_memory_mb": 0}
         if embedding_service:
             cache_stats = embedding_service.get_cache_stats()
 
-        # Determine overall status
         if vector_status["connected"] and embedding_status["model_loaded"]:
             status = "healthy"
         elif vector_status["connected"] or embedding_status["model_loaded"]:
@@ -187,7 +186,6 @@ async def get_metrics():
             embedding_service=embedding_status,
             cache_stats=cache_stats
         )
-
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         raise HTTPException(status_code=500, detail="Health check failed")
