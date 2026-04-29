@@ -123,11 +123,6 @@ async def startup_event():
             vector_store.collection.load()
             vector_store._collection_loaded = True
 
-        # Warm up the embedding model — first encode() triggers JIT compilation;
-        # doing it here means the first user-facing search is not penalised.
-        logger.info("Warming up embedding model...")
-        embedding_service.generate_embedding("warmup")
-
         # Pre-warm the catalog cache so workspace/profile endpoints are instant.
         # Non-fatal: if the catalog path is wrong the server still starts and
         # search (/query) continues to work; only workspace/profile endpoints 503.

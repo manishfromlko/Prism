@@ -1,11 +1,11 @@
-"""Embedding service for generating vector representations of text."""
+"""Embedding service — OpenAI text-embedding-3-small."""
 
 import hashlib
 import logging
-import time
-from typing import Dict, List, Optional, Tuple
+import os
+from typing import Any, Dict, List, Optional
 
-from sentence_transformers import SentenceTransformer
+from openai import OpenAI
 
 from .config import RetrievalConfig
 
@@ -13,213 +13,118 @@ logger = logging.getLogger(__name__)
 
 
 class EmbeddingService:
-    """Service for generating text embeddings using sentence transformers."""
+    """Generates text embeddings via the OpenAI Embeddings API."""
 
     def __init__(self, config: RetrievalConfig):
-        """Initialize the embedding service.
-
-        Args:
-            config: Retrieval configuration
-        """
         self.config = config
-        self.model: Optional[SentenceTransformer] = None
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "OPENAI_API_KEY is not set. "
+                "Add it to the .env file at the project root."
+            )
+        self.client = OpenAI(api_key=api_key)
         self._cache: Dict[str, List[float]] = {}
-        self._load_model()
+        logger.info(f"EmbeddingService ready (model={config.embedding_model})")
 
-    def _load_model(self) -> None:
-        """Load the sentence transformer model."""
-        try:
-            logger.info(f"Loading embedding model: {self.config.embedding_model}")
-            self.model = SentenceTransformer(self.config.embedding_model)
-            logger.info("Embedding model loaded successfully")
-        except Exception as e:
-            logger.error(f"Failed to load embedding model: {e}")
-            raise
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    # text-embedding-3-small limit: 8 192 tokens. CSV/numeric content can be
+    # 1-2 chars/token, so 4 000 chars guarantees we stay under the limit for
+    # any content type while still capturing the most semantically useful text.
+    _MAX_CHARS = 4_000
+
+    def _truncate(self, text: str) -> str:
+        return text[: self._MAX_CHARS] if len(text) > self._MAX_CHARS else text
 
     def generate_embedding(self, text: str, use_cache: bool = True) -> List[float]:
-        """Generate embedding for a single text.
+        """Embed a single text string."""
+        text = self._truncate(text)
+        if use_cache:
+            key = self._cache_key(text)
+            if key in self._cache:
+                return self._cache[key]
 
-        Args:
-            text: Input text to embed
-            use_cache: Whether to use caching
-
-        Returns:
-            List of float values representing the embedding vector
-        """
-        if not self.model:
-            raise RuntimeError("Embedding model not loaded")
+        response = self.client.embeddings.create(
+            input=[text],
+            model=self.config.embedding_model,
+        )
+        embedding: List[float] = response.data[0].embedding
 
         if use_cache:
-            cache_key = self._get_cache_key(text)
-            if cache_key in self._cache:
-                return self._cache[cache_key]
-
-        try:
-            embedding = self.model.encode(text, convert_to_numpy=True)
-            result = embedding.tolist()
-
-            if use_cache:
-                self._cache[cache_key] = result
-
-            return result
-        except Exception as e:
-            logger.error(f"Failed to generate embedding: {e}")
-            raise
+            self._cache[self._cache_key(text)] = embedding
+        return embedding
 
     def generate_embeddings(self, texts: List[str], use_cache: bool = True) -> List[List[float]]:
-        """Generate embeddings for multiple texts in batch.
-
-        Args:
-            texts: List of input texts to embed
-            use_cache: Whether to use caching
-
-        Returns:
-            List of embedding vectors
-        """
-        if not self.model:
-            raise RuntimeError("Embedding model not loaded")
-
-        # Check cache for each text
-        uncached_texts = []
-        uncached_indices = []
-        results = [None] * len(texts)
+        """Embed a list of texts, batching requests and using the cache."""
+        texts = [self._truncate(t) for t in texts]
+        results: List[Optional[List[float]]] = [None] * len(texts)
+        uncached_texts: List[str] = []
+        uncached_indices: List[int] = []
 
         if use_cache:
             for i, text in enumerate(texts):
-                cache_key = self._get_cache_key(text)
-                if cache_key in self._cache:
-                    results[i] = self._cache[cache_key]
+                key = self._cache_key(text)
+                if key in self._cache:
+                    results[i] = self._cache[key]
                 else:
                     uncached_texts.append(text)
                     uncached_indices.append(i)
         else:
-            uncached_texts = texts
+            uncached_texts = list(texts)
             uncached_indices = list(range(len(texts)))
 
-        # Generate embeddings for uncached texts
         if uncached_texts:
-            try:
-                logger.info(f"Generating embeddings for {len(uncached_texts)} texts")
-                start_time = time.time()
-
-                embeddings = self.model.encode(uncached_texts, batch_size=self.config.batch_size, convert_to_numpy=True)
-                embedding_list = embeddings.tolist()
-
-                end_time = time.time()
-                logger.info(f"Generated {len(embedding_list)} embeddings in {end_time - start_time:.2f}s")
-
-                # Store in cache and results
-                for i, (idx, embedding) in enumerate(zip(uncached_indices, embedding_list)):
-                    results[idx] = embedding
+            logger.info(
+                f"Requesting {len(uncached_texts)} embeddings from OpenAI "
+                f"(model={self.config.embedding_model})"
+            )
+            # OpenAI supports up to 2 048 inputs per call; we batch conservatively
+            batch_size = self.config.batch_size
+            for start in range(0, len(uncached_texts), batch_size):
+                batch = uncached_texts[start : start + batch_size]
+                response = self.client.embeddings.create(
+                    input=batch,
+                    model=self.config.embedding_model,
+                )
+                for j, item in enumerate(response.data):
+                    global_idx = uncached_indices[start + j]
+                    results[global_idx] = item.embedding
                     if use_cache:
-                        cache_key = self._get_cache_key(uncached_texts[i])
-                        self._cache[cache_key] = embedding
+                        self._cache[self._cache_key(batch[j])] = item.embedding
 
-            except Exception as e:
-                logger.error(f"Failed to generate embeddings: {e}")
-                raise
+                logger.info(
+                    f"  batch {start // batch_size + 1}/"
+                    f"{-(-len(uncached_texts) // batch_size)}: "
+                    f"{len(batch)} embeddings received"
+                )
 
-        return results
-
-    def _get_cache_key(self, text: str) -> str:
-        """Generate cache key for text.
-
-        Args:
-            text: Input text
-
-        Returns:
-            Cache key string
-        """
-        # Use hash of text + model name for cache key
-        content = f"{self.config.embedding_model}:{text}"
-        return hashlib.md5(content.encode('utf-8')).hexdigest()
+        return results  # type: ignore[return-value]
 
     def get_dimension(self) -> int:
-        """Get the dimension of the embedding vectors.
-
-        Returns:
-            Embedding dimension
-        """
         return self.config.embedding_dimension
 
     def is_loaded(self) -> bool:
-        """Check if the model is loaded.
-
-        Returns:
-            True if model is loaded, False otherwise
-        """
-        return self.model is not None
+        """Always True — the model is remote."""
+        return self.client is not None
 
     def clear_cache(self) -> None:
-        """Clear the embedding cache."""
         self._cache.clear()
         logger.info("Embedding cache cleared")
 
-    def get_cache_stats(self) -> Dict[str, int]:
-        """Get cache statistics.
-
-        Returns:
-            Dictionary with cache stats
-        """
+    def get_cache_stats(self) -> Dict[str, Any]:
+        bytes_per_embedding = self.config.embedding_dimension * 4  # float32
         return {
             "cached_embeddings": len(self._cache),
-            "cache_memory_mb": self._estimate_cache_memory(),
+            "cache_memory_mb": round(len(self._cache) * bytes_per_embedding / (1024 * 1024), 3),
         }
 
-    def _estimate_cache_memory(self) -> float:
-        """Estimate memory usage of cache in MB.
+    # ------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------
 
-        Returns:
-            Estimated memory in MB
-        """
-        # Rough estimate: each embedding is ~dimension * 4 bytes (float32)
-        bytes_per_embedding = self.config.embedding_dimension * 4
-        total_bytes = len(self._cache) * bytes_per_embedding
-        return total_bytes / (1024 * 1024)
-
-    def validate_embeddings(self, texts: List[str], embeddings: List[List[float]]) -> Dict[str, float]:
-        """Validate embedding quality and compute metrics.
-
-        Args:
-            texts: Original texts
-            embeddings: Generated embeddings
-
-        Returns:
-            Dictionary with validation metrics
-        """
-        if len(texts) != len(embeddings):
-            raise ValueError("Texts and embeddings count mismatch")
-
-        metrics = {
-            "count": len(embeddings),
-            "avg_dimension": sum(len(emb) for emb in embeddings) / len(embeddings),
-            "min_dimension": min(len(emb) for emb in embeddings),
-            "max_dimension": max(len(emb) for emb in embeddings),
-        }
-
-        # Check for zero vectors (potential issues)
-        zero_vectors = sum(1 for emb in embeddings if all(x == 0 for x in emb))
-        metrics["zero_vectors"] = zero_vectors
-
-        # Check dimension consistency
-        expected_dim = self.config.embedding_dimension
-        correct_dim = sum(1 for emb in embeddings if len(emb) == expected_dim)
-        metrics["correct_dimension_ratio"] = correct_dim / len(embeddings)
-
-        return metrics
-
-    def switch_model(self, model_name: str) -> None:
-        """Switch to a different embedding model.
-
-        Args:
-            model_name: Name of the new model to load
-        """
-        if model_name == self.config.embedding_model and self.model:
-            logger.info(f"Model {model_name} already loaded")
-            return
-
-        logger.info(f"Switching to model: {model_name}")
-        self.config.embedding_model = model_name
-        self.model = None  # Force reload
-        self.clear_cache()  # Clear cache as embeddings will be different
-        self._load_model()
+    def _cache_key(self, text: str) -> str:
+        content = f"{self.config.embedding_model}:{text}"
+        return hashlib.md5(content.encode("utf-8")).hexdigest()

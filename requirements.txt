@@ -3,12 +3,11 @@ langchain>=0.1.0
 langchain-core>=0.1.0
 pymilvus>=2.3.0
 
-# sentence-transformers <3 and transformers <5 required for torch 2.2.x compatibility
-sentence-transformers>=2.2,<3
-transformers>=4.40,<5
+# OpenAI embeddings (text-embedding-3-small)
+openai>=1.0.0
 
-# numpy <2 required; numpy 2.x breaks torch 2.2.x (_ARRAY_API error)
-numpy<2
+# Environment variable loading
+python-dotenv>=1.0.0
 
 fastapi>=0.100.0
 uvicorn>=0.23.0

@@ -59,6 +59,10 @@ class DocumentLoader:
 
         return list(self._catalog.get('artifacts', {}).values())
 
+    # Only index these file types — CSVs, binaries, archives, etc. are not useful
+    # for user profiling and can contain enormous amounts of noisy numerical data.
+    ALLOWED_FILE_TYPES = {"notebook", "script", "text"}
+
     def load_documents(self, apply_guardrails: bool = True) -> List[Document]:
         """Load all artifacts as Langchain documents.
 
@@ -72,6 +76,9 @@ class DocumentLoader:
         documents = []
 
         for artifact in artifacts:
+            file_type = artifact.get("file_type", artifact.get("type", ""))
+            if file_type not in self.ALLOWED_FILE_TYPES:
+                continue
             try:
                 doc = self._artifact_to_document(artifact)
                 if doc:

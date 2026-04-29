@@ -93,7 +93,12 @@ def run_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
     embeddings = embedder.generate_embeddings(texts)
 
     artifact_ids = [doc.metadata.get("artifact_id", "") for doc in new_docs]
-    contents = [doc.page_content[:5000] for doc in new_docs]
+    # Milvus VARCHAR max_length is measured in UTF-8 bytes; truncate to 4 900 bytes
+    # and decode back to str to stay safely under the 5 000-byte schema limit.
+    contents = [
+        doc.page_content.encode("utf-8")[:4900].decode("utf-8", errors="ignore")
+        for doc in new_docs
+    ]
     metadatas = [doc.metadata for doc in new_docs]
 
     logger.info("Inserting vectors into Milvus...")

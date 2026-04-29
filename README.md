@@ -41,11 +41,29 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-> **Note on version pins:** `sentence-transformers<3`, `transformers<5`, and `numpy<2` are pinned
-> because torch 2.2.x is incompatible with numpy 2.x (`_ARRAY_API not found` crash) and with
-> transformers 5.x (`NameError: name 'nn' is not defined`).
+### Step 3 — Create the `.env` file
 
-### Step 3 — Run the data ingestion pipeline
+Create a `.env` file at the project root (already gitignored):
+
+```bash
+cat > .env <<'EOF'
+OPENAI_API_KEY=<your-openai-api-key>
+EMBEDDING_MODEL=text-embedding-3-small
+EMBEDDING_DIMENSION=1536
+INGESTION_CATALOG_PATH=dataset/.ingestion/ingestion_catalog.json
+EOF
+```
+
+The Python backend loads `.env` automatically at startup — no need to export env vars manually.
+
+> **Note:** The embedding model is `text-embedding-3-small` (OpenAI, 1536-dim). A valid
+> `OPENAI_API_KEY` is required; the server refuses to start without it.
+
+### Step 4 — Run the data ingestion pipeline
+
+Only **Jupyter notebooks** (`.ipynb`), **scripts** (`.py`, `.scala`, `.sql`), and **text files**
+(`.txt`, `.md`) are catalogued. CSV files and other data files are intentionally excluded — the
+goal is to understand *what people are working on*, not to index their datasets.
 
 ```bash
 python -m src.ingestion.cli --root dataset/ --mode full
@@ -53,8 +71,7 @@ python -m src.ingestion.cli --root dataset/ --mode full
 
 Expected output:
 ```
-Ingestion complete: 4 workspaces, 178 artifacts
-Catalog written to: dataset/.ingestion/ingestion_catalog.json
+Done — 5 workspaces, 211 artifacts (132 notebooks, 75 scripts, 4 text)
 ```
 
 For subsequent runs, process only changed files:
@@ -62,12 +79,7 @@ For subsequent runs, process only changed files:
 python -m src.ingestion.cli --root dataset/ --mode incremental
 ```
 
-Dry run (validate without writing):
-```bash
-python -m src.ingestion.cli --root dataset/ --mode full --dry-run
-```
-
-### Step 4 — Start Milvus (vector database)
+### Step 5 — Start Milvus (vector database)
 
 ```bash
 docker run -d \
@@ -82,7 +94,7 @@ Wait ~10 seconds, then verify:
 docker logs milvus 2>&1 | tail -5
 ```
 
-### Step 5 — Index artifacts into Milvus
+### Step 6 — Index artifacts into Milvus
 
 Run the indexer after every ingestion to keep the vector store in sync with the catalog.
 It is **safe to run multiple times** — incremental mode queries Milvus first and only inserts
@@ -98,43 +110,39 @@ python -m src.retrieval.indexer \
 Expected output:
 ```
 Already indexed: 0 artifacts
-Catalog contains 298 indexable documents
-To index: 298 new | skipping: 0 already present
-Generating embeddings for 298 documents...
+Catalog contains 190 indexable documents
+To index: 190 new | skipping: 0 already present
+Generating embeddings for 190 documents...
 Inserting vectors into Milvus...
-Done — inserted: 298, skipped: 0, total: 298
+Done — inserted: 190, skipped: 0, total: 190
 ```
 
 Running it again (nothing changed):
 ```
-Already indexed: 298 artifacts
-To index: 0 new | skipping: 298 already present
-Done — inserted: 0, skipped: 298, total: 298
+Already indexed: 190 artifacts
+To index: 0 new | skipping: 190 already present
+Done — inserted: 0, skipped: 190, total: 190
 ```
 
-To fully rebuild the index from scratch (e.g., after changing the embedding model):
+To fully rebuild the index from scratch (e.g., after re-ingestion):
 ```bash
 python -m src.retrieval.indexer \
   --catalog dataset/.ingestion/ingestion_catalog.json \
   --mode full
 ```
 
-### Step 6 — Start the retrieval API
+### Step 7 — Start the retrieval API
 
-`INGESTION_CATALOG_PATH` is **required**. The server will refuse to load workspace/profile
-data without it. Run from the project root with `python -m uvicorn` (not bare `uvicorn`).
+All configuration is read from `.env` automatically. Run from the project root:
 
 ```bash
-INGESTION_CATALOG_PATH=dataset/.ingestion/ingestion_catalog.json \
-  python -m uvicorn src.retrieval.api:app --host 0.0.0.0 --port 8000
+python -m uvicorn src.retrieval.api:app --host 0.0.0.0 --port 8000
 ```
 
-If port 8000 is already in use (e.g. Docker is running something there), use another port
-and note it for Step 9:
+If port 8000 is already in use, use another port and note it for Step 10:
 
 ```bash
-INGESTION_CATALOG_PATH=dataset/.ingestion/ingestion_catalog.json \
-  python -m uvicorn src.retrieval.api:app --host 0.0.0.0 --port 8002
+python -m uvicorn src.retrieval.api:app --host 0.0.0.0 --port 8002
 ```
 
 Verify the API is healthy:
@@ -146,8 +154,8 @@ Expected response:
 ```json
 {
   "status": "healthy",
-  "vector_store": {"connected": true, "total_vectors": 298},
-  "embedding_service": {"model_loaded": true, "model_name": "all-MiniLM-L6-v2"}
+  "vector_store": {"connected": true, "total_vectors": 190},
+  "embedding_service": {"model_loaded": true, "model_name": "text-embedding-3-small"}
 }
 ```
 
@@ -156,7 +164,7 @@ Check the new workspace list endpoint:
 curl http://localhost:8000/workspaces
 ```
 
-### Step 7 — Test semantic search (optional smoke test)
+### Step 8 — Test semantic search (optional smoke test)
 
 ```bash
 curl -X POST http://localhost:8000/query \
@@ -166,14 +174,14 @@ curl -X POST http://localhost:8000/query \
 
 Expected: 3 results with cosine similarity scores (~0.6–0.7).
 
-### Step 8 — Install webapp dependencies
+### Step 9 — Install webapp dependencies
 
 ```bash
 cd webapp
 npm install
 ```
 
-### Step 9 — Start the webapp
+### Step 10 — Start the webapp
 
 ```bash
 # If your API is on port 8000 (default):
@@ -243,14 +251,18 @@ Python backend:
 
 ### Python backend
 
+Set all of these in the `.env` file at the project root (loaded automatically):
+
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `OPENAI_API_KEY` | — | **Required.** OpenAI API key for embeddings |
+| `EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI embedding model |
+| `EMBEDDING_DIMENSION` | `1536` | Must match the model's output dimension |
 | `MILVUS_HOST` | `localhost` | Milvus server host |
 | `MILVUS_PORT` | `19530` | Milvus server port |
 | `MILVUS_COLLECTION` | `kubeflow_artifacts` | Collection name |
-| `EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | SentenceTransformer model |
-| `INGESTION_CATALOG_PATH` | `./data/catalog.json` | **Must override** — path to the catalog JSON |
-| `BATCH_SIZE` | `32` | Embedding batch size |
+| `INGESTION_CATALOG_PATH` | `dataset/.ingestion/ingestion_catalog.json` | Path to the catalog JSON |
+| `BATCH_SIZE` | `32` | Embeddings per OpenAI API request |
 
 ### Webapp (Next.js)
 

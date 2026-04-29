@@ -25,9 +25,7 @@ SUPPORTED_EXTENSIONS = {
     ".scala": FileType.SCRIPT,
     ".sql": FileType.SCRIPT,
     ".txt": FileType.TEXT,
-    ".csv": FileType.TEXT,
-    ".tsv": FileType.TEXT,
-    ".docx": FileType.DOCUMENT,
+    ".md": FileType.TEXT,
 }
 
 
@@ -46,8 +44,9 @@ class IngestionPipeline:
     def run(self) -> None:
         self.ingestion_run.workspace_scope = [p.name for p in safe_list_dir(self.root) if p.is_dir()]
         self.ingestion_run.status = "running"
-        if self.mode == "incremental":
-            self.storage._load()  # Load existing data for incremental
+        if self.mode == "full":
+            # Reset catalog so stale entries from previous runs don't persist
+            self.storage._catalog = {}
         for workspace_dir in self._list_workspaces():
             workspace = self._ingest_workspace(workspace_dir)
             self.storage.write_workspace(workspace)
@@ -115,6 +114,9 @@ class IngestionPipeline:
                 content_hash=current_hash,
                 capture_source={"source_path": str(path.resolve())},
             )
+
+            if file_type == FileType.UNSUPPORTED:
+                continue
 
             if classification["decision"] == "skipped":
                 artifact.ingestion_status = IngestionStatus.SKIPPED
