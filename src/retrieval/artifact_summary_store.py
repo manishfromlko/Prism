@@ -84,6 +84,20 @@ class ArtifactSummaryStore:
         logger.info(f"Upserted {len(result.primary_keys)} artifact summaries")
         return len(result.primary_keys)
 
+    def get_all_summaries(self, limit: int = 10000) -> List[Dict]:
+        if not self.collection:
+            return []
+        try:
+            self._ensure_loaded()
+            return self.collection.query(
+                expr='user_id != ""',
+                output_fields=["id", "user_id", "artifact_id", "artifact_summary", "tags"],
+                limit=limit,
+            )
+        except Exception as e:
+            logger.error(f"Failed to query all artifact summaries: {e}")
+            return []
+
     def get_workspace_summaries(self, user_id: str, limit: int = 1000) -> List[Dict]:
         if not self.collection:
             return []

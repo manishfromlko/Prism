@@ -15,7 +15,7 @@ class RetrievalConfig(BaseModel):
     """Configuration for the vector retrieval system."""
 
     # Milvus
-    milvus_host: str = Field(default="localhost")
+    milvus_host: str = Field(default="127.0.0.1")
     milvus_port: int = Field(default=19530)
     collection_name: str = Field(default="kubeflow_artifacts")
 
@@ -43,7 +43,7 @@ class RetrievalConfig(BaseModel):
     def from_env(cls) -> "RetrievalConfig":
         """Create config from environment variables (after .env is loaded)."""
         return cls(
-            milvus_host=os.getenv("MILVUS_HOST", "localhost"),
+            milvus_host=os.getenv("MILVUS_HOST", "127.0.0.1"),
             milvus_port=int(os.getenv("MILVUS_PORT", "19530")),
             collection_name=os.getenv("MILVUS_COLLECTION", "kubeflow_artifacts"),
             embedding_model=os.getenv("EMBEDDING_MODEL", "text-embedding-3-small"),
