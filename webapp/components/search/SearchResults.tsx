@@ -145,7 +145,9 @@ export function SearchResults({
                   <CardTitle className="text-base line-clamp-2">
                     {result.metadata.filename}
                   </CardTitle>
-                  <CardDescription className="mt-1">
+                  {/* Use <div> not <p> (CardDescription) — Badge renders as <div> and
+                      a <div> inside a <p> is invalid HTML causing hydration errors. */}
+                  <div className="text-sm text-muted-foreground mt-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <Link
                         href={`/workspaces/${result.metadata.workspace_id}`}
@@ -171,7 +173,7 @@ export function SearchResults({
                     <div className="text-xs text-muted-foreground mt-1">
                       Modified {new Date(result.metadata.modified_at).toLocaleDateString()}
                     </div>
-                  </CardDescription>
+                  </div>
                 </div>
               </div>
               <Button variant="outline" size="sm" asChild>

@@ -1,7 +1,9 @@
 import { QueryClient } from '@tanstack/react-query'
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+// Empty string → relative URLs → requests go to Next.js /api/* routes on the same origin.
+// The Next.js API routes then proxy to the Python backend (PYTHON_API_URL, default localhost:8000).
+const API_BASE_URL = ''
 const API_TIMEOUT = 30000
 
 // Create Query Client with default options
