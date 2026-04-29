@@ -137,7 +137,6 @@ def generate_artifact_summaries(
             )[:1000]
 
             summaries.append({
-                "id": f"artifact:{workspace_id}:{artifact_id}",
                 "user_id": workspace_id,
                 "artifact_id": artifact_id,
                 "artifact_summary": summary_text,

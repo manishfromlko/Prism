@@ -27,7 +27,7 @@ class ArtifactSummaryStore:
 
     def _schema(self) -> CollectionSchema:
         fields = [
-            FieldSchema(name="id", dtype=DataType.VARCHAR, max_length=255, is_primary=True, auto_id=False),
+            FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="user_id", dtype=DataType.VARCHAR, max_length=255),
             FieldSchema(name="artifact_id", dtype=DataType.VARCHAR, max_length=500),
             FieldSchema(name="artifact_summary", dtype=DataType.VARCHAR, max_length=1500),
@@ -66,12 +66,11 @@ class ArtifactSummaryStore:
         self._ensure_loaded()
         for s in summaries:
             try:
-                self.collection.delete(f'id == "{s["id"]}"')
+                self.collection.delete(f'artifact_id == "{s["artifact_id"]}"')
             except Exception:
                 pass
 
         data = [
-            [s["id"] for s in summaries],
             [s["user_id"] for s in summaries],
             [s["artifact_id"] for s in summaries],
             [s["artifact_summary"][:1500] for s in summaries],
@@ -83,6 +82,20 @@ class ArtifactSummaryStore:
         self._loaded = False
         logger.info(f"Upserted {len(result.primary_keys)} artifact summaries")
         return len(result.primary_keys)
+
+    def get_all_summaries(self, limit: int = 10000) -> List[Dict]:
+        if not self.collection:
+            return []
+        try:
+            self._ensure_loaded()
+            return self.collection.query(
+                expr='user_id != ""',
+                output_fields=["id", "user_id", "artifact_id", "artifact_summary", "tags"],
+                limit=limit,
+            )
+        except Exception as e:
+            logger.error(f"Failed to query all artifact summaries: {e}")
+            return []
 
     def get_workspace_summaries(self, user_id: str, limit: int = 1000) -> List[Dict]:
         if not self.collection:
@@ -103,9 +116,8 @@ class ArtifactSummaryStore:
             return None
         try:
             self._ensure_loaded()
-            summary_id = f"artifact:{user_id}:{artifact_id}"
             rows = self.collection.query(
-                expr=f'id == "{summary_id}"',
+                expr=f'user_id == "{user_id}" && artifact_id == "{artifact_id}"',
                 output_fields=["id", "user_id", "artifact_id", "artifact_summary", "tags"],
                 limit=1,
             )

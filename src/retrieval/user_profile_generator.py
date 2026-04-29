@@ -236,11 +236,9 @@ def generate_profiles(
             data_tags = ",".join(str(t).strip() for t in data_tags_raw if t)[:500]
 
             profiles.append({
-                "id": f"profile:{user_id}",
                 "user_id": user_id,
                 "user_profile": profile_text,
-                "tech_tags": tech_tags,
-                "data_tags": data_tags,
+                "tags": ",".join(filter(None, [tech_tags, data_tags]))[:1000],
             })
 
             logger.info(f"  profile ({len(profile_text)} chars): {profile_text[:80]}...")

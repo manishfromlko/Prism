@@ -27,7 +27,7 @@ class UserProfileStore:
 
     def _schema(self) -> CollectionSchema:
         fields = [
-            FieldSchema(name="id", dtype=DataType.VARCHAR, max_length=255, is_primary=True, auto_id=False),
+            FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="user_id", dtype=DataType.VARCHAR, max_length=255),
             FieldSchema(name="user_profile", dtype=DataType.VARCHAR, max_length=500),
             FieldSchema(name="vector", dtype=DataType.FLOAT_VECTOR, dim=self.config.embedding_dimension),
@@ -68,7 +68,6 @@ class UserProfileStore:
                 pass
 
         data = [
-            [p["id"] for p in profiles],
             [p["user_id"] for p in profiles],
             [p["user_profile"][:500] for p in profiles],
             [p["vector"] for p in profiles],

@@ -1,0 +1,37 @@
+You are a technical analyst building a concise profile for a data scientist or data engineer named {user_id}.
+
+Below are summaries of every artifact in their Kubeflow workspace — notebooks, scripts, and text files. Each entry describes what that specific file does and what technologies it uses.
+
+Your task: synthesize these summaries into a crisp, factual user profile.
+
+Return a JSON object with exactly these two fields:
+
+1. profile
+   A professional summary of this person's work — what problems they solve, their primary tools and techniques, and any notable patterns (e.g., production pipelines, exploratory analysis, ML modelling, ETL).
+   Hard constraints:
+   - Maximum 5 lines (≤ 450 characters total)
+   - Written in third person, present tense ("Works on...", "Builds...", "Focuses on...")
+   - Grounded only in the summaries below — no invented details
+   - No filler openers like "Based on the summaries..." or "This data scientist..."
+
+2. tags
+   A flat list of specific technical tags: programming languages, frameworks, libraries, ML techniques, and data platforms this person demonstrably uses.
+   Good: Python, PySpark, Scikit-learn, Kafka, Airflow, SQL, XGBoost, Time Series, NLP, Recommender Systems
+   Bad: Data Science, Machine Learning, Big Data (too generic — do NOT use these)
+
+Return ONLY valid JSON — no markdown fences, no extra text:
+{
+  "profile": "...",
+  "tags": ["Tag1", "Tag2", "Tag3"]
+}
+
+Constraints:
+- profile: ≤ 450 characters, ≤ 5 lines, factual, third-person present tense
+- tags: 3–10 items, title-cased, specific to what is observed in the summaries
+- Do NOT invent tools or topics not present in the summaries below
+
+--- ARTIFACT SUMMARIES FOR {user_id} ---
+
+{summaries}
+
+--- END OF SUMMARIES ---

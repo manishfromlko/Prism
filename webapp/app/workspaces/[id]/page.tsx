@@ -2,10 +2,11 @@
 
 import dynamic from 'next/dynamic'
 import { useParams, useSearchParams } from 'next/navigation'
-import { useWorkspace, useWorkspaceProfile, useArtifactSummary, useWorkspaceArtifactSummaries } from '@/hooks/use-api'
+import { useWorkspace, useWorkspaceProfile, useArtifactSummary, useWorkspaceArtifactSummaries, useUserProfile } from '@/hooks/use-api'
 import { ProfileCard } from '@/components/workspace/ProfileCard'
 import { ArtifactList } from '@/components/workspace/ArtifactList'
 import { InsightPanel } from '@/components/workspace/InsightPanel'
+import { UserProfileSummary } from '@/components/workspace/UserProfileSummary'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
@@ -29,6 +30,10 @@ export default function WorkspaceDetailPage() {
     error: profileError,
   } = useWorkspaceProfile(workspaceId)
   const {
+    data: userProfileData,
+    isLoading: userProfileLoading,
+  } = useUserProfile(workspaceId)
+  const {
     data: artifactSummaryData,
     isLoading: artifactSummaryLoading,
     error: artifactSummaryError,
@@ -40,6 +45,7 @@ export default function WorkspaceDetailPage() {
 
   const workspace = workspaceData?.data
   const profile = profileData?.data
+  const userProfile = userProfileData?.data
   const summariesByArtifactId = Object.fromEntries(
     (workspaceSummariesData?.data || []).map((summary) => [summary.artifact_id, summary])
   )
@@ -133,6 +139,8 @@ export default function WorkspaceDetailPage() {
           </CardContent>
         </Card>
       )}
+
+      <UserProfileSummary profile={userProfile} isLoading={userProfileLoading} />
 
       <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
         <div className="space-y-6">

@@ -17,6 +17,7 @@ from .profiling import WorkspaceProfiler
 from .indexer import run_indexing
 from .user_profile_store import UserProfileStore
 from .profile_indexer import run_profile_indexing
+from .profile_from_summaries_indexer import run_profile_indexing_from_summaries
 from .artifact_summary_store import ArtifactSummaryStore
 from .artifact_summary_indexer import run_artifact_summary_indexing
 
@@ -439,7 +440,7 @@ async def list_user_profiles():
         data = []
         for p in profiles:
             data.append({
-                "id": p.get("id", ""),
+                "id": str(p.get("id", "")),
                 "user_id": p.get("user_id", ""),
                 "user_profile": p.get("user_profile", ""),
                 "tags": [t.strip() for t in p.get("tags", "").split(",") if t.strip()],
@@ -461,7 +462,7 @@ async def get_user_profile(user_id: str):
             raise HTTPException(status_code=404, detail=f"Profile for '{user_id}' not found")
         return {
             "data": {
-                "id": p.get("id", ""),
+                "id": str(p.get("id", "")),
                 "user_id": p.get("user_id", ""),
                 "user_profile": p.get("user_profile", ""),
                 "tags": [t.strip() for t in p.get("tags", "").split(",") if t.strip()],
@@ -476,7 +477,7 @@ async def get_user_profile(user_id: str):
 
 @app.post("/admin/sync-profiles")
 async def sync_profiles():
-    """Re-generate and re-index all user profiles from the catalog."""
+    """Re-generate and re-index all user profiles from the catalog (raw-file approach)."""
     if not config:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
@@ -486,7 +487,6 @@ async def sync_profiles():
             None,
             lambda: run_profile_indexing(config.ingestion_catalog_path),
         )
-        # Refresh the in-process store handle
         global user_profile_store
         user_profile_store = UserProfileStore(config)
         user_profile_store.create_collection(drop_if_exists=False)
@@ -494,6 +494,34 @@ async def sync_profiles():
     except Exception as e:
         logger.error(f"Profile sync failed: {e}")
         raise HTTPException(status_code=500, detail=f"Profile sync failed: {e}")
+
+
+@app.post("/admin/sync-profiles-from-summaries")
+async def sync_profiles_from_summaries():
+    """
+    Re-generate and re-index user profiles using artifact summaries from Milvus
+    as LLM context (gpt-4o-mini, ≤5-line summaries).
+
+    Requires the artifact_summaries collection to be populated first.
+    Call POST /admin/sync-artifact-summaries before this endpoint.
+    """
+    if not config:
+        raise HTTPException(status_code=503, detail="Service not initialized")
+    try:
+        import asyncio
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            None,
+            lambda: run_profile_indexing_from_summaries(drop_existing=True),
+        )
+        global user_profile_store
+        user_profile_store = UserProfileStore(config)
+        user_profile_store.create_collection(drop_if_exists=False)
+        user_profile_store._ensure_loaded()
+        return {"status": "completed", "profiles_indexed": result["inserted"]}
+    except Exception as e:
+        logger.error(f"Profile sync from summaries failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Profile sync from summaries failed: {e}")
 
 
 @app.get("/artifact-summaries")
@@ -510,7 +538,7 @@ async def get_artifact_summary(
             raise HTTPException(status_code=404, detail="Artifact summary not found")
         return {
             "data": {
-                "id": summary.get("id", ""),
+                "id": str(summary.get("id", "")),
                 "user_id": summary.get("user_id", ""),
                 "artifact_id": summary.get("artifact_id", ""),
                 "artifact_summary": summary.get("artifact_summary", ""),
@@ -534,7 +562,7 @@ async def list_artifact_summaries(workspace_id: str):
         data = []
         for s in summaries:
             data.append({
-                "id": s.get("id", ""),
+                "id": str(s.get("id", "")),
                 "user_id": s.get("user_id", ""),
                 "artifact_id": s.get("artifact_id", ""),
                 "artifact_summary": s.get("artifact_summary", ""),
