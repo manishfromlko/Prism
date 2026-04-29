@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useSearch } from '@/hooks/use-api'
 import { SearchBar } from '@/components/search/SearchBar'
@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import type { SearchQuery, SearchFilters as SearchFiltersType } from '@/types'
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams()
   const initialQuery = searchParams.get('q') || ''
 
@@ -140,5 +140,13 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense>
+      <SearchPageContent />
+    </Suspense>
   )
 }
