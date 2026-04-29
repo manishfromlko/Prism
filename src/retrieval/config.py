@@ -36,6 +36,9 @@ class RetrievalConfig(BaseModel):
     # Catalog path — must point to ingestion_catalog.json
     ingestion_catalog_path: str = Field(default="dataset/.ingestion/ingestion_catalog.json")
 
+    # LLM for user profile generation (chat completion, not embeddings)
+    profile_llm_model: str = Field(default="gpt-4o-mini")
+
     @classmethod
     def from_env(cls) -> "RetrievalConfig":
         """Create config from environment variables (after .env is loaded)."""
@@ -50,6 +53,7 @@ class RetrievalConfig(BaseModel):
                 "INGESTION_CATALOG_PATH",
                 "dataset/.ingestion/ingestion_catalog.json",
             ),
+            profile_llm_model=os.getenv("PROFILE_LLM_MODEL", "gpt-4o-mini"),
         )
 
 

@@ -15,6 +15,8 @@ from .vector_store import VectorStore
 from .embeddings import EmbeddingService
 from .profiling import WorkspaceProfiler
 from .indexer import run_indexing
+from .user_profile_store import UserProfileStore
+from .profile_indexer import run_profile_indexing
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +83,7 @@ vector_store: Optional[VectorStore] = None
 embedding_service: Optional[EmbeddingService] = None
 query_processor: Optional[QueryProcessor] = None
 profiler: Optional[WorkspaceProfiler] = None
+user_profile_store: Optional[UserProfileStore] = None
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -109,7 +112,7 @@ app = create_app()
 
 @app.on_event("startup")
 async def startup_event():
-    global config, vector_store, embedding_service, query_processor, profiler
+    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store
     try:
         config = RetrievalConfig.from_env()
         vector_store = VectorStore(config)
@@ -118,14 +121,21 @@ async def startup_event():
         profiler = WorkspaceProfiler(config, config.ingestion_catalog_path)
         vector_store.create_collection()
 
-        # Pre-load collection into Milvus memory so the first search is not slow
+        # Pre-load kubeflow_artifacts collection into Milvus memory
         if vector_store.collection:
             vector_store.collection.load()
             vector_store._collection_loaded = True
 
-        # Pre-warm the catalog cache so workspace/profile endpoints are instant.
-        # Non-fatal: if the catalog path is wrong the server still starts and
-        # search (/query) continues to work; only workspace/profile endpoints 503.
+        # Load user_profiles collection (non-fatal if not yet indexed)
+        try:
+            user_profile_store = UserProfileStore(config)
+            user_profile_store.create_collection(drop_if_exists=False)
+            user_profile_store._ensure_loaded()
+        except Exception as e:
+            logger.warning(f"User profile store not ready: {e}")
+            user_profile_store = None
+
+        # Pre-warm the catalog cache
         try:
             profiler.loader.load_catalog()
         except FileNotFoundError:
@@ -402,6 +412,77 @@ async def sync_data(request: SyncRequest):
     except Exception as e:
         logger.error(f"Sync failed: {e}")
         raise HTTPException(status_code=500, detail=f"Sync operation failed: {e}")
+
+# ---------------------------------------------------------------------------
+# User profiles endpoints
+# ---------------------------------------------------------------------------
+
+@app.get("/user-profiles")
+async def list_user_profiles():
+    """Return all user profiles stored in the user_profiles collection."""
+    if not user_profile_store:
+        raise HTTPException(status_code=503, detail="User profile store not initialized. Run profile_indexer first.")
+    try:
+        profiles = user_profile_store.get_all_profiles()
+        data = []
+        for p in profiles:
+            data.append({
+                "id": p.get("id", ""),
+                "user_id": p.get("user_id", ""),
+                "user_profile": p.get("user_profile", ""),
+                "tags": [t.strip() for t in p.get("tags", "").split(",") if t.strip()],
+            })
+        return {"data": data, "total": len(data)}
+    except Exception as e:
+        logger.error(f"Failed to list user profiles: {e}")
+        raise HTTPException(status_code=500, detail="Failed to list user profiles")
+
+
+@app.get("/user-profiles/{user_id}")
+async def get_user_profile(user_id: str):
+    """Return the profile for a single user."""
+    if not user_profile_store:
+        raise HTTPException(status_code=503, detail="User profile store not initialized.")
+    try:
+        p = user_profile_store.get_profile(user_id)
+        if not p:
+            raise HTTPException(status_code=404, detail=f"Profile for '{user_id}' not found")
+        return {
+            "data": {
+                "id": p.get("id", ""),
+                "user_id": p.get("user_id", ""),
+                "user_profile": p.get("user_profile", ""),
+                "tags": [t.strip() for t in p.get("tags", "").split(",") if t.strip()],
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get profile for {user_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get user profile")
+
+
+@app.post("/admin/sync-profiles")
+async def sync_profiles():
+    """Re-generate and re-index all user profiles from the catalog."""
+    if not config:
+        raise HTTPException(status_code=503, detail="Service not initialized")
+    try:
+        import asyncio
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            None,
+            lambda: run_profile_indexing(config.ingestion_catalog_path),
+        )
+        # Refresh the in-process store handle
+        global user_profile_store
+        user_profile_store = UserProfileStore(config)
+        user_profile_store.create_collection(drop_if_exists=False)
+        return {"status": "completed", "profiles_indexed": result["inserted"]}
+    except Exception as e:
+        logger.error(f"Profile sync failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Profile sync failed: {e}")
+
 
 if __name__ == "__main__":
     import uvicorn

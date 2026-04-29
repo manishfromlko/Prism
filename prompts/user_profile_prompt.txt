@@ -1,0 +1,41 @@
+You are a technical analyst reviewing the workspace of a data scientist or data engineer named {user_id}.
+
+Below is a curated sample of their actual Jupyter notebooks, Python/Scala/SQL scripts, and text files — including code cells, markdown documentation, import statements, and data-access patterns.
+
+Your task is to produce three things in a single JSON response:
+
+1. profile
+   A 2–3 sentence professional summary (strictly ≤ 500 characters) describing:
+   - What domains and problems this person primarily works on
+   - Their main technical approach and tools
+   - Any notable patterns (e.g., production pipelines, exploratory analysis, ML modelling)
+
+2. tech_tags
+   A list of specific technical tags: programming languages, frameworks, libraries, and ML/data techniques this person demonstrably uses.
+   Good examples: Python, PySpark, Pandas, Scikit-learn, Kafka, Airflow, SQL, Time Series Forecasting, NLP, Recommender Systems, Classification, Regression, Data Visualisation
+   Bad examples (too generic — do NOT use): Data Science, Machine Learning, Big Data, Analysis
+
+3. data_tags
+   A list of named data assets explicitly referenced in the code: table names, database or schema names, HDFS paths, S3 paths, Kafka topic names, named datasets, or specific file paths.
+   Only include assets that are clearly and unambiguously named in the code below.
+   Good examples: customer_transactions, hdfs://warehouse/sales_fact, production_db.orders, kafka_topic_user_events, appl_1980_2014.csv, investor_flow_of_funds
+   If no named assets are found in the code, return an empty list [].
+
+Return ONLY a valid JSON object with exactly this structure — no markdown fences, no extra text, no explanation:
+{
+  "profile": "...",
+  "tech_tags": ["Tag1", "Tag2", "Tag3"],
+  "data_tags": ["asset1", "path2"]
+}
+
+Constraints:
+- profile: ≤ 500 characters, factual, grounded in the content below
+- tech_tags: 3–10 items, title-cased, specific to what is observed
+- data_tags: only named assets explicitly present in the code; return [] if none found
+- Do NOT invent or infer tables/paths that are not literally present in the code
+
+--- WORKSPACE CONTENT FOR {user_id} ---
+
+{content}
+
+--- END OF WORKSPACE CONTENT ---

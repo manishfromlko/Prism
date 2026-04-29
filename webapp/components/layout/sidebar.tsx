@@ -15,6 +15,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  Users,
 } from 'lucide-react'
 
 const navigation = [
@@ -27,6 +28,11 @@ const navigation = [
     name: 'Search',
     href: '/search',
     icon: Search,
+  },
+  {
+    name: 'User Profiles',
+    href: '/user-profiles',
+    icon: Users,
   },
   {
     name: 'Workspaces',

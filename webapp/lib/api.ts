@@ -129,10 +129,26 @@ class ApiClient {
       body: JSON.stringify(options || {}),
     })
   }
+
+  // User profile endpoints
+  async getUserProfiles(): Promise<{ data: UserProfile[]; total: number }> {
+    return this.request('/api/user-profiles')
+  }
+
+  async getUserProfile(userId: string): Promise<{ data: UserProfile }> {
+    return this.request(`/api/user-profiles/${encodeURIComponent(userId)}`)
+  }
 }
 
 // Export singleton instance
 export const apiClient = new ApiClient(API_BASE_URL)
+
+export interface UserProfile {
+  id: string
+  user_id: string
+  user_profile: string
+  tags: string[]
+}
 
 // Query keys for React Query
 export const queryKeys = {
@@ -148,4 +164,6 @@ export const queryKeys = {
   ] as const,
   health: ['health'] as const,
   metrics: ['metrics'] as const,
+  userProfiles: ['user-profiles'] as const,
+  userProfile: (id: string) => ['user-profiles', id] as const,
 }
