@@ -71,6 +71,13 @@ class LogResponse(BaseModel):
     logs: List[Dict[str, Any]]
     total_count: int
 
+class SyncResponse(BaseModel):
+    """Response model for data synchronization."""
+    sync_id: str
+    status: str
+    processed_count: int
+    errors: List[str]
+
 # Global services (initialized on startup)
 config: Optional[RetrievalConfig] = None
 vector_store: Optional[VectorStore] = None

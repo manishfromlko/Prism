@@ -118,49 +118,42 @@ class DocumentLoader:
         Returns:
             Extracted text content
         """
-        # For notebooks, extract cell contents
-        if artifact.get('type') == 'notebook':
-            return self._extract_notebook_content(artifact)
+        file_type = artifact.get('file_type', artifact.get('type', ''))
+        source_path = artifact.get('capture_source', {}).get('source_path', '')
 
-        # For scripts, use the content directly
-        elif artifact.get('type') in ['python', 'script']:
+        if not source_path:
             return artifact.get('content', '')
 
-        # For other types, try content field
-        return artifact.get('content', '')
-
-    def _extract_notebook_content(self, artifact: Dict) -> str:
-        """Extract content from Jupyter notebook.
-
-        Args:
-            artifact: Notebook artifact
-
-        Returns:
-            Concatenated cell contents
-        """
-        content = artifact.get('content', '')
-        if not content:
-            return ''
-
         try:
-            # Parse notebook JSON
-            notebook = json.loads(content)
-            cells = notebook.get('cells', [])
+            content = open(source_path, 'r', encoding='utf-8', errors='ignore').read()
+        except (OSError, IOError):
+            return None
 
-            # Extract code and markdown cells
-            text_parts = []
+        if file_type == 'notebook':
+            return self._extract_notebook_content_from_text(content)
+
+        return content
+
+    def _extract_notebook_content_from_text(self, raw: str) -> str:
+        """Extract cell text from raw notebook JSON string."""
+        try:
+            notebook = json.loads(raw)
+            cells = notebook.get('cells', [])
+            parts = []
             for cell in cells:
                 if cell.get('cell_type') in ['code', 'markdown']:
                     source = cell.get('source', [])
-                    if isinstance(source, list):
-                        text_parts.append(''.join(source))
-                    else:
-                        text_parts.append(str(source))
+                    parts.append(''.join(source) if isinstance(source, list) else str(source))
+            return '\n\n'.join(parts)
+        except (json.JSONDecodeError, Exception):
+            return raw
 
-            return '\n\n'.join(text_parts)
-        except json.JSONDecodeError:
-            logger.warning(f"Invalid notebook JSON for artifact {artifact.get('id')}")
-            return content
+    def _extract_notebook_content(self, artifact: Dict) -> str:
+        """Extract content from Jupyter notebook artifact dict (legacy path)."""
+        content = artifact.get('content', '')
+        if not content:
+            return ''
+        return self._extract_notebook_content_from_text(content)
 
     def _build_metadata(self, artifact: Dict) -> Dict:
         """Build metadata dictionary for the document.
@@ -172,12 +165,12 @@ class DocumentLoader:
             Metadata dictionary
         """
         metadata = {
-            'artifact_id': artifact.get('id', ''),
+            'artifact_id': artifact.get('artifact_id', artifact.get('id', '')),
             'workspace_id': artifact.get('workspace_id', ''),
-            'type': artifact.get('type', ''),
-            'path': artifact.get('path', ''),
-            'size': artifact.get('size', 0),
-            'modified_at': artifact.get('modified_at', ''),
+            'type': artifact.get('file_type', artifact.get('type', '')),
+            'path': artifact.get('relative_path', artifact.get('path', '')),
+            'size': artifact.get('size_bytes', artifact.get('size', 0)),
+            'modified_at': artifact.get('last_modified_at', artifact.get('modified_at', '')),
         }
 
         # Add any additional metadata from artifact
@@ -206,9 +199,9 @@ class DocumentLoader:
         workspace = workspaces.get(workspace_id, {})
 
         return {
-            'workspace_name': workspace.get('name', ''),
+            'workspace_name': workspace.get('workspace_id', workspace.get('name', '')),
             'workspace_owner': workspace.get('owner', ''),
-            'workspace_path': workspace.get('path', ''),
+            'workspace_path': workspace.get('root_path', workspace.get('path', '')),
             'artifact_count_in_workspace': len([
                 a for a in self._catalog.get('artifacts', {}).values()
                 if a.get('workspace_id') == workspace_id
