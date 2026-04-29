@@ -138,6 +138,18 @@ class ApiClient {
   async getUserProfile(userId: string): Promise<{ data: UserProfile }> {
     return this.request(`/api/user-profiles/${encodeURIComponent(userId)}`)
   }
+
+  async getArtifactSummary(workspaceId: string, artifactId: string): Promise<{ data: ArtifactSummary }> {
+    const params = new URLSearchParams({
+      workspace_id: workspaceId,
+      artifact_id: artifactId,
+    })
+    return this.request(`/api/artifact-summaries?${params.toString()}`)
+  }
+
+  async getWorkspaceArtifactSummaries(workspaceId: string): Promise<{ data: ArtifactSummary[]; total: number }> {
+    return this.request(`/api/artifact-summaries/workspace/${encodeURIComponent(workspaceId)}`)
+  }
 }
 
 // Export singleton instance
@@ -147,6 +159,14 @@ export interface UserProfile {
   id: string
   user_id: string
   user_profile: string
+  tags: string[]
+}
+
+export interface ArtifactSummary {
+  id: string
+  user_id: string
+  artifact_id: string
+  artifact_summary: string
   tags: string[]
 }
 
@@ -166,4 +186,8 @@ export const queryKeys = {
   metrics: ['metrics'] as const,
   userProfiles: ['user-profiles'] as const,
   userProfile: (id: string) => ['user-profiles', id] as const,
+  artifactSummary: (workspaceId: string, artifactId: string) =>
+    ['artifact-summaries', workspaceId, artifactId] as const,
+  workspaceArtifactSummaries: (workspaceId: string) =>
+    ['artifact-summaries', 'workspace', workspaceId] as const,
 }

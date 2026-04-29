@@ -81,6 +81,10 @@ export function ArtifactList({ artifacts = [], isLoading = false, workspaceId }:
       <CardContent>
         <div className="space-y-3">
           {artifacts.slice(0, 10).map((artifact) => (
+            (() => {
+              const artifactId = artifact.artifact_id || `${workspaceId}:${artifact.file_path}`
+              const href = `/workspaces/${workspaceId}?file=${encodeURIComponent(artifact.file_path)}&artifact_id=${encodeURIComponent(artifactId)}`
+              return (
             <div
               key={`${artifact.workspace_id}-${artifact.file_path}`}
               className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
@@ -114,11 +118,13 @@ export function ArtifactList({ artifacts = [], isLoading = false, workspaceId }:
                 size="sm"
                 className="ml-2 h-8 w-8 p-0"
               >
-                <a href={`/workspaces/${workspaceId}?file=${artifact.file_path}`}>
+                <a href={href}>
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
             </div>
+              )
+            })()
           ))}
         </div>
       </CardContent>

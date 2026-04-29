@@ -58,6 +58,7 @@ export interface SearchResult {
 }
 
 export interface ArtifactMetadata {
+  artifact_id?: string
   workspace_id: string
   workspace_name: string
   filename: string
@@ -70,6 +71,14 @@ export interface ArtifactMetadata {
   language?: string
   dependencies?: string[]
   line_number?: number
+}
+
+export interface ArtifactSummary {
+  id: string
+  user_id: string
+  artifact_id: string
+  artifact_summary: string
+  tags: string[]
 }
 
 export interface SearchQuery {

@@ -151,6 +151,7 @@ class WorkspaceProfiler:
         for a in sorted_arts[:limit]:
             filename = a.get('file_name', '') or a.get('relative_path', '').split('/')[-1]
             result.append({
+                'artifact_id': a.get('artifact_id', ''),
                 'workspace_id': workspace_id,
                 'workspace_name': workspace_id,
                 'filename': filename,

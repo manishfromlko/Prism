@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient, queryKeys, type UserProfile } from '@/lib/api'
+import { apiClient, queryKeys, type UserProfile, type ArtifactSummary } from '@/lib/api'
 import type {
   Workspace,
   WorkspaceProfile,
@@ -133,6 +133,24 @@ export function useUserProfile(userId: string) {
     queryKey: queryKeys.userProfile(userId),
     queryFn: () => apiClient.getUserProfile(userId),
     enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useArtifactSummary(workspaceId: string, artifactId: string) {
+  return useQuery({
+    queryKey: queryKeys.artifactSummary(workspaceId, artifactId),
+    queryFn: () => apiClient.getArtifactSummary(workspaceId, artifactId),
+    enabled: !!workspaceId && !!artifactId,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useWorkspaceArtifactSummaries(workspaceId: string) {
+  return useQuery<{ data: ArtifactSummary[]; total: number }>({
+    queryKey: queryKeys.workspaceArtifactSummaries(workspaceId),
+    queryFn: () => apiClient.getWorkspaceArtifactSummaries(workspaceId),
+    enabled: !!workspaceId,
     staleTime: 5 * 60 * 1000,
   })
 }

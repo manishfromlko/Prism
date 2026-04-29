@@ -17,6 +17,8 @@ from .profiling import WorkspaceProfiler
 from .indexer import run_indexing
 from .user_profile_store import UserProfileStore
 from .profile_indexer import run_profile_indexing
+from .artifact_summary_store import ArtifactSummaryStore
+from .artifact_summary_indexer import run_artifact_summary_indexing
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +86,7 @@ embedding_service: Optional[EmbeddingService] = None
 query_processor: Optional[QueryProcessor] = None
 profiler: Optional[WorkspaceProfiler] = None
 user_profile_store: Optional[UserProfileStore] = None
+artifact_summary_store: Optional[ArtifactSummaryStore] = None
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -112,7 +115,7 @@ app = create_app()
 
 @app.on_event("startup")
 async def startup_event():
-    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store
+    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store
     try:
         config = RetrievalConfig.from_env()
         vector_store = VectorStore(config)
@@ -134,6 +137,15 @@ async def startup_event():
         except Exception as e:
             logger.warning(f"User profile store not ready: {e}")
             user_profile_store = None
+
+        # Load artifact_summaries collection (non-fatal if not yet indexed)
+        try:
+            artifact_summary_store = ArtifactSummaryStore(config)
+            artifact_summary_store.create_collection(drop_if_exists=False)
+            artifact_summary_store._ensure_loaded()
+        except Exception as e:
+            logger.warning(f"Artifact summary store not ready: {e}")
+            artifact_summary_store = None
 
         # Pre-warm the catalog cache
         try:
@@ -482,6 +494,78 @@ async def sync_profiles():
     except Exception as e:
         logger.error(f"Profile sync failed: {e}")
         raise HTTPException(status_code=500, detail=f"Profile sync failed: {e}")
+
+
+@app.get("/artifact-summaries")
+async def get_artifact_summary(
+    workspace_id: str = Query(..., description="Workspace ID"),
+    artifact_id: str = Query(..., description="Artifact ID"),
+):
+    """Return summary for one artifact under a workspace."""
+    if not artifact_summary_store:
+        raise HTTPException(status_code=503, detail="Artifact summary store not initialized.")
+    try:
+        summary = artifact_summary_store.get_summary(workspace_id, artifact_id)
+        if not summary:
+            raise HTTPException(status_code=404, detail="Artifact summary not found")
+        return {
+            "data": {
+                "id": summary.get("id", ""),
+                "user_id": summary.get("user_id", ""),
+                "artifact_id": summary.get("artifact_id", ""),
+                "artifact_summary": summary.get("artifact_summary", ""),
+                "tags": [t.strip() for t in summary.get("tags", "").split(",") if t.strip()],
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get artifact summary for {workspace_id}/{artifact_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get artifact summary")
+
+
+@app.get("/artifact-summaries/workspace/{workspace_id}")
+async def list_artifact_summaries(workspace_id: str):
+    """Return all artifact summaries for a workspace."""
+    if not artifact_summary_store:
+        raise HTTPException(status_code=503, detail="Artifact summary store not initialized.")
+    try:
+        summaries = artifact_summary_store.get_workspace_summaries(workspace_id)
+        data = []
+        for s in summaries:
+            data.append({
+                "id": s.get("id", ""),
+                "user_id": s.get("user_id", ""),
+                "artifact_id": s.get("artifact_id", ""),
+                "artifact_summary": s.get("artifact_summary", ""),
+                "tags": [t.strip() for t in s.get("tags", "").split(",") if t.strip()],
+            })
+        return {"data": data, "total": len(data)}
+    except Exception as e:
+        logger.error(f"Failed to list artifact summaries for {workspace_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to list artifact summaries")
+
+
+@app.post("/admin/sync-artifact-summaries")
+async def sync_artifact_summaries(force_full: bool = False):
+    """Generate and index artifact summaries into Milvus."""
+    if not config:
+        raise HTTPException(status_code=503, detail="Service not initialized")
+    try:
+        import asyncio
+        loop = asyncio.get_event_loop()
+        mode = "full" if force_full else "incremental"
+        result = await loop.run_in_executor(
+            None,
+            lambda: run_artifact_summary_indexing(config.ingestion_catalog_path, mode),
+        )
+        global artifact_summary_store
+        artifact_summary_store = ArtifactSummaryStore(config)
+        artifact_summary_store.create_collection(drop_if_exists=False)
+        return {"status": "completed", "mode": mode, "summaries_indexed": result["inserted"]}
+    except Exception as e:
+        logger.error(f"Artifact summary sync failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Artifact summary sync failed: {e}")
 
 
 if __name__ == "__main__":

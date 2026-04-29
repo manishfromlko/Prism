@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useSearchParams } from 'next/navigation'
-import { useWorkspace, useWorkspaceProfile } from '@/hooks/use-api'
+import { useWorkspace, useWorkspaceProfile, useArtifactSummary } from '@/hooks/use-api'
 import { ProfileCard } from '@/components/workspace/ProfileCard'
 import { ToolChart } from '@/components/workspace/ToolChart'
 import { ArtifactList } from '@/components/workspace/ArtifactList'
@@ -15,6 +15,7 @@ export default function WorkspaceDetailPage() {
   const searchParams = useSearchParams()
   const workspaceId = typeof params?.id === 'string' ? params.id : ''
   const selectedFile = searchParams.get('file') || undefined
+  const selectedArtifactId = searchParams.get('artifact_id') || (selectedFile ? `${workspaceId}:${selectedFile}` : '')
 
   const { data: workspaceData, isLoading: workspaceLoading, error: workspaceError } = useWorkspace(workspaceId)
   const {
@@ -22,6 +23,11 @@ export default function WorkspaceDetailPage() {
     isLoading: profileLoading,
     error: profileError,
   } = useWorkspaceProfile(workspaceId)
+  const {
+    data: artifactSummaryData,
+    isLoading: artifactSummaryLoading,
+    error: artifactSummaryError,
+  } = useArtifactSummary(workspaceId, selectedArtifactId)
 
   const workspace = workspaceData?.data
   const profile = profileData?.data
@@ -89,6 +95,29 @@ export default function WorkspaceDetailPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">{selectedFile}</p>
+            <div className="mt-4 space-y-2">
+              <p className="text-sm font-medium">Artifact Summary</p>
+              {artifactSummaryLoading && (
+                <p className="text-sm text-muted-foreground">Loading summary...</p>
+              )}
+              {!artifactSummaryLoading && artifactSummaryData?.data && (
+                <>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {artifactSummaryData.data.artifact_summary}
+                  </p>
+                  {artifactSummaryData.data.tags?.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Tags: {artifactSummaryData.data.tags.join(', ')}
+                    </p>
+                  )}
+                </>
+              )}
+              {!artifactSummaryLoading && artifactSummaryError && (
+                <p className="text-sm text-muted-foreground">
+                  Summary unavailable for this artifact.
+                </p>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
