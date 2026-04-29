@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(git checkout *)",
+      "Bash(python3 -m src.retrieval.profile_indexer --catalog dataset/.ingestion/ingestion_catalog.json)"
+    ],
+    "additionalDirectories": [
+      "/Users/manish/mount/test/project-1/webapp/app/api/user-profiles"
     ]
   }
 }
