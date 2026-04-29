@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient, queryKeys } from '@/lib/api'
+import { apiClient, queryKeys, type UserProfile } from '@/lib/api'
 import type {
   Workspace,
   WorkspaceProfile,
@@ -117,6 +117,24 @@ export function useSearchWithDebounce(query: SearchQuery, debounceMs = 300) {
   }, [query, debounceMs])
 
   return useSearch(debouncedQuery, !!debouncedQuery.query)
+}
+
+// User profile hooks
+export function useUserProfiles() {
+  return useQuery({
+    queryKey: queryKeys.userProfiles,
+    queryFn: () => apiClient.getUserProfiles(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useUserProfile(userId: string) {
+  return useQuery({
+    queryKey: queryKeys.userProfile(userId),
+    queryFn: () => apiClient.getUserProfile(userId),
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+  })
 }
 
 // Error handling utilities
