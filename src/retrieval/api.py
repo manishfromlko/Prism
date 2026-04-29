@@ -116,6 +116,19 @@ async def startup_event():
         query_processor = QueryProcessor(config)
         profiler = WorkspaceProfiler(config, config.ingestion_catalog_path)
         vector_store.create_collection()
+
+        # Pre-load collection into Milvus memory so the first search is not slow
+        if vector_store.collection:
+            vector_store.collection.load()
+            vector_store._collection_loaded = True
+
+        # Pre-warm the catalog cache so workspace/profile endpoints are instant
+        profiler.loader.load_catalog()
+
+        # Warm up the embedding model — first encode() triggers JIT compilation;
+        # doing it here means the first user-facing search is not penalised.
+        logger.info("Warming up embedding model...")
+        embedding_service.generate_embedding("warmup")
         logger.info("API services initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize services: {e}")
@@ -307,9 +320,17 @@ async def query_documents(request: QueryRequest):
         start_time = time.time()
 
         if request.use_hybrid:
-            retriever = HybridRetriever(vector_store=vector_store, config=config)
+            retriever = HybridRetriever(
+                vector_store=vector_store,
+                config=config,
+                embedding_service=embedding_service,
+            )
         else:
-            retriever = VectorRetriever(vector_store=vector_store, config=config)
+            retriever = VectorRetriever(
+                vector_store=vector_store,
+                config=config,
+                embedding_service=embedding_service,
+            )
 
         documents = retriever._get_relevant_documents(
             request.query, run_manager=None, top_k=request.top_k

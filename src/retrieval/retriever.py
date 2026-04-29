@@ -3,6 +3,8 @@
 import logging
 from typing import Any, Dict, List, Optional
 
+from typing import Optional
+
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
@@ -19,6 +21,8 @@ class VectorRetriever(BaseRetriever):
 
     vector_store: VectorStore = Field(...)
     config: RetrievalConfig = Field(...)
+    # Accept a pre-loaded EmbeddingService so the model is not reloaded on every query.
+    embedding_service: Optional[Any] = Field(default=None)
 
     class Config:
         arbitrary_types_allowed = True
@@ -30,19 +34,9 @@ class VectorRetriever(BaseRetriever):
         run_manager: CallbackManagerForRetrieverRun,
         **kwargs
     ) -> List[Document]:
-        """Retrieve relevant documents for a query.
-
-        Args:
-            query: Search query
-            run_manager: Callback manager
-
-        Returns:
-            List of relevant documents
-        """
         try:
-            # Generate query embedding
             from .embeddings import EmbeddingService
-            embedder = EmbeddingService(self.config)
+            embedder = self.embedding_service or EmbeddingService(self.config)
             query_vector = embedder.generate_embedding(query)
 
             # Search vectors
@@ -76,6 +70,7 @@ class HybridRetriever(BaseRetriever):
 
     vector_store: VectorStore = Field(...)
     config: RetrievalConfig = Field(...)
+    embedding_service: Optional[Any] = Field(default=None)
     keyword_weight: float = Field(default=0.3)
     vector_weight: float = Field(default=0.7)
 
@@ -117,7 +112,11 @@ class HybridRetriever(BaseRetriever):
 
     def _vector_search(self, query: str, **kwargs) -> List[Document]:
         """Perform vector search."""
-        retriever = VectorRetriever(vector_store=self.vector_store, config=self.config)
+        retriever = VectorRetriever(
+            vector_store=self.vector_store,
+            config=self.config,
+            embedding_service=self.embedding_service,
+        )
         return retriever._get_relevant_documents(query, run_manager=None, **kwargs)
 
     def _keyword_search(self, query: str, **kwargs) -> List[Document]:

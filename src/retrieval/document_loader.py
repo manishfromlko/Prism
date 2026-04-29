@@ -27,12 +27,15 @@ class DocumentLoader:
         self.config = config or RetrievalConfig()
         self._catalog: Optional[Dict] = None
 
-    def load_catalog(self) -> Dict:
-        """Load the ingestion catalog from JSON file.
+    def load_catalog(self, force: bool = False) -> Dict:
+        """Load the ingestion catalog from JSON file. Cached after first load.
 
-        Returns:
-            Catalog dictionary
+        Args:
+            force: Re-read from disk even if already cached
         """
+        if self._catalog is not None and not force:
+            return self._catalog
+
         if not self.catalog_path.exists():
             raise FileNotFoundError(f"Catalog file not found: {self.catalog_path}")
 

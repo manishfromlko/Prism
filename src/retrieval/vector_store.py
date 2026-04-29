@@ -28,6 +28,7 @@ class VectorStore:
         """
         self.config = config
         self.collection: Optional[Collection] = None
+        self._collection_loaded = False
         self._connect()
 
     def _connect(self) -> None:
@@ -177,8 +178,10 @@ class VectorStore:
             raise RuntimeError("Collection not initialized")
 
         try:
-            # Load collection for search
-            self.collection.load()
+            # Load collection into memory only once per process lifetime
+            if not self._collection_loaded:
+                self.collection.load()
+                self._collection_loaded = True
 
             # Prepare search parameters
             search_params = {"metric_type": self.config.similarity_metric, "params": {"ef": 128}}
@@ -323,8 +326,9 @@ class VectorStore:
             raise RuntimeError("Collection not initialized")
 
         try:
-            # Load all data
-            self.collection.load()
+            if not self._collection_loaded:
+                self.collection.load()
+                self._collection_loaded = True
             results = self.collection.query(
                 expr="id >= 0",  # Get all
                 output_fields=["artifact_id", "vector", "content", "metadata"]
