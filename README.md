@@ -82,44 +82,41 @@ Wait ~10 seconds, then verify:
 docker logs milvus 2>&1 | tail -5
 ```
 
-### Step 5 — Populate the vector store
+### Step 5 — Index artifacts into Milvus
 
-Run once (or after re-ingestion). This loads documents from the catalog, generates 384-dim
-embeddings with `all-MiniLM-L6-v2`, and inserts them into Milvus:
+Run the indexer after every ingestion to keep the vector store in sync with the catalog.
+It is **safe to run multiple times** — incremental mode queries Milvus first and only inserts
+artifact IDs not already present, so there are no duplicate vectors.
 
 ```bash
-INGESTION_CATALOG_PATH=dataset/.ingestion/ingestion_catalog.json python -c "
-from src.retrieval.config import RetrievalConfig
-from src.retrieval.document_loader import DocumentLoader
-from src.retrieval.embeddings import EmbeddingService
-from src.retrieval.vector_store import VectorStore
-
-config = RetrievalConfig.from_env()
-
-store = VectorStore(config)
-store.create_collection()
-
-loader = DocumentLoader('dataset/.ingestion/ingestion_catalog.json', config)
-documents = loader.load_documents()
-
-embedder = EmbeddingService(config)
-texts = [doc.page_content for doc in documents]
-embeddings = embedder.generate_embeddings(texts)
-
-artifact_ids = [doc.metadata.get('artifact_id', '') for doc in documents]
-contents = [doc.page_content[:5000] for doc in documents]
-metadatas = [doc.metadata for doc in documents]
-
-store.insert_vectors(artifact_ids, embeddings, contents, metadatas)
-print(f'Inserted {len(documents)} vectors into Milvus')
-"
+# First run (or after adding new workspaces to the catalog):
+python -m src.retrieval.indexer \
+  --catalog dataset/.ingestion/ingestion_catalog.json \
+  --mode incremental
 ```
 
 Expected output:
 ```
-Loaded 301 documents from 178 artifacts
-Applied guardrails: 298/301 documents retained
-Inserted 298 vectors into Milvus
+Already indexed: 0 artifacts
+Catalog contains 298 indexable documents
+To index: 298 new | skipping: 0 already present
+Generating embeddings for 298 documents...
+Inserting vectors into Milvus...
+Done — inserted: 298, skipped: 0, total: 298
+```
+
+Running it again (nothing changed):
+```
+Already indexed: 298 artifacts
+To index: 0 new | skipping: 298 already present
+Done — inserted: 0, skipped: 298, total: 298
+```
+
+To fully rebuild the index from scratch (e.g., after changing the embedding model):
+```bash
+python -m src.retrieval.indexer \
+  --catalog dataset/.ingestion/ingestion_catalog.json \
+  --mode full
 ```
 
 ### Step 6 — Start the retrieval API
@@ -202,7 +199,7 @@ never needs a direct connection to the Python backend.
 | `GET` | `/workspaces/{id}` | Get a single workspace by ID |
 | `POST` | `/query` | Semantic search across workspace artifacts |
 | `GET` | `/profile/workspace/{id}` | AI-powered workspace insights |
-| `POST` | `/admin/sync` | Trigger re-sync with ingestion catalog |
+| `POST` | `/admin/sync` | Re-index catalog into Milvus (`force_full: true` to rebuild) |
 | `GET` | `/docs` | Interactive OpenAPI documentation |
 
 ### Search request body
@@ -288,6 +285,7 @@ project-1/
 │       ├── document_loader.py       # Catalog → LangChain Documents
 │       ├── document_guard.py        # Document-level content filtering
 │       ├── retriever.py             # VectorRetriever + HybridRetriever
+│       ├── indexer.py               # CLI: embed catalog artifacts → insert into Milvus
 │       ├── text_processor.py        # Text chunking
 │       └── profiling.py             # WorkspaceProfiler
 ├── webapp/                          # Phase 3: Next.js frontend

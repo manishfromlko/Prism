@@ -14,6 +14,7 @@ from .retriever import VectorRetriever, HybridRetriever, QueryProcessor
 from .vector_store import VectorStore
 from .embeddings import EmbeddingService
 from .profiling import WorkspaceProfiler
+from .indexer import run_indexing
 
 logger = logging.getLogger(__name__)
 
@@ -366,12 +367,36 @@ async def query_documents(request: QueryRequest):
 
 @app.post("/admin/sync", response_model=SyncResponse)
 async def sync_data(request: SyncRequest):
-    """Synchronize with latest ingestion catalog."""
+    """Re-index the ingestion catalog into Milvus (incremental or full)."""
+    if not config:
+        raise HTTPException(status_code=503, detail="Service not initialized")
     try:
-        return SyncResponse(sync_id="sync_001", status="completed", processed_count=0, errors=[])
+        import uuid
+        from concurrent.futures import ThreadPoolExecutor
+        import asyncio
+
+        mode = "full" if request.force_full else "incremental"
+        loop = asyncio.get_event_loop()
+
+        # Run the CPU/IO-bound indexing in a thread so the event loop isn't blocked
+        result = await loop.run_in_executor(
+            None,
+            lambda: run_indexing(config.ingestion_catalog_path, mode),
+        )
+
+        # Reload the catalog cache after sync
+        if profiler:
+            profiler.loader.load_catalog(force=True)
+
+        return SyncResponse(
+            sync_id=str(uuid.uuid4()),
+            status="completed",
+            processed_count=result["inserted"],
+            errors=[],
+        )
     except Exception as e:
         logger.error(f"Sync failed: {e}")
-        raise HTTPException(status_code=500, detail="Sync operation failed")
+        raise HTTPException(status_code=500, detail=f"Sync operation failed: {e}")
 
 if __name__ == "__main__":
     import uvicorn
