@@ -4,9 +4,15 @@ Chatbot engine — orchestrates: classify → rewrite → retrieve → generate 
 classify   →  IntentClassifier
 rewrite    →  QueryRewriter
 retrieve   →  DocRetriever | ArtifactRetriever | UserRetriever (or all for HYBRID)
-resolve    →  UserNameResolver  (partial-name disambiguation via LLM + full roster)
+resolve    →  UserNameResolver  (name disambiguation before any vector search)
 generate   →  OpenAI chat completion with per-intent prompt template
 format     →  formatter.format_response
+
+USER_SEARCH flow:
+  1. String-match + RapidFuzz against full user roster (no vector search)
+  2. Single high-confidence hit → fetch raw profile from Milvus, return (no LLM)
+  3. Multiple/ambiguous → LLM disambiguation (no vector search)
+  4. Zero hits → fall through to vector retrieval (semantic query like "who works on NLP?")
 """
 
 import logging
@@ -30,7 +36,7 @@ from .prompts import (
 )
 from .query_rewriter import QueryRewriter
 from .retrievers import ArtifactRetriever, DocRetriever, UserRetriever
-from .user_resolver import UserNameResolver
+from .user_resolver import UserNameResolver, retrieve_candidates
 
 logger = logging.getLogger(__name__)
 
@@ -42,29 +48,6 @@ _OUT_OF_SCOPE_REPLY = (
     "• **People search** — finding colleagues by expertise or what they're working on\n\n"
     "Try asking something like: *\"How do I submit a Spark job?\"* or *\"Who works on NLP?\"*"
 )
-
-
-def _find_exact_user_hit(query: str, user_hits: List[Dict]) -> Optional[Dict]:
-    """Return the hit whose user_id appears verbatim in the query, or None."""
-    query_lower = query.lower()
-    for hit in user_hits:
-        user_id = hit.get("user_id", "")
-        if user_id and user_id.lower() in query_lower:
-            return hit
-    return None
-
-
-def _is_partial_name_query(query: str, user_hits: List[Dict]) -> bool:
-    """
-    Return True when no exact user_id appears in the query — meaning the user
-    typed a first name, last name, or fragment rather than a full username.
-    """
-    query_lower = query.lower()
-    for hit in user_hits:
-        user_id = hit.get("user_id", "")
-        if user_id and user_id.lower() in query_lower:
-            return False
-    return True
 
 
 class ChatEngine:
@@ -93,6 +76,7 @@ class ChatEngine:
             raise RuntimeError("OPENAI_API_KEY not set")
         self.client = OpenAI(api_key=api_key)
 
+        self.user_store = user_store
         self.classifier = IntentClassifier(model=llm_model)
         self.rewriter = QueryRewriter(model=llm_model)
         self.doc_retriever = DocRetriever(doc_store, embedding_service)
@@ -125,7 +109,33 @@ class ChatEngine:
         # 3. Rewrite query for better embedding recall
         search_query = self.rewriter.rewrite(query)
 
-        # 4. Route & retrieve (deterministic — sources never mixed unless HYBRID)
+        # 4. USER_SEARCH: name resolution first, vector retrieval only as fallback
+        if intent == "USER_SEARCH":
+            all_ids = self.user_store.get_all_user_ids()
+            name_candidates = retrieve_candidates(query, all_ids)
+
+            if name_candidates:
+                # Name lookup path — resolve, then fetch from Milvus if exact
+                resolved = self.user_resolver.resolve(query, candidates=name_candidates)
+                if resolved.get("exact_uid"):
+                    uid = resolved["exact_uid"]
+                    profile = self.user_store.get_profile(uid)
+                    if profile:
+                        return format_response(
+                            answer=f"**{uid}**\n\n{profile['user_profile']}",
+                            intent="USER_SEARCH",
+                            confidence=1.0,
+                            raw_users=[profile],
+                            exact_match=True,
+                        )
+                return format_response(
+                    answer=resolved["answer"],
+                    intent="USER_SEARCH",
+                    confidence=0.5,
+                )
+            # No name match — fall through to semantic vector search below
+
+        # 5. Route & retrieve for non-name-lookup paths
         doc_hits: List[Dict] = []
         artifact_hits: List[Dict] = []
         user_hits: List[Dict] = []
@@ -135,34 +145,12 @@ class ChatEngine:
         elif intent == "ARTIFACT_SEARCH":
             artifact_hits = self.artifact_retriever.retrieve(search_query, top_k=5)
         elif intent == "USER_SEARCH":
+            # Semantic query: "who works on NLP?" — no name tokens matched
             user_hits = self.user_retriever.retrieve(search_query, top_k=5)
         elif intent == "HYBRID":
             doc_hits = self.doc_retriever.retrieve(search_query, top_k=3)
             artifact_hits = self.artifact_retriever.retrieve(search_query, top_k=3)
             user_hits = self.user_retriever.retrieve(search_query, top_k=3)
-
-        # 5a. Exact match — return raw user_profile from Milvus, no LLM rephrasing
-        if intent == "USER_SEARCH":
-            exact_hit = _find_exact_user_hit(query, user_hits)
-            if exact_hit:
-                profile_text = exact_hit.get("user_profile", "No profile available.")
-                return format_response(
-                    answer=f"**{exact_hit['user_id']}**\n\n{profile_text}",
-                    intent="USER_SEARCH",
-                    confidence=1.0,
-                    raw_users=[exact_hit],
-                    exact_match=True,
-                )
-
-        # 5b. Partial name — use LLM name resolver against the full user roster
-        #     (avoids returning topically-similar users via vector similarity)
-        if intent == "USER_SEARCH" and _is_partial_name_query(query, user_hits):
-            resolved = self.user_resolver.resolve(query)
-            return format_response(
-                answer=resolved["answer"],
-                intent="USER_SEARCH",
-                confidence=0.5,
-            )
 
         # 6. Build prompt
         if intent == "DOC_QA":

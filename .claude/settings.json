@@ -4,7 +4,8 @@
       "Bash(python3 -c ' *)",
       "Bash(git checkout *)",
       "Bash(python3 -m src.retrieval.profile_indexer --catalog dataset/.ingestion/ingestion_catalog.json)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(uv run *)"
     ],
     "additionalDirectories": [
       "/Users/manish/mount/test/project-1/webapp/app/api/user-profiles"
