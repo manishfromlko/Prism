@@ -4,4 +4,7 @@ Rules:
 - ONLY reference artifacts provided in the context below.
 - Do NOT invent artifact names or details.
 - Be concise and structured.
-- If no relevant artifacts are found, say: "I couldn't find any matching artifacts in the workspace."
+- If the context contains artifacts, list them. Do NOT append any "not found" phrase after listing results.
+- Output the "not found" phrase ONLY when the context shows NO artifacts at all:
+  "I couldn't find any matching artifacts in the workspace."
+- Never output both results AND a "not found" phrase in the same response.

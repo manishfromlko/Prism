@@ -94,6 +94,22 @@ class UserProfileStore:
             logger.error(f"Failed to query all profiles: {e}")
             return []
 
+    def get_all_user_ids(self) -> List[str]:
+        """Return a flat list of every user_id in the collection."""
+        if not self.collection:
+            return []
+        try:
+            self._ensure_loaded()
+            rows = self.collection.query(
+                expr='user_id != ""',
+                output_fields=["user_id"],
+                limit=1000,
+            )
+            return [r["user_id"] for r in rows if r.get("user_id")]
+        except Exception as e:
+            logger.error(f"Failed to list user_ids: {e}")
+            return []
+
     def get_profile(self, user_id: str) -> Optional[Dict]:
         if not self.collection:
             return None

@@ -1,4 +1,4 @@
-"""Intent classifier: maps user query → DOC_QA | ARTIFACT_SEARCH | USER_SEARCH | HYBRID."""
+"""Intent classifier: maps user query → DOC_QA | ARTIFACT_SEARCH | USER_SEARCH | HYBRID | OUT_OF_SCOPE."""
 
 import json
 import logging
@@ -11,7 +11,7 @@ from .prompt_loader import load_prompt
 
 logger = logging.getLogger(__name__)
 
-INTENTS = {"DOC_QA", "ARTIFACT_SEARCH", "USER_SEARCH", "HYBRID"}
+INTENTS = {"DOC_QA", "ARTIFACT_SEARCH", "USER_SEARCH", "HYBRID", "OUT_OF_SCOPE"}
 
 
 class IntentClassifier:
