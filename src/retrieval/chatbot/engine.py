@@ -1,11 +1,12 @@
 """
 Chatbot engine — orchestrates: classify → rewrite → retrieve → generate → format.
 
-classify  →  IntentClassifier
-rewrite   →  QueryRewriter
-retrieve  →  DocRetriever | ArtifactRetriever | UserRetriever (or all for HYBRID)
-generate  →  OpenAI chat completion with per-intent prompt template
-format    →  formatter.format_response
+classify   →  IntentClassifier
+rewrite    →  QueryRewriter
+retrieve   →  DocRetriever | ArtifactRetriever | UserRetriever (or all for HYBRID)
+resolve    →  UserNameResolver  (partial-name disambiguation via LLM + full roster)
+generate   →  OpenAI chat completion with per-intent prompt template
+format     →  formatter.format_response
 """
 
 import logging
@@ -29,6 +30,7 @@ from .prompts import (
 )
 from .query_rewriter import QueryRewriter
 from .retrievers import ArtifactRetriever, DocRetriever, UserRetriever
+from .user_resolver import UserNameResolver
 
 logger = logging.getLogger(__name__)
 
@@ -52,38 +54,17 @@ def _find_exact_user_hit(query: str, user_hits: List[Dict]) -> Optional[Dict]:
     return None
 
 
-def _needs_user_clarification(query: str, user_hits: List[Dict]) -> bool:
+def _is_partial_name_query(query: str, user_hits: List[Dict]) -> bool:
     """
-    Return True when the query references a person by partial name only
-    (i.e. no exact user_id from the results appears verbatim in the query).
-
-    This triggers a disambiguation step instead of a direct answer.
+    Return True when no exact user_id appears in the query — meaning the user
+    typed a first name, last name, or fragment rather than a full username.
     """
-    if not user_hits:
-        return False
     query_lower = query.lower()
     for hit in user_hits:
         user_id = hit.get("user_id", "")
         if user_id and user_id.lower() in query_lower:
-            return False  # exact user_id found in the query — no ambiguity
+            return False
     return True
-
-
-def _build_clarification_response(user_hits: List[Dict], query: str) -> Dict:
-    """Return a clarification message listing matched users for the user to confirm."""
-    lines = ["I found the following users that might match your query. Could you confirm which one you meant?\n"]
-    for hit in user_hits[:5]:
-        user_id = hit.get("user_id", "unknown")
-        tags = [t.strip() for t in hit.get("tags", "").split(",") if t.strip()]
-        tag_str = ", ".join(tags[:4]) if tags else "—"
-        lines.append(f"• **{user_id}** — {tag_str}")
-    lines.append("\nReply with the exact username (e.g. `ravi.verma`) and I'll fetch the details.")
-    return format_response(
-        answer="\n".join(lines),
-        intent="USER_SEARCH",
-        confidence=0.5,
-        raw_users=user_hits,
-    )
 
 
 class ChatEngine:
@@ -117,6 +98,7 @@ class ChatEngine:
         self.doc_retriever = DocRetriever(doc_store, embedding_service)
         self.artifact_retriever = ArtifactRetriever(artifact_store, embedding_service)
         self.user_retriever = UserRetriever(user_store, embedding_service)
+        self.user_resolver = UserNameResolver(user_store, model=llm_model)
 
     def chat(self, query: str, history: Optional[List[Dict]] = None) -> Dict:
         """
@@ -132,7 +114,7 @@ class ChatEngine:
         confidence = classification["confidence"]
         logger.info(f"Intent: {intent} ({confidence:.2f}) — '{query}'")
 
-        # 2. Short-circuit out-of-scope queries — no retrieval or LLM generation needed
+        # 2. Short-circuit out-of-scope queries
         if intent == "OUT_OF_SCOPE":
             return format_response(
                 answer=_OUT_OF_SCOPE_REPLY,
@@ -172,9 +154,15 @@ class ChatEngine:
                     exact_match=True,
                 )
 
-        # 5b. Disambiguation: if USER_SEARCH used a partial name, ask which user
-        if intent == "USER_SEARCH" and _needs_user_clarification(query, user_hits):
-            return _build_clarification_response(user_hits, query)
+        # 5b. Partial name — use LLM name resolver against the full user roster
+        #     (avoids returning topically-similar users via vector similarity)
+        if intent == "USER_SEARCH" and _is_partial_name_query(query, user_hits):
+            resolved = self.user_resolver.resolve(query)
+            return format_response(
+                answer=resolved["answer"],
+                intent="USER_SEARCH",
+                confidence=0.5,
+            )
 
         # 6. Build prompt
         if intent == "DOC_QA":
