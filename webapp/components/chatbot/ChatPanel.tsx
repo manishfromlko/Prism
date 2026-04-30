@@ -63,6 +63,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
         content: data.answer,
         intent: data.intent,
         confidence: data.confidence,
+        exact_match: data.exact_match ?? false,
         artifacts: data.artifacts,
         users: data.users,
         sources: data.sources,

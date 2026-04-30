@@ -649,6 +649,7 @@ class ChatResponse(BaseModel):
     answer: str
     intent: str
     confidence: float
+    exact_match: bool = False
     artifacts: List[ArtifactResult] = Field(default_factory=list)
     users: List[UserResult] = Field(default_factory=list)
     sources: List[SourceResult] = Field(default_factory=list)
@@ -671,6 +672,7 @@ async def chat(request: ChatRequest):
             answer=result["answer"],
             intent=result["intent"],
             confidence=result["confidence"],
+            exact_match=result.get("exact_match", False),
             artifacts=[ArtifactResult(**a) for a in result.get("artifacts", [])],
             users=[UserResult(**u) for u in result.get("users", [])],
             sources=[SourceResult(**s) for s in result.get("sources", [])],

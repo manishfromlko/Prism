@@ -1,6 +1,8 @@
 'use client'
 
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { MarkdownText } from './MarkdownText'
 
 export interface ArtifactResult {
   title: string
@@ -24,6 +26,7 @@ export interface ChatMessageData {
   content: string
   intent?: string
   confidence?: number
+  exact_match?: boolean
   artifacts?: ArtifactResult[]
   users?: UserResult[]
   sources?: SourceResult[]
@@ -54,13 +57,13 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
     <div className={cn('flex flex-col gap-1', isUser ? 'items-end' : 'items-start')}>
       <div
         className={cn(
-          'max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap',
+          'max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
           isUser
             ? 'bg-primary text-primary-foreground rounded-br-sm'
             : 'bg-muted text-foreground rounded-bl-sm'
         )}
       >
-        {message.isLoading ? <LoadingDots /> : message.content}
+        {message.isLoading ? <LoadingDots /> : <MarkdownText text={message.content} />}
       </div>
 
       {/* Intent badge */}
@@ -97,15 +100,24 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
         </div>
       )}
 
-      {/* Users */}
+      {/* Users — badges only on exact match */}
       {!isUser && message.users && message.users.length > 0 && (
         <div className="w-full max-w-[85%] rounded-xl border bg-card p-3 text-xs space-y-2">
           <p className="font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">
             People
           </p>
           {message.users.map((u, i) => (
-            <div key={i}>
+            <div key={i} className="space-y-1">
               <p className="font-medium">{u.name}</p>
+              {message.exact_match && u.skills.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {u.skills.map((s) => (
+                    <Badge key={s} variant="secondary" className="text-[10px] px-1.5 py-0">
+                      {s}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

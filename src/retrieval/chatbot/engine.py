@@ -169,6 +169,7 @@ class ChatEngine:
                     intent="USER_SEARCH",
                     confidence=1.0,
                     raw_users=[exact_hit],
+                    exact_match=True,
                 )
 
         # 5b. Disambiguation: if USER_SEARCH used a partial name, ask which user
