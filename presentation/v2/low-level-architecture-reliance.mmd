@@ -1,0 +1,70 @@
+flowchart TD
+    classDef exp fill:#0B1F5F,color:#FFFFFF,stroke:#0B1F5F,stroke-width:2px;
+    classDef app fill:#1F4EAA,color:#FFFFFF,stroke:#1F4EAA,stroke-width:2px;
+    classDef ai fill:#00A3E0,color:#FFFFFF,stroke:#0077A6,stroke-width:2px;
+    classDef data fill:#EAF1FF,color:#0B1F5F,stroke:#1F4EAA,stroke-width:1.5px;
+
+    subgraph Frontend["Frontend (Next.js BFF Pattern)"]
+      PAGES[App Router Pages]:::exp
+      COMP[Component Layer]:::app
+      HOOKS[React Query Hooks]:::app
+      CLIENT[API Client]:::app
+      ROUTES[app/api Route Handlers]:::app
+      PAGES --> COMP --> HOOKS --> CLIENT --> ROUTES
+    end
+
+    subgraph Backend["Backend (FastAPI Orchestration)"]
+      API[api.py]:::exp
+      CFG[RetrievalConfig]:::app
+      RET[Retriever Layer]:::app
+      PROF[WorkspaceProfiler]:::app
+      CHAT[ChatEngine]:::ai
+      CLS[IntentClassifier]:::ai
+      REW[QueryRewriter]:::ai
+      R_DOC[DocRetriever]:::app
+      R_ART[ArtifactRetriever]:::app
+      R_USR[UserRetriever]:::app
+      FMT[Formatter]:::app
+      API --> CFG
+      API --> RET
+      API --> PROF
+      API --> CHAT
+      CHAT --> CLS --> REW
+      REW --> R_DOC
+      REW --> R_ART
+      REW --> R_USR
+      R_DOC --> FMT
+      R_ART --> FMT
+      R_USR --> FMT
+    end
+
+    subgraph DataPlane["Data & Model Plane"]
+      CAT[Ingestion Catalog]:::data
+      VS[(kubeflow_artifacts)]:::data
+      AS[(artifact_summaries)]:::data
+      US[(user_profiles)]:::data
+      PD[(platform_docs)]:::data
+      OAI[OpenAI APIs]:::ai
+    end
+
+    ROUTES --> API
+    API --> CAT
+    RET --> VS
+    CHAT --> AS
+    CHAT --> US
+    CHAT --> PD
+    RET --> OAI
+    CHAT --> OAI
+
+    subgraph Pipelines["Offline Pipelines"]
+      ING[IngestionPipeline]:::app
+      IDX[Indexer]:::app
+      ASI[ArtifactSummaryIndexer]:::app
+      PSI[ProfileFromSummariesIndexer]:::app
+      DING[DocIngestion]:::app
+      ING --> CAT
+      CAT --> IDX --> VS
+      CAT --> ASI --> AS
+      AS --> PSI --> US
+      DING --> PD
+    end

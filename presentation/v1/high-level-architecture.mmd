@@ -1,0 +1,27 @@
+flowchart LR
+    U[Users<br/>AI Engineers / Analysts] --> W[Next.js Webapp<br/>App Router + React Query]
+    W --> BFF[Next.js API Proxy Layer<br/>webapp/app/api/*]
+    BFF --> API[FastAPI Retrieval API<br/>src/retrieval/api.py]
+
+    API --> ING[Ingestion Catalog<br/>dataset/.ingestion/ingestion_catalog.json]
+    API --> MILVUS[(Milvus Vector DB)]
+    API --> OPENAI[OpenAI APIs<br/>Embeddings + LLM]
+    API --> PROMPTS[Prompt Templates<br/>prompts/*]
+
+    DS[(Workspace Data<br/>dataset/*)] --> PIPE[Ingestion Pipeline<br/>src/ingestion/*]
+    PIPE --> ING
+
+    ING --> IDX[Indexer<br/>src/retrieval/indexer.py]
+    IDX --> MILVUS
+    IDX --> OPENAI
+
+    DOCS[(Platform Docs<br/>platform_documents/*.docx)] --> DOCING[Doc Ingestion<br/>chatbot/doc_ingestion.py]
+    DOCING --> MILVUS
+    DOCING --> OPENAI
+
+    SUM[Artifact Summary Indexer] --> MILVUS
+    SUM --> OPENAI
+    PROF[Profile Indexer from Summaries] --> MILVUS
+    PROF --> OPENAI
+
+    AIR[Airflow DAG<br/>airflow/dags/ingestion_dag.py] --> PIPE

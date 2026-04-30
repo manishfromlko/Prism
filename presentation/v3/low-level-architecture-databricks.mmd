@@ -1,0 +1,53 @@
+flowchart TD
+    classDef app fill:#1F4EAA,color:#FFFFFF,stroke:#0B1F5F,stroke-width:2px;
+    classDef data fill:#EAF1FF,color:#0B1F5F,stroke:#1F4EAA,stroke-width:1.5px;
+    classDef ai fill:#00A3E0,color:#FFFFFF,stroke:#0077A6,stroke-width:1.5px;
+    classDef sec fill:#5B2C83,color:#FFFFFF,stroke:#3E1F5A,stroke-width:1.5px;
+
+    subgraph EXPERIENCE["Experience Layer"]
+      UI[Next.js UI]:::app
+      BFF[Server-side API Routes]:::app
+      UI --> BFF
+    end
+
+    subgraph APP["Application Orchestration Layer"]
+      ORCH[Query Orchestrator API]:::app
+      AUTH[AuthZ Filter<br/>workspace/team ACL]:::sec
+      ROUTER[Intent Router<br/>DOC_QA/ARTIFACT/USER/HYBRID]:::ai
+      REWRITE[Query Rewriter]:::ai
+      RESP[Response Formatter + Citations]:::app
+      BFF --> ORCH --> AUTH --> ROUTER --> REWRITE
+      REWRITE --> RESP
+    end
+
+    subgraph DBX["Databricks Services Layer"]
+      MVS[(Mosaic Vector Search Indexes)]:::data
+      DLT[(Delta Lake Tables)]:::data
+      SERVE[Databricks Model Serving]:::ai
+      WF[Databricks Workflows Jobs]:::app
+      UC[Unity Catalog + Lineage]:::sec
+      WF --> DLT
+      DLT --> MVS
+      UC --> DLT
+      UC --> MVS
+    end
+
+    subgraph PIPE["Pipelines"]
+      CRAWL[Metadata Crawler Job<br/>Workspace/Repos/Jobs APIs]:::app
+      CHUNK[Chunk + Embed Job]:::ai
+      SUM[Artifact Summary Job]:::ai
+      PROF[User Profile Job]:::ai
+      DOC[Docs Ingestion Job]:::app
+      CRAWL --> DLT
+      CHUNK --> MVS
+      SUM --> DLT
+      SUM --> MVS
+      PROF --> DLT
+      PROF --> MVS
+      DOC --> DLT
+      DOC --> MVS
+    end
+
+    ROUTER --> MVS
+    ROUTER --> SERVE
+    RESP --> UI

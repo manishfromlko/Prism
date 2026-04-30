@@ -1,0 +1,65 @@
+flowchart TD
+    subgraph Frontend["Frontend (webapp/)"]
+      PAGES[App Router Pages<br/>dashboard/search/workspaces/analytics]
+      COMP[UI Components<br/>layout/chat/search/workspace]
+      HOOKS[Hooks<br/>hooks/use-api.ts]
+      CLIENT[API Client<br/>lib/api.ts]
+      ROUTES[API Route Handlers<br/>app/api/**/route.ts]
+      PAGES --> COMP --> HOOKS --> CLIENT --> ROUTES
+    end
+
+    subgraph Backend["Backend (src/retrieval/)"]
+      API[FastAPI app<br/>api.py]
+      CFG[RetrievalConfig]
+      RET[Retriever Layer<br/>VectorRetriever/HybridRetriever]
+      PROF[WorkspaceProfiler]
+      CHAT[ChatEngine]
+      CLS[IntentClassifier]
+      REW[QueryRewriter]
+      R_DOC[DocRetriever]
+      R_ART[ArtifactRetriever]
+      R_USR[UserRetriever]
+      FMT[Response Formatter]
+      API --> CFG
+      API --> RET
+      API --> PROF
+      API --> CHAT
+      CHAT --> CLS --> REW
+      REW --> R_DOC
+      REW --> R_ART
+      REW --> R_USR
+      R_DOC --> FMT
+      R_ART --> FMT
+      R_USR --> FMT
+    end
+
+    subgraph DataPlane["Data & Model Plane"]
+      CAT[Ingestion Catalog JSON]
+      VS[(Milvus: kubeflow_artifacts)]
+      AS[(Milvus: artifact_summaries)]
+      US[(Milvus: user_profiles)]
+      PD[(Milvus: platform_docs)]
+      OAI[OpenAI Embeddings + Chat]
+    end
+
+    ROUTES --> API
+    API --> CAT
+    RET --> VS
+    CHAT --> AS
+    CHAT --> US
+    CHAT --> PD
+    RET --> OAI
+    CHAT --> OAI
+
+    subgraph OfflinePipelines["Offline/Batch Pipelines"]
+      ING[IngestionPipeline]
+      IDX[Indexer]
+      ASI[ArtifactSummaryIndexer]
+      PSI[ProfileFromSummariesIndexer]
+      DING[DocIngestion]
+      ING --> CAT
+      CAT --> IDX --> VS
+      CAT --> ASI --> AS
+      AS --> PSI --> US
+      DING --> PD
+    end

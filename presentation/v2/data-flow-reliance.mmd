@@ -1,0 +1,36 @@
+flowchart TD
+    classDef step fill:#1F4EAA,color:#FFFFFF,stroke:#0B1F5F,stroke-width:1.5px;
+    classDef store fill:#EAF1FF,color:#0B1F5F,stroke:#1F4EAA,stroke-width:1.5px;
+    classDef ai fill:#00A3E0,color:#FFFFFF,stroke:#0077A6,stroke-width:1.5px;
+
+    A1[1. Workspace Data]:::store --> A2[2. Ingestion Pipeline]:::step
+    A2 --> A3[3. Guardrails + Metadata Extraction]:::step
+    A3 --> A4[4. Catalog + Audit Persisted]:::store
+
+    A4 --> B1[5. Artifact Indexer]:::step
+    B1 --> B2[6. Chunking + Loader]:::step
+    B2 --> B3[7. Embedding Generation]:::ai
+    B3 --> B4[8. Milvus kubeflow_artifacts]:::store
+
+    A4 --> C1[9. Summary Indexer]:::step
+    C1 --> C2[10. LLM Summarization + Tagging]:::ai
+    C2 --> C3[11. Milvus artifact_summaries]:::store
+
+    C3 --> D1[12. Profile Indexer]:::step
+    D1 --> D2[13. LLM User Profiling]:::ai
+    D2 --> D3[14. Milvus user_profiles]:::store
+
+    E1[15. Platform Docs]:::store --> E2[16. Doc Parsing + Chunking]:::step
+    E2 --> E3[17. Embedding Generation]:::ai
+    E3 --> E4[18. Milvus platform_docs]:::store
+
+    F1[19. User Query from UI]:::step --> F2[20. Next.js API Proxy]:::step
+    F2 --> F3[21. FastAPI Endpoint]:::step
+    F3 --> F4[22. Classify + Rewrite]:::ai
+    F4 --> F5[23. Intent-Based Retrieval]:::step
+    F5 --> C3
+    F5 --> D3
+    F5 --> E4
+    F5 --> G1[24. LLM Answer Generation]:::ai
+    G1 --> F6[25. Structured Response + Citations]:::step
+    F6 --> F7[26. UI Rendering]:::step

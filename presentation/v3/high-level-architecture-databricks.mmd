@@ -1,0 +1,38 @@
+flowchart LR
+    classDef app fill:#1F4EAA,color:#FFFFFF,stroke:#0B1F5F,stroke-width:2px;
+    classDef data fill:#EAF1FF,color:#0B1F5F,stroke:#1F4EAA,stroke-width:1.5px;
+    classDef ai fill:#00A3E0,color:#FFFFFF,stroke:#0077A6,stroke-width:1.5px;
+    classDef sec fill:#5B2C83,color:#FFFFFF,stroke:#3E1F5A,stroke-width:1.5px;
+
+    U[Enterprise Users]:::app --> WEB[Web App<br/>Azure App Service]:::app
+    WEB --> API[Orchestration API<br/>AKS/App Service]:::app
+    API --> DBX[Azure Databricks]:::app
+
+    subgraph DBXPLANE["Databricks Intelligence Plane"]
+      WF[Databricks Workflows]:::app
+      DELTA[(Delta Tables<br/>artifact/profile/doc marts)]:::data
+      VS[(Mosaic AI Vector Search)]:::data
+      SERVE[Model Serving Endpoints]:::ai
+      UC[Unity Catalog Governance]:::sec
+      WF --> DELTA
+      DELTA --> VS
+      API --> SERVE
+      API --> VS
+      UC --> DELTA
+      UC --> VS
+    end
+
+    subgraph SOURCES["Enterprise Sources"]
+      WS[Databricks Workspaces<br/>Notebooks + Files]:::data
+      REPO[Repos/Git Projects]:::data
+      JOBS[Jobs Metadata + Run History]:::data
+      DOCS[Platform Documentation]:::data
+      WS --> WF
+      REPO --> WF
+      JOBS --> WF
+      DOCS --> WF
+    end
+
+    AAD[Microsoft Entra ID]:::sec --> WEB
+    AAD --> API
+    KV[Azure Key Vault]:::sec --> API

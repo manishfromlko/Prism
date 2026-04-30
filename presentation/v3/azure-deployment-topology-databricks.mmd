@@ -1,0 +1,33 @@
+flowchart LR
+    classDef edge fill:#0B1F5F,color:#FFFFFF,stroke:#0B1F5F,stroke-width:2px;
+    classDef app fill:#1F4EAA,color:#FFFFFF,stroke:#0B1F5F,stroke-width:1.5px;
+    classDef data fill:#EAF1FF,color:#0B1F5F,stroke:#1F4EAA,stroke-width:1.5px;
+    classDef sec fill:#5B2C83,color:#FFFFFF,stroke:#3E1F5A,stroke-width:1.5px;
+
+    USERS[Enterprise Users]:::edge --> FD[Azure Front Door + WAF]:::edge
+    FD --> WEB[Next.js Web App<br/>Azure App Service]:::app
+    FD --> API[Orchestrator API<br/>AKS or App Service]:::app
+
+    AAD[Microsoft Entra ID]:::sec --> WEB
+    AAD --> API
+    KV[Azure Key Vault]:::sec --> API
+    MON[Azure Monitor + App Insights]:::sec --> API
+    MON --> WEB
+
+    subgraph VNET["Hub-Spoke VNet (Private Access)"]
+      PE_DBX[Private Endpoint<br/>Azure Databricks]:::sec
+      PE_AOAI[Private Endpoint<br/>Azure OpenAI]:::sec
+      PE_ST[Private Endpoint<br/>ADLS/Storage]:::sec
+    end
+
+    API --> PE_DBX
+    API --> PE_AOAI
+    API --> PE_ST
+
+    PE_DBX --> DBXWS[Databricks Workspace]:::app
+    DBXWS --> WF[Databricks Workflows]:::app
+    DBXWS --> SERVE[Model Serving Endpoints]:::app
+    DBXWS --> VS[(Mosaic Vector Search)]:::data
+    DBXWS --> UC[(Unity Catalog + Delta Tables)]:::data
+
+    UC --> ADLS[(Azure Data Lake Gen2)]:::data

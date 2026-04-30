@@ -1,0 +1,34 @@
+flowchart TD
+    classDef step fill:#1F4EAA,color:#FFFFFF,stroke:#0B1F5F,stroke-width:1.5px;
+    classDef store fill:#EAF1FF,color:#0B1F5F,stroke:#1F4EAA,stroke-width:1.5px;
+    classDef ai fill:#00A3E0,color:#FFFFFF,stroke:#0077A6,stroke-width:1.5px;
+
+    S1[1. Databricks Workspace/Repos/Jobs APIs]:::step --> S2[2. Metadata Crawler Workflow]:::step
+    S2 --> S3[3. Bronze Delta: raw artifacts + ACL + lineage]:::store
+    S3 --> S4[4. Silver Delta: normalized artifact registry]:::store
+
+    S4 --> S5[5. Chunking + content normalization]:::step
+    S5 --> S6[6. Embeddings generation]:::ai
+    S6 --> S7[7. Vector index: artifact chunks]:::store
+
+    S4 --> S8[8. Artifact summarization job]:::ai
+    S8 --> S9[9. Gold Delta: artifact summaries + tags]:::store
+    S9 --> S10[10. Vector index: artifact summaries]:::store
+
+    S9 --> S11[11. User profile generation job]:::ai
+    S11 --> S12[12. Gold Delta: user profiles]:::store
+    S12 --> S13[13. Vector index: user profiles]:::store
+
+    D1[14. Enterprise docs ingestion]:::step --> D2[15. Docs chunking + embeddings]:::ai
+    D2 --> D3[16. Vector index: docs corpus]:::store
+
+    Q1[17. User query from web app]:::step --> Q2[18. BFF/API gateway]:::step
+    Q2 --> Q3[19. Intent classify + query rewrite]:::ai
+    Q3 --> Q4[20. ACL-aware retrieval from indexes]:::step
+    Q4 --> S7
+    Q4 --> S10
+    Q4 --> S13
+    Q4 --> D3
+    Q4 --> Q5[21. LLM response synthesis]:::ai
+    Q5 --> Q6[22. Structured response + citations]:::step
+    Q6 --> Q7[23. UI rendering + feedback capture]:::step
