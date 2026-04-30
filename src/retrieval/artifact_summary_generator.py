@@ -31,7 +31,7 @@ def _extract_text_for_artifact(artifact: Dict) -> str:
 
 
 def _call_llm(
-    client: OpenAI,
+    client,
     model: str,
     prompt: str,
     temperature: float,
