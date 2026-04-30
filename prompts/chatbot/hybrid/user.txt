@@ -9,4 +9,7 @@ User profiles:
 
 Query: {user_query}
 
-Provide a comprehensive response with direct answer, supporting artifacts, and relevant users.
+Respond concisely:
+- Direct answer (1–3 sentences if applicable from docs)
+- Top 2 relevant artifacts (name + one-line reason), if any
+- Top 2 relevant users (name + one-line reason), if any

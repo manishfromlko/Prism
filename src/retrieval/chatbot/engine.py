@@ -32,6 +32,49 @@ from .retrievers import ArtifactRetriever, DocRetriever, UserRetriever
 
 logger = logging.getLogger(__name__)
 
+_OUT_OF_SCOPE_REPLY = (
+    "That's outside what I can help with — I don't have access to real-time or external information.\n\n"
+    "I'm designed to assist with:\n"
+    "• **Platform docs** — how-to guides, onboarding, concepts\n"
+    "• **Artifact discovery** — finding notebooks, scripts, and code examples\n"
+    "• **People search** — finding colleagues by expertise or what they're working on\n\n"
+    "Try asking something like: *\"How do I submit a Spark job?\"* or *\"Who works on NLP?\"*"
+)
+
+
+def _needs_user_clarification(query: str, user_hits: List[Dict]) -> bool:
+    """
+    Return True when the query references a person by partial name only
+    (i.e. no exact user_id from the results appears verbatim in the query).
+
+    This triggers a disambiguation step instead of a direct answer.
+    """
+    if not user_hits:
+        return False
+    query_lower = query.lower()
+    for hit in user_hits:
+        user_id = hit.get("user_id", "")
+        if user_id and user_id.lower() in query_lower:
+            return False  # exact user_id found in the query — no ambiguity
+    return True
+
+
+def _build_clarification_response(user_hits: List[Dict], query: str) -> Dict:
+    """Return a clarification message listing matched users for the user to confirm."""
+    lines = ["I found the following users that might match your query. Could you confirm which one you meant?\n"]
+    for hit in user_hits[:5]:
+        user_id = hit.get("user_id", "unknown")
+        tags = [t.strip() for t in hit.get("tags", "").split(",") if t.strip()]
+        tag_str = ", ".join(tags[:4]) if tags else "—"
+        lines.append(f"• **{user_id}** — {tag_str}")
+    lines.append("\nReply with the exact username (e.g. `ravi.verma`) and I'll fetch the details.")
+    return format_response(
+        answer="\n".join(lines),
+        intent="USER_SEARCH",
+        confidence=0.5,
+        raw_users=user_hits,
+    )
+
 
 class ChatEngine:
     """
@@ -79,10 +122,18 @@ class ChatEngine:
         confidence = classification["confidence"]
         logger.info(f"Intent: {intent} ({confidence:.2f}) — '{query}'")
 
-        # 2. Rewrite query for better embedding recall
+        # 2. Short-circuit out-of-scope queries — no retrieval or LLM generation needed
+        if intent == "OUT_OF_SCOPE":
+            return format_response(
+                answer=_OUT_OF_SCOPE_REPLY,
+                intent="OUT_OF_SCOPE",
+                confidence=confidence,
+            )
+
+        # 3. Rewrite query for better embedding recall
         search_query = self.rewriter.rewrite(query)
 
-        # 3. Route & retrieve (deterministic, sources never mixed unless HYBRID)
+        # 4. Route & retrieve (deterministic — sources never mixed unless HYBRID)
         doc_hits: List[Dict] = []
         artifact_hits: List[Dict] = []
         user_hits: List[Dict] = []
@@ -98,7 +149,11 @@ class ChatEngine:
             artifact_hits = self.artifact_retriever.retrieve(search_query, top_k=3)
             user_hits = self.user_retriever.retrieve(search_query, top_k=3)
 
-        # 4. Build prompt
+        # 5. Disambiguation: if USER_SEARCH used a partial name, ask which user
+        if intent == "USER_SEARCH" and _needs_user_clarification(query, user_hits):
+            return _build_clarification_response(user_hits, query)
+
+        # 6. Build prompt
         if intent == "DOC_QA":
             messages = build_doc_qa_messages(doc_hits, query)
         elif intent == "ARTIFACT_SEARCH":
@@ -112,20 +167,20 @@ class ChatEngine:
         if history:
             messages = [messages[0]] + history + [messages[-1]]
 
-        # 5. Generate
+        # 7. Generate
         try:
             response = self.client.chat.completions.create(
                 model=self.llm_model,
                 messages=messages,
                 temperature=0.2,
-                max_tokens=800,
+                max_tokens=600,
             )
             answer = response.choices[0].message.content.strip()
         except Exception as e:
             logger.error(f"LLM generation failed: {e}")
             answer = "I encountered an error generating a response. Please try again."
 
-        # 6. Format
+        # 8. Format
         return format_response(
             answer=answer,
             intent=intent,
