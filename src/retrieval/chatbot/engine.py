@@ -42,6 +42,16 @@ _OUT_OF_SCOPE_REPLY = (
 )
 
 
+def _find_exact_user_hit(query: str, user_hits: List[Dict]) -> Optional[Dict]:
+    """Return the hit whose user_id appears verbatim in the query, or None."""
+    query_lower = query.lower()
+    for hit in user_hits:
+        user_id = hit.get("user_id", "")
+        if user_id and user_id.lower() in query_lower:
+            return hit
+    return None
+
+
 def _needs_user_clarification(query: str, user_hits: List[Dict]) -> bool:
     """
     Return True when the query references a person by partial name only
@@ -149,7 +159,19 @@ class ChatEngine:
             artifact_hits = self.artifact_retriever.retrieve(search_query, top_k=3)
             user_hits = self.user_retriever.retrieve(search_query, top_k=3)
 
-        # 5. Disambiguation: if USER_SEARCH used a partial name, ask which user
+        # 5a. Exact match — return raw user_profile from Milvus, no LLM rephrasing
+        if intent == "USER_SEARCH":
+            exact_hit = _find_exact_user_hit(query, user_hits)
+            if exact_hit:
+                profile_text = exact_hit.get("user_profile", "No profile available.")
+                return format_response(
+                    answer=f"**{exact_hit['user_id']}**\n\n{profile_text}",
+                    intent="USER_SEARCH",
+                    confidence=1.0,
+                    raw_users=[exact_hit],
+                )
+
+        # 5b. Disambiguation: if USER_SEARCH used a partial name, ask which user
         if intent == "USER_SEARCH" and _needs_user_clarification(query, user_hits):
             return _build_clarification_response(user_hits, query)
 

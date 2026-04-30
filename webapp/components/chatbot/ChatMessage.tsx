@@ -1,6 +1,5 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 export interface ArtifactResult {
@@ -55,7 +54,7 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
     <div className={cn('flex flex-col gap-1', isUser ? 'items-end' : 'items-start')}>
       <div
         className={cn(
-          'max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
+          'max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap',
           isUser
             ? 'bg-primary text-primary-foreground rounded-br-sm'
             : 'bg-muted text-foreground rounded-bl-sm'
@@ -93,7 +92,6 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
             <div key={i} className="space-y-0.5">
               <p className="font-medium truncate">{a.title}</p>
               <p className="text-muted-foreground">Owner: {a.owner}</p>
-              <p className="text-muted-foreground">{a.reason}</p>
             </div>
           ))}
         </div>
@@ -106,15 +104,8 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
             People
           </p>
           {message.users.map((u, i) => (
-            <div key={i} className="space-y-1">
+            <div key={i}>
               <p className="font-medium">{u.name}</p>
-              <div className="flex flex-wrap gap-1">
-                {u.skills.slice(0, 4).map((s) => (
-                  <Badge key={s} variant="secondary" className="text-[10px] px-1.5 py-0">
-                    {s}
-                  </Badge>
-                ))}
-              </div>
             </div>
           ))}
         </div>
@@ -124,8 +115,7 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
       {!isUser && message.sources && message.sources.length > 0 && (
         <div className="w-full max-w-[85%] px-1">
           <p className="text-[10px] text-muted-foreground">
-            Sources:{' '}
-            {message.sources.map((s) => s.file).join(', ')}
+            Sources: {message.sources.map((s) => s.file).join(', ')}
           </p>
         </div>
       )}
