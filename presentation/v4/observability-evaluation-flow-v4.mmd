@@ -1,0 +1,36 @@
+flowchart LR
+    subgraph REQ["One chat request"]
+      Q[Query] --> CLS[Classify]
+      CLS --> RW[Rewrite]
+      RW --> RET[Retrieve contexts]
+      RET --> GEN[Generate answer]
+    end
+
+    CLS -->|LiteLLM metadata trace_id| LF[Langfuse Trace]
+    RW -->|LiteLLM metadata trace_id| LF
+    GEN -->|tokens cost latency prompt response| LF
+
+    GEN --> H[Layer 1 heuristic scoring]
+    H --> H1[response_length]
+    H --> H2[has_content]
+    H --> H3[intent_confidence]
+    H --> H4[source_count]
+    H1 --> LF
+    H2 --> LF
+    H3 --> LF
+    H4 --> LF
+
+    GEN --> BG[Background evaluation thread]
+    RET --> BG
+    BG --> RAGAS{RAG path?}
+    RAGAS -->|Yes| M1[RAGAS faithfulness]
+    RAGAS -->|Yes| M2[RAGAS answer_relevancy]
+    RAGAS -->|Yes| M3[RAGAS context_precision]
+    RAGAS -->|Exact USER_SEARCH| J[LLM judge profile_relevance]
+    M1 --> LF
+    M2 --> LF
+    M3 --> LF
+    J --> LF
+
+    UI[User feedback endpoint] --> UF[user_feedback score]
+    UF --> LF
