@@ -15,7 +15,7 @@ from typing import Dict, List, Optional
 from openai import OpenAI
 
 from .artifact_summary_store import ArtifactSummaryStore
-from .config import RetrievalConfig
+from .config import RetrievalConfig, make_openai_client
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,6 @@ def _build_summaries_context(summaries: List[Dict]) -> str:
 
 def generate_profiles_from_summaries(
     config: RetrievalConfig,
-    openai_api_key: str,
     model: str = "gpt-4o-mini",
 ) -> List[Dict]:
     """
@@ -98,7 +97,7 @@ def generate_profiles_from_summaries(
     logger.info(f"Found summaries for {len(summaries_by_user)} users")
 
     prompt_template = _load_prompt_template()
-    client = OpenAI(api_key=openai_api_key)
+    client = make_openai_client()
     profiles: List[Dict] = []
 
     for user_id, summaries in summaries_by_user.items():

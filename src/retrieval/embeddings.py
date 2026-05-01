@@ -5,9 +5,7 @@ import logging
 import os
 from typing import Any, Dict, List, Optional
 
-from openai import OpenAI
-
-from .config import RetrievalConfig
+from .config import RetrievalConfig, make_openai_client
 
 logger = logging.getLogger(__name__)
 
@@ -17,13 +15,7 @@ class EmbeddingService:
 
     def __init__(self, config: RetrievalConfig):
         self.config = config
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise RuntimeError(
-                "OPENAI_API_KEY is not set. "
-                "Add it to the .env file at the project root."
-            )
-        self.client = OpenAI(api_key=api_key)
+        self.client = make_openai_client()
         self._cache: Dict[str, List[float]] = {}
         logger.info(f"EmbeddingService ready (model={config.embedding_model})")
 

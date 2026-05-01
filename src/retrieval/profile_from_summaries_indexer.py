@@ -40,16 +40,11 @@ def run_profile_indexing_from_summaries(drop_existing: bool = True) -> dict:
     """
     config = RetrievalConfig.from_env()
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is not set. Add it to the .env file at the project root.")
-
     model = os.getenv("PROFILE_LLM_MODEL", config.profile_llm_model)
 
     logger.info(f"Generating user profiles from artifact summaries using model={model}...")
     profiles = generate_profiles_from_summaries(
         config=config,
-        openai_api_key=api_key,
         model=model,
     )
 

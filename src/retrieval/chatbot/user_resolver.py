@@ -11,13 +11,12 @@ User name resolver — three-stage pipeline:
 """
 
 import logging
-import os
 import re
 from typing import Dict, List, Optional, Tuple
 
-from openai import OpenAI
 from rapidfuzz import fuzz
 
+from ..config import make_openai_client
 from ..user_profile_store import UserProfileStore
 from .prompt_loader import load_prompt
 
@@ -115,10 +114,7 @@ class UserNameResolver:
     """
 
     def __init__(self, user_store: UserProfileStore, model: str = "gpt-4o-mini"):
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY not set")
-        self.client = OpenAI(api_key=api_key)
+        self.client = make_openai_client()
         self.model = model
         self.user_store = user_store
         self._system_prompt = load_prompt("chatbot/user_resolution/system.txt")

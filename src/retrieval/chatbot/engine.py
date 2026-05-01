@@ -16,13 +16,10 @@ USER_SEARCH flow:
 """
 
 import logging
-import os
 from typing import Dict, List, Optional
 
-from openai import OpenAI
-
 from ..artifact_summary_store import ArtifactSummaryStore
-from ..config import RetrievalConfig
+from ..config import RetrievalConfig, make_openai_client
 from ..embeddings import EmbeddingService
 from ..user_profile_store import UserProfileStore
 from .classifier import IntentClassifier
@@ -71,10 +68,7 @@ class ChatEngine:
         self.config = config
         self.llm_model = llm_model
 
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY not set")
-        self.client = OpenAI(api_key=api_key)
+        self.client = make_openai_client()
 
         self.user_store = user_store
         self.classifier = IntentClassifier(model=llm_model)

@@ -28,10 +28,6 @@ def run_artifact_summary_indexing(catalog_path: str, mode: str = "incremental") 
     store = ArtifactSummaryStore(config)
     store.create_collection(drop_if_exists=(mode == "full"))
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is not set. Add it to the .env file at the project root.")
-
     model = os.getenv("ARTIFACT_SUMMARY_LLM_MODEL", config.profile_llm_model)
     temperature = float(os.getenv("ARTIFACT_SUMMARY_LLM_TEMPERATURE", "0.0"))
     max_tokens = int(os.getenv("ARTIFACT_SUMMARY_LLM_MAX_TOKENS", "220"))
@@ -42,7 +38,6 @@ def run_artifact_summary_indexing(catalog_path: str, mode: str = "incremental") 
     logger.info("Generating artifact summaries from catalog...")
     summaries = generate_artifact_summaries(
         catalog_path=catalog_path,
-        openai_api_key=api_key,
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,

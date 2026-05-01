@@ -1,10 +1,8 @@
 """Query rewriting layer — optimise user query for semantic search."""
 
 import logging
-import os
 
-from openai import OpenAI
-
+from ..config import make_openai_client
 from .prompt_loader import load_prompt
 
 logger = logging.getLogger(__name__)
@@ -12,10 +10,7 @@ logger = logging.getLogger(__name__)
 
 class QueryRewriter:
     def __init__(self, model: str = "gpt-4o-mini"):
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY not set")
-        self.client = OpenAI(api_key=api_key)
+        self.client = make_openai_client()
         self.model = model
         self._system_prompt = load_prompt("chatbot/query_rewriter/system.txt")
 

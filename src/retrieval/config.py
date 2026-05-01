@@ -4,6 +4,7 @@ import os
 from typing import Optional
 
 from dotenv import load_dotenv
+from openai import OpenAI
 from pydantic import BaseModel, Field
 
 # Load .env from project root (or any parent directory) automatically.
@@ -39,6 +40,10 @@ class RetrievalConfig(BaseModel):
     # LLM for user profile generation (chat completion, not embeddings)
     profile_llm_model: str = Field(default="gpt-4o-mini")
 
+    # LiteLLM proxy
+    litellm_base_url: str = Field(default="http://localhost:4000")
+    litellm_api_key: str = Field(default="sk-1234")
+
     @classmethod
     def from_env(cls) -> "RetrievalConfig":
         """Create config from environment variables (after .env is loaded)."""
@@ -54,7 +59,14 @@ class RetrievalConfig(BaseModel):
                 "dataset/.ingestion/ingestion_catalog.json",
             ),
             profile_llm_model=os.getenv("PROFILE_LLM_MODEL", "gpt-4o-mini"),
+            litellm_base_url=os.getenv("LITELLM_BASE_URL", "http://localhost:4000"),
+            litellm_api_key=os.getenv("LITELLM_API_KEY", "sk-1234"),
         )
 
 
 config = RetrievalConfig.from_env()
+
+
+def make_openai_client() -> OpenAI:
+    """Return an OpenAI-compatible client pointed at the LiteLLM proxy."""
+    return OpenAI(api_key=config.litellm_api_key, base_url=config.litellm_base_url)
