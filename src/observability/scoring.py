@@ -74,13 +74,13 @@ def score_trace(
     if not lf or not trace_id:
         return
     try:
-        lf.score(
+        lf.create_score(
             trace_id=trace_id,
             name=name,
             value=round(float(value), 4),
             comment=comment,
         )
-        logger.debug(f"Score posted: trace={trace_id} name={name} value={value:.4f}")
+        logger.debug(f"Score queued: trace={trace_id} name={name} value={value:.4f}")
     except Exception as e:
         logger.warning(f"Failed to post score '{name}' to trace {trace_id}: {e}")
 
@@ -96,6 +96,9 @@ def score_user_feedback(trace_id: str, thumbs_up: bool) -> None:
         value=1.0 if thumbs_up else 0.0,
         comment="thumbs_up" if thumbs_up else "thumbs_down",
     )
+    lf = _get_langfuse()
+    if lf:
+        lf.flush()
 
 
 def score_response_quality(
@@ -149,8 +152,11 @@ def score_response_quality(
     # ── source_count ─────────────────────────────────────────────────────────
     src_score = min(1.0, source_count / _SOURCE_NORM) if source_count > 0 else 0.0
 
-    # ── post all scores ──────────────────────────────────────────────────────
+    # ── post all scores then flush so they appear immediately ────────────────
     score_trace(trace_id, "response_length",   length_score,            f"chars={n}")
     score_trace(trace_id, "has_content",        has_content,             f"intent={intent}")
     score_trace(trace_id, "intent_confidence",  min(1.0, float(confidence)), f"intent={intent}")
     score_trace(trace_id, "source_count",       src_score,               f"sources={source_count}")
+    lf = _get_langfuse()
+    if lf:
+        lf.flush()
