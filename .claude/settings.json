@@ -6,7 +6,8 @@
       "Bash(python3 -m src.retrieval.profile_indexer --catalog dataset/.ingestion/ingestion_catalog.json)",
       "Bash(npx tsc *)",
       "Bash(uv run *)",
-      "Bash(docker exec *)"
+      "Bash(docker exec *)",
+      "Bash(python generate_eval_slides.py)"
     ],
     "additionalDirectories": [
       "/Users/manish/mount/test/project-1/webapp/app/api/user-profiles"
