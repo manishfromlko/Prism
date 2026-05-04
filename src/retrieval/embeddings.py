@@ -2,7 +2,6 @@
 
 import hashlib
 import logging
-import os
 from typing import Any, Dict, List, Optional
 
 from .config import RetrievalConfig, make_openai_client

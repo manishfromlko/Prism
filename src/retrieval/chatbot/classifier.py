@@ -2,8 +2,9 @@
 
 import json
 import logging
-from typing import Dict
+from typing import Dict, Optional
 
+from ...observability import litellm_metadata
 from ..config import make_openai_client
 from .prompt_loader import load_prompt
 
@@ -20,10 +21,12 @@ class IntentClassifier:
         self.model = model
         self._system_prompt = load_prompt("chatbot/classifier/system.txt")
 
-    def classify(self, query: str) -> Dict:
+    def classify(self, query: str, trace_id: Optional[str] = None) -> Dict:
         """
         Returns dict: {intent, confidence, reasoning}
         Falls back to DOC_QA with low confidence on failure.
+        trace_id is forwarded to LiteLLM so this generation is grouped under
+        the same Langfuse trace as the rest of the request pipeline.
         """
         try:
             response = self.client.chat.completions.create(
@@ -35,6 +38,7 @@ class IntentClassifier:
                 temperature=0.0,
                 max_tokens=150,
                 response_format={"type": "json_object"},
+                extra_body=litellm_metadata(trace_id, "classify") if trace_id else None,
             )
             raw = response.choices[0].message.content
             result = json.loads(raw)

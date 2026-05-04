@@ -5,8 +5,6 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from openai import OpenAI
-
 from .config import make_openai_client
 
 logger = logging.getLogger(__name__)
@@ -164,7 +162,7 @@ def _load_prompt_template() -> str:
         return f.read()
 
 
-def _call_llm(client: OpenAI, model: str, prompt: str) -> Optional[Dict]:
+def _call_llm(client, model: str, prompt: str) -> Optional[Dict]:
     """Call OpenAI chat completion and return parsed JSON, or None on failure."""
     response = client.chat.completions.create(
         model=model,

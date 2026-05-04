@@ -1,0 +1,41 @@
+# Databricks Apps configuration for the FastAPI backend
+# Deploy via: databricks apps deploy kubeflow-intelligence-api
+
+command:
+  - uvicorn
+  - src.retrieval.api:app
+  - --host
+  - "0.0.0.0"
+  - --port
+  - "8000"
+
+env:
+  - name: DATABRICKS_HOST
+    valueFrom:
+      secretKeyRef:
+        scope: kubeflow-scope
+        key: databricks-host
+
+  - name: DATABRICKS_TOKEN
+    valueFrom:
+      secretKeyRef:
+        scope: kubeflow-scope
+        key: databricks-token
+
+  - name: VECTOR_SEARCH_ENDPOINT
+    value: "kubeflow-intelligence-endpoint"
+
+  - name: LLM_MODEL
+    value: "databricks-meta-llama-3-3-70b-instruct"
+
+  - name: EVAL_MODEL
+    value: "databricks-meta-llama-3-1-405b-instruct"
+
+  - name: JUDGE_MODEL
+    value: "databricks-meta-llama-3-1-405b-instruct"
+
+  - name: MLFLOW_EXPERIMENT
+    value: "/kubeflow-intelligence/chatbot"
+
+  - name: MLFLOW_TRACKING_URI
+    value: "databricks"

@@ -37,8 +37,7 @@ class VectorStore:
             logger.info(f"Connecting to Milvus at {self.config.milvus_host}:{self.config.milvus_port}")
             connections.connect(
                 alias="default",
-                host=self.config.milvus_host,
-                port=self.config.milvus_port
+                uri=f"http://{self.config.milvus_host}:{self.config.milvus_port}",
             )
             logger.info("Connected to Milvus successfully")
         except Exception as e:

@@ -1,0 +1,64 @@
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    restart: always
+    ports:
+      - "4000:4000"
+    volumes:
+      - ${PWD}/litellm_config.yaml:/app/config.yaml
+    command:
+      - "--config=/app/config.yaml"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://llmproxy:dbpassword9090@db:5432/litellm}
+      STORE_MODEL_IN_DB: ${STORE_MODEL_IN_DB:-True}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-1234}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  db:
+    image: postgres:16
+    restart: always
+    container_name: litellm_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-litellm}
+      POSTGRES_USER: ${POSTGRES_USER:-llmproxy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dbpassword9090}
+    ports:
+      - "5442:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d litellm -U llmproxy"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9191:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+
+volumes:
+  prometheus_data:
+    driver: local
+  postgres_data:
+    name: litellm_postgres_data

@@ -630,6 +630,7 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     query: str = Field(..., description="User's question")
     history: List[ChatMessage] = Field(default_factory=list, description="Prior conversation turns")
+    session_id: Optional[str] = Field(None, description="Session ID for Langfuse trace grouping")
 
 class ArtifactResult(BaseModel):
     title: str
@@ -653,6 +654,7 @@ class ChatResponse(BaseModel):
     artifacts: List[ArtifactResult] = Field(default_factory=list)
     users: List[UserResult] = Field(default_factory=list)
     sources: List[SourceResult] = Field(default_factory=list)
+    trace_id: Optional[str] = Field(None, description="Langfuse trace ID — use to post scores")
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -667,7 +669,10 @@ async def chat(request: ChatRequest):
         import asyncio
         history_dicts = [{"role": m.role, "content": m.content} for m in request.history]
         loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(None, lambda: chat_engine.chat(request.query, history_dicts))
+        result = await loop.run_in_executor(
+            None,
+            lambda: chat_engine.chat(request.query, history_dicts, session_id=request.session_id),
+        )
         return ChatResponse(
             answer=result["answer"],
             intent=result["intent"],
@@ -676,10 +681,38 @@ async def chat(request: ChatRequest):
             artifacts=[ArtifactResult(**a) for a in result.get("artifacts", [])],
             users=[UserResult(**u) for u in result.get("users", [])],
             sources=[SourceResult(**s) for s in result.get("sources", [])],
+            trace_id=result.get("trace_id"),
         )
     except Exception as e:
         logger.error(f"Chat endpoint failed: {e}")
         raise HTTPException(status_code=500, detail=f"Chat failed: {e}")
+
+
+# ---------------------------------------------------------------------------
+# Observability endpoints
+# ---------------------------------------------------------------------------
+
+class ScoreRequest(BaseModel):
+    trace_id: str = Field(..., description="Langfuse trace ID returned by /chat")
+    score_name: str = Field(..., description="Score name, e.g. 'user_feedback', 'faithfulness'")
+    value: float = Field(..., description="Score value in [0, 1]", ge=0.0, le=1.0)
+    comment: Optional[str] = Field(None, description="Optional free-text comment")
+
+class FeedbackRequest(BaseModel):
+    trace_id: str = Field(..., description="Langfuse trace ID returned by /chat")
+    thumbs_up: bool = Field(..., description="True = positive feedback, False = negative")
+
+@app.post("/observability/score", status_code=204)
+async def post_score(request: ScoreRequest):
+    """Post a named score to a Langfuse trace (e.g. RAGAS metrics, manual eval)."""
+    from ..observability import score_trace
+    score_trace(request.trace_id, request.score_name, request.value, request.comment)
+
+@app.post("/observability/feedback", status_code=204)
+async def post_feedback(request: FeedbackRequest):
+    """Record thumbs-up / thumbs-down user feedback against a chat trace."""
+    from ..observability import score_user_feedback
+    score_user_feedback(request.trace_id, request.thumbs_up)
 
 
 @app.post("/admin/ingest-docs")

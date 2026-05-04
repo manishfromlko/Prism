@@ -22,7 +22,7 @@ class ArtifactSummaryStore:
         self._connect()
 
     def _connect(self):
-        connections.connect("default", host=self.config.milvus_host, port=str(self.config.milvus_port))
+        connections.connect("default", uri=f"http://{self.config.milvus_host}:{self.config.milvus_port}")
         logger.info(f"Connected to Milvus at {self.config.milvus_host}:{self.config.milvus_port}")
 
     def _schema(self) -> CollectionSchema:

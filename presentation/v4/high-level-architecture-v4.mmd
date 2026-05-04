@@ -1,0 +1,48 @@
+flowchart LR
+    classDef user fill:#F5F7FA,color:#1F2937,stroke:#6B7280,stroke-width:1.2px;
+    classDef app fill:#DBEAFE,color:#0F172A,stroke:#2563EB,stroke-width:1.5px;
+    classDef api fill:#DCFCE7,color:#052E16,stroke:#16A34A,stroke-width:1.5px;
+    classDef data fill:#FEF3C7,color:#422006,stroke:#D97706,stroke-width:1.5px;
+    classDef ops fill:#FCE7F3,color:#500724,stroke:#DB2777,stroke-width:1.5px;
+
+    U[Data Scientists<br/>ML Engineers]:::user --> WEB[Next.js Webapp<br/>BFF API Routes]:::app
+    WEB --> API[FastAPI Retrieval API<br/>Search + Profiles + Chat + Admin]:::api
+
+    subgraph ORCH["Chat Orchestration"]
+      CLS[LLM Intent Classifier]:::api
+      RW[Query Rewriter]:::api
+      ROUTE[Intent Router]:::api
+      GEN[Prompt Builder + LLM Generate]:::api
+      CLS --> RW --> ROUTE --> GEN
+    end
+
+    API --> ORCH
+
+    subgraph KNOWLEDGE["Milvus Knowledge Collections"]
+      ART[(kubeflow_artifacts<br/>raw artifact chunks)]:::data
+      SUM[(artifact_summaries<br/>summary vectors)]:::data
+      PROF[(user_profiles<br/>expertise vectors)]:::data
+      DOC[(platform_docs<br/>doc chunks)]:::data
+    end
+
+    ROUTE --> ART
+    ROUTE --> SUM
+    ROUTE --> PROF
+    ROUTE --> DOC
+
+    subgraph INGEST["Ingestion and Indexing"]
+      DS[Workspace Files<br/>notebooks scripts text]:::data
+      CAT[Ingestion Catalog JSON]:::data
+      IDX[Indexers + Embeddings]:::api
+      DS --> CAT --> IDX --> KNOWLEDGE
+    end
+
+    GEN --> LITELLM[LiteLLM Proxy]:::ops
+    CLS --> LITELLM
+    RW --> LITELLM
+    LITELLM --> MODEL[OpenAI-compatible Models]:::ops
+    LITELLM --> LF[Langfuse<br/>traces cost latency prompts]:::ops
+    API --> SCORES[Heuristic Scores<br/>feedback endpoint]:::ops
+    SCORES --> LF
+    API --> RAGAS[RAGAS / LLM Judge<br/>background evaluation]:::ops
+    RAGAS --> LF

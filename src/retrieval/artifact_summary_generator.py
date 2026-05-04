@@ -5,8 +5,6 @@ import logging
 from pathlib import Path
 from typing import Dict, List
 
-from openai import OpenAI
-
 from .config import make_openai_client
 
 logger = logging.getLogger(__name__)
@@ -33,7 +31,7 @@ def _extract_text_for_artifact(artifact: Dict) -> str:
 
 
 def _call_llm(
-    client: OpenAI,
+    client,
     model: str,
     prompt: str,
     temperature: float,

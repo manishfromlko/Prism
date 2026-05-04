@@ -1,0 +1,32 @@
+flowchart LR
+    classDef source fill:#F8FAFC,color:#111827,stroke:#64748B,stroke-width:1px;
+    classDef process fill:#DCFCE7,color:#052E16,stroke:#16A34A,stroke-width:1.5px;
+    classDef vector fill:#FEF3C7,color:#422006,stroke:#D97706,stroke-width:1.5px;
+    classDef llm fill:#EDE9FE,color:#2E1065,stroke:#7C3AED,stroke-width:1.5px;
+    classDef obs fill:#FCE7F3,color:#500724,stroke:#DB2777,stroke-width:1.5px;
+
+    subgraph OFFLINE["Offline build path"]
+      WS[Workspace files<br/>notebooks scripts text]:::source
+      CAT[Ingestion catalog<br/>hashes metadata guardrails]:::process
+      PARSE[DocumentLoader + TextProcessor<br/>cell extraction chunking]:::process
+      EMB[EmbeddingService<br/>text-embedding-3-small]:::llm
+      MILVUS[(Milvus collections<br/>artifacts summaries profiles docs)]:::vector
+      SUM[Artifact summaries<br/>User profiles<br/>Platform doc chunks]:::process
+      WS --> CAT --> PARSE --> EMB --> MILVUS
+      SUM --> EMB
+    end
+
+    subgraph ONLINE["Online serving path"]
+      Q[User query]:::source
+      ROUTE[Classify + rewrite]:::process
+      RET[Retrieve context]:::vector
+      PROMPT[Build intent prompt]:::process
+      GEN[Generate via LiteLLM]:::llm
+      RESP[Answer + sources + trace_id]:::source
+      Q --> ROUTE --> RET --> PROMPT --> GEN --> RESP
+    end
+
+    MILVUS --> RET
+    GEN --> LF[Langfuse trace<br/>tokens cost latency prompts]:::obs
+    RESP --> EVAL[RAGAS / LLM judge<br/>background scoring]:::obs
+    EVAL --> LF

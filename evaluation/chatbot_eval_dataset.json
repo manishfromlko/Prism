@@ -1,0 +1,1337 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Exhaustive evaluation dataset for the Kubeflow chatbot. Covers all 5 intents, all retrieval paths, and all scoring layers. Use this to validate Langfuse traces and score distributions after any change to the engine, prompts, or retrieval stack.",
+    "intents": ["DOC_QA", "ARTIFACT_SEARCH", "USER_SEARCH", "HYBRID", "OUT_OF_SCOPE"],
+    "users_in_dataset": ["ajay11.yadav", "amit23.sharma", "dhruv2.aggarwal", "julie1.dixit", "ravi.verma"],
+    "platform_docs": ["Kubeflow_Access_Guide.docx", "Kubeflow_First_Notebook.docx", "Kubeflow_Spark_Job_Guide.docx"],
+    "scoring_layers": {
+      "layer1_inline": ["response_length", "has_content", "intent_confidence", "source_count"],
+      "layer2_background_ragas": ["faithfulness", "answer_relevancy", "context_precision"],
+      "layer2_background_llm_judge": ["profile_relevance"],
+      "user_initiated": ["user_feedback"]
+    },
+    "pipeline_steps": {
+      "classify": "LLM call — always runs, produces intent + confidence + reasoning",
+      "rewrite": "LLM call — runs for all intents EXCEPT OUT_OF_SCOPE",
+      "generate": "LLM call — runs for DOC_QA, ARTIFACT_SEARCH, semantic USER_SEARCH, HYBRID",
+      "user_resolve": "LLM call — runs only for USER_SEARCH when fuzzy name match is found",
+      "vector_retrieve": "Milvus similarity search — runs for DOC_QA, ARTIFACT_SEARCH, semantic USER_SEARCH, HYBRID"
+    },
+    "score_ranges": {
+      "response_length": "peaks at 1.0 for 300–2000 chars; 0.5 at 50 chars; penalised above 2000",
+      "has_content": "1.0 if answer is substantive; 0.0 if fallback phrase detected",
+      "intent_confidence": "classifier confidence 0–1, passed through directly",
+      "source_count": "retrieved_sources / 5, capped at 1.0; 0.0 if no sources",
+      "faithfulness": "RAGAS 0–1; answer grounded in retrieved context",
+      "answer_relevancy": "RAGAS 0–1; answer addresses the question",
+      "context_precision": "RAGAS 0–1; top retrieved context is most relevant",
+      "profile_relevance": "LLM judge 0/0.3/0.7/1.0; only for exact USER_SEARCH name match",
+      "user_feedback": "1.0 thumbs-up, 0.0 thumbs-down; user-initiated via frontend"
+    }
+  },
+  "queries": [
+
+    {
+      "id": "DOC-001",
+      "category": "doc_qa_how_to",
+      "query": "How do I submit a Spark job in Kubeflow?",
+      "description": "Direct procedural question matching Kubeflow_Spark_Job_Guide.docx",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "high",
+        "min_confidence": 0.85
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 3, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "trace_metadata_keys": ["query", "search_query", "intent", "confidence", "doc_hits"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0", "reason": "Answer should be 300+ chars with steps" },
+          "has_content": { "expected": 1.0, "reason": "Substantive answer from doc chunks" },
+          "intent_confidence": { "expected_range": ">0.85" },
+          "source_count": { "expected_range": "0.6–1.0", "reason": "3–5 doc chunks retrieved" },
+          "faithfulness": { "expected_range": ">0.7", "reason": "Answer should cite Spark job guide content" },
+          "answer_relevancy": { "expected_range": ">0.8" },
+          "context_precision": { "expected_range": ">0.6" }
+        },
+        "verification_steps": [
+          "Open Langfuse → Traces. Filter by tag 'intent:DOC_QA'.",
+          "Find the trace with name 'chat · DOC_QA' created just after query submission.",
+          "Click trace → verify 3 generation spans: classify, rewrite, generate.",
+          "Click 'generate' span → input should show retrieved doc chunks from Kubeflow_Spark_Job_Guide.",
+          "Check Scores tab → response_length, has_content, intent_confidence, source_count appear within seconds.",
+          "Wait 10–30s → faithfulness, answer_relevancy, context_precision appear from background RAGAS thread.",
+          "Verify trace metadata: doc_hits >= 3, artifact_hits = 0, user_hits = 0."
+        ]
+      },
+      "notes": "Golden path DOC_QA. If faithfulness < 0.5, the doc retrieval or chunking is poor."
+    },
+
+    {
+      "id": "DOC-002",
+      "category": "doc_qa_concept",
+      "query": "What is a Kubeflow notebook server?",
+      "description": "Concept question — should match Kubeflow_First_Notebook.docx",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "high",
+        "min_confidence": 0.8
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 3, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "trace_metadata_keys": ["query", "search_query", "intent", "confidence", "doc_hits"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.8" },
+          "source_count": { "expected_range": ">0.4" },
+          "faithfulness": { "expected_range": ">0.7" },
+          "answer_relevancy": { "expected_range": ">0.8" },
+          "context_precision": { "expected_range": ">0.6" }
+        },
+        "verification_steps": [
+          "Check 'generate' span input in Langfuse — should include Kubeflow_First_Notebook chunks.",
+          "Verify search_query in trace metadata is semantically richer than original query (query rewriter should expand it).",
+          "All RAGAS scores should appear in the Scores panel within 30s."
+        ]
+      },
+      "notes": "Verify that the query rewriter expanded 'notebook server' into a more retrieval-friendly form."
+    },
+
+    {
+      "id": "DOC-003",
+      "category": "doc_qa_access",
+      "query": "How do I get access to Kubeflow?",
+      "description": "Access/onboarding question — matches Kubeflow_Access_Guide.docx",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "high",
+        "min_confidence": 0.85
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 3, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "trace_metadata_keys": ["query", "search_query", "intent", "confidence", "doc_hits"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.85" },
+          "source_count": { "expected_range": "0.6–1.0" },
+          "faithfulness": { "expected_range": ">0.7" },
+          "answer_relevancy": { "expected_range": ">0.8" },
+          "context_precision": { "expected_range": ">0.7" }
+        },
+        "verification_steps": [
+          "Confirm 'generate' span references Kubeflow_Access_Guide chunks.",
+          "Verify source_count > 0 (doc retrieval must find access guide content)."
+        ]
+      },
+      "notes": "Key onboarding flow. Low faithfulness here indicates access guide was not ingested properly."
+    },
+
+    {
+      "id": "DOC-004",
+      "category": "doc_qa_troubleshoot",
+      "query": "My notebook server is not starting, what should I do?",
+      "description": "Troubleshooting question — classifier may assign lower confidence since it spans how-to and concept",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "medium-high",
+        "min_confidence": 0.7
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 2, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.7–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": "0.7–0.95" },
+          "source_count": { "expected_range": "0.2–0.8" },
+          "faithfulness": { "expected_range": "0.5–0.9", "reason": "Depends on whether troubleshooting content is in docs" },
+          "answer_relevancy": { "expected_range": ">0.7" },
+          "context_precision": { "expected_range": "0.5–0.9" }
+        },
+        "verification_steps": [
+          "Check if doc_hits > 0 in trace metadata — if 0, platform docs lack troubleshooting content.",
+          "If has_content = 0.0, the answer was a fallback — indicates missing troubleshooting docs.",
+          "Low faithfulness + high answer_relevancy = LLM hallucinated (answered from training data, not docs)."
+        ]
+      },
+      "notes": "Important diagnostic: faithfulness < 0.4 with high answer_relevancy is a hallucination signal."
+    },
+
+    {
+      "id": "DOC-005",
+      "category": "doc_qa_no_context",
+      "query": "What is the data retention policy for archived experiments?",
+      "description": "Question where no relevant docs exist — should return a substantive but hedged answer",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "medium",
+        "min_confidence": 0.6
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.5–0.9" },
+          "has_content": { "expected": 0.0, "reason": "Answer will contain 'couldn't find' or 'no matching'" },
+          "intent_confidence": { "expected_range": "0.6–0.9" },
+          "source_count": { "expected": 0.0, "reason": "No doc chunks retrieved" },
+          "faithfulness": { "expected_range": "0.0–0.5", "reason": "No context to ground the answer" },
+          "answer_relevancy": { "expected_range": ">0.5" },
+          "context_precision": { "expected_range": "0.0–0.3" }
+        },
+        "verification_steps": [
+          "Check trace metadata: doc_hits = 0.",
+          "Verify has_content = 0.0 — if 1.0, LLM fabricated an answer from training data (concern).",
+          "Low source_count + low faithfulness is expected and correct for missing content.",
+          "Check the actual answer text in the 'generate' span output — should say doc not found, not fabricate a policy."
+        ]
+      },
+      "notes": "This is a known-missing content test. If has_content = 1.0 here, the LLM is hallucinating and trust is broken."
+    },
+
+    {
+      "id": "DOC-006",
+      "category": "doc_qa_spark_config",
+      "query": "How do I configure CPU and memory limits for a Spark job?",
+      "description": "Configuration question — strong match to Kubeflow_Spark_Job_Guide.docx",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "high",
+        "min_confidence": 0.85
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 3, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.85" },
+          "source_count": { "expected_range": ">0.6" },
+          "faithfulness": { "expected_range": ">0.75" },
+          "answer_relevancy": { "expected_range": ">0.8" },
+          "context_precision": { "expected_range": ">0.7" }
+        },
+        "verification_steps": [
+          "Confirm doc_hits >= 3 in trace metadata.",
+          "Click 'generate' span — context window should show Spark config content from the guide.",
+          "RAGAS faithfulness > 0.75 confirms answer is grounded in the Spark guide, not invented."
+        ]
+      },
+      "notes": "Strong positive test for doc retrieval quality against Spark content."
+    },
+
+    {
+      "id": "ART-001",
+      "category": "artifact_search_by_technology",
+      "query": "Show me Spark notebooks in the workspace",
+      "description": "Technology-scoped artifact search — multiple workspaces have Spark content",
+      "expected": {
+        "intent": "ARTIFACT_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.85
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 4, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · ARTIFACT_SEARCH",
+        "tags": ["intent:ARTIFACT_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.85" },
+          "source_count": { "expected_range": "0.8–1.0", "reason": "4–5 Spark artifacts should match" },
+          "faithfulness": { "expected_range": ">0.7", "reason": "Answer should name actual artifact IDs from results" },
+          "answer_relevancy": { "expected_range": ">0.8" },
+          "context_precision": { "expected_range": ">0.6" }
+        },
+        "verification_steps": [
+          "Trace metadata: artifact_hits >= 3, doc_hits = 0, user_hits = 0.",
+          "Click 'generate' span — context should list artifact IDs with Spark-related summaries.",
+          "Verify the answer lists actual artifact_ids (e.g., 'ajay11.yadav:01-PySpark-Get-Started.ipynb').",
+          "RAGAS faithfulness confirms answer names are grounded in retrieved artifact summaries."
+        ]
+      },
+      "notes": "Key capability test. Multiple workspaces (ajay11.yadav, dhruv2.aggarwal, ravi.verma) have Spark content."
+    },
+
+    {
+      "id": "ART-002",
+      "category": "artifact_search_by_task",
+      "query": "Find examples of data preprocessing notebooks",
+      "description": "Task-based search — should match pandas/data analysis content (amit23.sharma)",
+      "expected": {
+        "intent": "ARTIFACT_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.8
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 3, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · ARTIFACT_SEARCH",
+        "tags": ["intent:ARTIFACT_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.8" },
+          "source_count": { "expected_range": "0.6–1.0" },
+          "faithfulness": { "expected_range": ">0.65" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "Check artifact_hits in trace metadata — should include amit23.sharma workspace entries.",
+          "Verify the rewriter expanded 'data preprocessing' into more specific ML terms.",
+          "Context window in 'generate' span should show pandas/filtering/grouping artifact summaries."
+        ]
+      },
+      "notes": "Tests semantic similarity on task descriptions rather than technology keywords."
+    },
+
+    {
+      "id": "ART-003",
+      "category": "artifact_search_by_format",
+      "query": "Show me all Python scripts available",
+      "description": "File-type search — dhruv2.aggarwal has HelloSpark.py and other scripts",
+      "expected": {
+        "intent": "ARTIFACT_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.82
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 3, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · ARTIFACT_SEARCH",
+        "tags": ["intent:ARTIFACT_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.8–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.82" },
+          "source_count": { "expected_range": ">0.4" },
+          "faithfulness": { "expected_range": ">0.6" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "Verify artifact_hits > 0 in trace metadata.",
+          "Check that retrieved summaries contain 'script' or '.py' type artifacts.",
+          "If context_precision is low, the top-ranked artifacts may be notebooks instead of scripts — embedding quality issue."
+        ]
+      },
+      "notes": "Tests whether file_type is embedded into summary vectors meaningfully."
+    },
+
+    {
+      "id": "ART-004",
+      "category": "artifact_search_by_concept",
+      "query": "Find notebooks that use SQL queries",
+      "description": "Concept-based search — ravi.verma has .sql files, dhruv2.aggarwal has SparkSQL notebooks",
+      "expected": {
+        "intent": "ARTIFACT_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.82
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 3, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · ARTIFACT_SEARCH",
+        "tags": ["intent:ARTIFACT_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.8–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.8" },
+          "source_count": { "expected_range": ">0.4" },
+          "faithfulness": { "expected_range": ">0.65" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "Confirm retrieved artifact summaries mention SQL, SparkSQL, or table operations.",
+          "Cross-check: ravi.verma:03-spark-table-demo.sql and dhruv2.aggarwal SparkSQL notebooks should rank high."
+        ]
+      },
+      "notes": "Tests cross-workspace retrieval on concept terms."
+    },
+
+    {
+      "id": "ART-005",
+      "category": "artifact_search_no_results",
+      "query": "Find notebooks for TensorFlow model deployment to Kubernetes",
+      "description": "Specific search unlikely to match existing content — tests graceful no-result handling",
+      "expected": {
+        "intent": "ARTIFACT_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.8
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · ARTIFACT_SEARCH",
+        "tags": ["intent:ARTIFACT_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.5–0.8" },
+          "has_content": { "expected": 0.0, "reason": "Answer should say no matching artifacts found" },
+          "intent_confidence": { "expected_range": ">0.8" },
+          "source_count": { "expected": 0.0 },
+          "faithfulness": { "expected_range": "0.0–0.3" },
+          "answer_relevancy": { "expected_range": ">0.5" },
+          "context_precision": { "expected_range": "0.0–0.2" }
+        },
+        "verification_steps": [
+          "Trace metadata: artifact_hits = 0, source_count = 0.",
+          "has_content should be 0.0 — if 1.0, the LLM is fabricating artifact names.",
+          "Check the answer text in 'generate' span — must not hallucinate artifact IDs."
+        ]
+      },
+      "notes": "Critical negative test. Fabricated artifact IDs in the answer are a serious trust issue."
+    },
+
+    {
+      "id": "ART-006",
+      "category": "artifact_search_data_analysis",
+      "query": "Find notebooks for statistical analysis or visualization",
+      "description": "Broad semantic search — amit23.sharma has Stats, Visualization folders",
+      "expected": {
+        "intent": "ARTIFACT_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.82
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 4, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · ARTIFACT_SEARCH",
+        "tags": ["intent:ARTIFACT_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.82" },
+          "source_count": { "expected_range": ">0.6" },
+          "faithfulness": { "expected_range": ">0.7" },
+          "answer_relevancy": { "expected_range": ">0.8" },
+          "context_precision": { "expected_range": ">0.6" }
+        },
+        "verification_steps": [
+          "Verify amit23.sharma workspace artifacts appear in the context.",
+          "Confirm context_precision is high — Stats and Visualization notebooks should rank above Spark ones."
+        ]
+      },
+      "notes": "Tests quality of embedding for data analysis concepts vs Spark dominance."
+    },
+
+    {
+      "id": "ART-007",
+      "category": "artifact_search_join_operations",
+      "query": "Any examples of join operations or merge in datasets?",
+      "description": "Concept search — amit23.sharma has 05_Merge, dhruv2.aggarwal has SparkJoinDemo",
+      "expected": {
+        "intent": "ARTIFACT_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.8
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 3, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · ARTIFACT_SEARCH",
+        "tags": ["intent:ARTIFACT_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.8" },
+          "source_count": { "expected_range": ">0.4" },
+          "faithfulness": { "expected_range": ">0.65" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "Verify both amit23.sharma (pandas merge) and dhruv2.aggarwal (Spark join) appear in artifact_hits.",
+          "Low context_precision with high source_count = retrieval is mixing unrelated join types — check embedding quality."
+        ]
+      },
+      "notes": "Tests cross-technology semantic match (pandas merge vs Spark join are semantically close)."
+    },
+
+    {
+      "id": "USR-001",
+      "category": "user_search_exact_name",
+      "query": "Show me the profile of ajay11.yadav",
+      "description": "Exact username match — triggers string match path, no LLM generate, LLM judge scores profile_relevance",
+      "expected": {
+        "intent": "USER_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.85,
+        "pipeline_path": "exact_match"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "user_resolve"],
+        "retrievers_used": [],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 },
+        "special": "Returns raw Milvus profile directly. No generate step. exact_match=True."
+      },
+      "langfuse": {
+        "trace_name": "chat · USER_SEARCH",
+        "tags": ["intent:USER_SEARCH"],
+        "scores_expected": {
+          "profile_relevance": { "expected": "1.0", "reason": "Direct profile lookup for explicitly named user" }
+        },
+        "scores_not_expected": ["response_length", "has_content", "source_count", "faithfulness", "answer_relevancy", "context_precision"],
+        "verification_steps": [
+          "Trace should show only 2–3 generation spans: classify, rewrite, user_resolve.",
+          "NO 'generate' span — answer is raw profile from Milvus, not LLM generated.",
+          "Layer 1 scores (response_length, has_content, etc.) should NOT appear — engine returns before scoring.",
+          "profile_relevance appears in Scores panel within ~5s (LLM judge background thread).",
+          "Expected profile_relevance = 1.0 since the profile directly answers 'show me the profile of ajay11.yadav'.",
+          "Verify response body contains 'ajay11.yadav' as the user heading."
+        ]
+      },
+      "notes": "The absence of Layer 1 scores is intentional and correct. If they appear, there is a bug in the engine short-circuit."
+    },
+
+    {
+      "id": "USR-002",
+      "category": "user_search_exact_name_partial",
+      "query": "Tell me about ravi.verma",
+      "description": "Another exact name lookup — verifies profile_relevance scoring on a different user",
+      "expected": {
+        "intent": "USER_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.85,
+        "pipeline_path": "exact_match"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "user_resolve"],
+        "retrievers_used": [],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · USER_SEARCH",
+        "tags": ["intent:USER_SEARCH"],
+        "scores_expected": {
+          "profile_relevance": { "expected": "0.7–1.0", "reason": "Profile answers the question but may only partially cover all details" }
+        },
+        "scores_not_expected": ["response_length", "has_content", "faithfulness"],
+        "verification_steps": [
+          "Same structure as USR-001. Verify profile_relevance appears, Layer 1 does not.",
+          "Compare profile_relevance between USR-001 and USR-002 — both should be high since they are direct lookups."
+        ]
+      },
+      "notes": "Pair with USR-001 to establish a baseline for profile_relevance on exact matches."
+    },
+
+    {
+      "id": "USR-003",
+      "category": "user_search_fuzzy_name",
+      "query": "Show me ajay yadav's work",
+      "description": "Fuzzy name — 'ajay yadav' should fuzzy-match 'ajay11.yadav' via RapidFuzz, then LLM resolver disambiguates",
+      "expected": {
+        "intent": "USER_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.8,
+        "pipeline_path": "fuzzy_then_resolve"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "user_resolve"],
+        "retrievers_used": [],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · USER_SEARCH",
+        "tags": ["intent:USER_SEARCH"],
+        "scores_expected": {
+          "profile_relevance": { "expected": "0.7–1.0" }
+        },
+        "scores_not_expected": ["response_length", "has_content", "source_count", "faithfulness"],
+        "verification_steps": [
+          "Trace should have classify, rewrite, user_resolve spans.",
+          "user_resolve span input should contain 'ajay yadav' as the query and 'ajay11.yadav' as a candidate.",
+          "Verify the response correctly identifies ajay11.yadav as the matching user.",
+          "profile_relevance should be >= 0.7 since the correct profile was returned."
+        ]
+      },
+      "notes": "Tests RapidFuzz name matching. If profile_relevance = 0.0, wrong user was resolved."
+    },
+
+    {
+      "id": "USR-004",
+      "category": "user_search_expertise_semantic",
+      "query": "Who is working on Spark-based data processing?",
+      "description": "Semantic expertise search — no explicit name, triggers vector retrieval on user_profiles",
+      "expected": {
+        "intent": "USER_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.82,
+        "pipeline_path": "vector_retrieval"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["user_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 3 }
+      },
+      "langfuse": {
+        "trace_name": "chat · USER_SEARCH",
+        "tags": ["intent:USER_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.8–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.82" },
+          "source_count": { "expected_range": ">0.4" },
+          "faithfulness": { "expected_range": ">0.65" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "Trace should have classify, rewrite, generate spans (full pipeline — no early return).",
+          "user_hits >= 2 in trace metadata — ajay11.yadav and dhruv2.aggarwal should rank high (both have Spark content).",
+          "Layer 1 scores present (unlike exact name path).",
+          "RAGAS faithfulness confirms answer names are grounded in retrieved user profiles."
+        ]
+      },
+      "notes": "Tests the semantic path vs name-lookup path. If user_hits = 0, user_profile indexing may have failed."
+    },
+
+    {
+      "id": "USR-005",
+      "category": "user_search_by_technology",
+      "query": "Who uses pandas for data analysis?",
+      "description": "Technology-specific user search — should surface amit23.sharma",
+      "expected": {
+        "intent": "USER_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.8,
+        "pipeline_path": "vector_retrieval"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["user_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 2 }
+      },
+      "langfuse": {
+        "trace_name": "chat · USER_SEARCH",
+        "tags": ["intent:USER_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.8–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.8" },
+          "source_count": { "expected_range": ">0.2" },
+          "faithfulness": { "expected_range": ">0.65" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "user_hits should include amit23.sharma (pandas workspace).",
+          "context_precision validates that pandas users ranked higher than Spark users."
+        ]
+      },
+      "notes": "Tests precision of user profile vectors for technology-specific expertise."
+    },
+
+    {
+      "id": "USR-006",
+      "category": "user_search_no_match",
+      "query": "Who is the ML platform reliability engineer?",
+      "description": "Role that doesn't exist in the dataset — tests graceful fallback",
+      "expected": {
+        "intent": "USER_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.8,
+        "pipeline_path": "vector_retrieval"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["user_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · USER_SEARCH",
+        "tags": ["intent:USER_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.4–0.8" },
+          "has_content": { "expected": 0.0 },
+          "intent_confidence": { "expected_range": ">0.8" },
+          "source_count": { "expected": 0.0 },
+          "faithfulness": { "expected_range": "0.0–0.3" },
+          "answer_relevancy": { "expected_range": ">0.4" },
+          "context_precision": { "expected_range": "0.0–0.2" }
+        },
+        "verification_steps": [
+          "user_hits = 0 in trace metadata.",
+          "has_content = 0.0 expected. If 1.0, the LLM invented a user.",
+          "Check answer text — should say no matching user found, not invent a name."
+        ]
+      },
+      "notes": "Critical negative test. User invention is a reliability failure."
+    },
+
+    {
+      "id": "USR-007",
+      "category": "user_search_ambiguous_name",
+      "query": "Tell me about amit",
+      "description": "Single first name — may fuzzy-match amit23.sharma; tests resolution with partial names",
+      "expected": {
+        "intent": "USER_SEARCH",
+        "confidence_range": "medium-high",
+        "min_confidence": 0.75,
+        "pipeline_path": "fuzzy_then_resolve"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "user_resolve"],
+        "retrievers_used": [],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · USER_SEARCH",
+        "tags": ["intent:USER_SEARCH"],
+        "scores_expected": {
+          "profile_relevance": { "expected": "0.7–1.0", "reason": "Only one 'amit' in dataset, so correct resolution expected" }
+        },
+        "scores_not_expected": ["response_length", "has_content", "faithfulness"],
+        "verification_steps": [
+          "user_resolve span should show 'amit' as query and 'amit23.sharma' as candidate.",
+          "If no candidates found at all, falls through to vector search → different span structure.",
+          "profile_relevance >= 0.7 confirms correct user was surfaced."
+        ]
+      },
+      "notes": "With only one 'amit' in the dataset this should resolve cleanly. In a larger dataset this would test disambiguation."
+    },
+
+    {
+      "id": "USR-008",
+      "category": "user_search_what_are_they_working_on",
+      "query": "What is dhruv2.aggarwal working on?",
+      "description": "Exact name but framed as activity question — tests profile_relevance scoring quality",
+      "expected": {
+        "intent": "USER_SEARCH",
+        "confidence_range": "high",
+        "min_confidence": 0.85,
+        "pipeline_path": "exact_match"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "user_resolve"],
+        "retrievers_used": [],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · USER_SEARCH",
+        "tags": ["intent:USER_SEARCH"],
+        "scores_expected": {
+          "profile_relevance": { "expected": "0.7–1.0", "reason": "Profile should describe Spark/data work" }
+        },
+        "scores_not_expected": ["response_length", "faithfulness"],
+        "verification_steps": [
+          "Verify profile_relevance is high — dhruv2.aggarwal has Spark content so the profile should answer the question.",
+          "If profile_relevance = 0.3, the profile was indexed with insufficient detail — re-run profile indexing.",
+          "Compare profile_relevance for this query vs USR-001 (direct lookup) — both should be similar."
+        ]
+      },
+      "notes": "Tests that the LLM judge can distinguish a vague 'working on' question from a direct profile lookup."
+    },
+
+    {
+      "id": "HYB-001",
+      "category": "hybrid_docs_and_artifacts",
+      "query": "How do I run a Spark job and can you show me existing notebook examples?",
+      "description": "Combines DOC_QA + ARTIFACT_SEARCH — should route to HYBRID, retrieve from both stores",
+      "expected": {
+        "intent": "HYBRID",
+        "confidence_range": "high",
+        "min_confidence": 0.75
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store", "artifact_store"],
+        "expected_hits": { "doc_hits": 3, "artifact_hits": 3, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · HYBRID",
+        "tags": ["intent:HYBRID"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0", "reason": "Longer answer combining doc steps + artifact list" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.75" },
+          "source_count": { "expected_range": "0.8–1.0", "reason": "6 total sources: 3 doc + 3 artifact" },
+          "faithfulness": { "expected_range": ">0.7" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "Trace metadata: doc_hits >= 2 AND artifact_hits >= 2 — both stores must contribute.",
+          "source_count = doc_hits + artifact_hits + user_hits, should be 5–6.",
+          "Click 'generate' span — context window should show both doc chunks and artifact summaries.",
+          "If either doc_hits = 0 or artifact_hits = 0, one store failed — investigate independently.",
+          "RAGAS faithfulness on HYBRID is harder — lower threshold acceptable (0.6)."
+        ]
+      },
+      "notes": "Most complex retrieval path. The source_count score being high is critical here."
+    },
+
+    {
+      "id": "HYB-002",
+      "category": "hybrid_users_and_artifacts",
+      "query": "Who works on data analysis and what notebooks have they created?",
+      "description": "Combines USER_SEARCH + ARTIFACT_SEARCH — all three retrievers or just user+artifact",
+      "expected": {
+        "intent": "HYBRID",
+        "confidence_range": "high",
+        "min_confidence": 0.75
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store", "user_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 3, "user_hits": 3 }
+      },
+      "langfuse": {
+        "trace_name": "chat · HYBRID",
+        "tags": ["intent:HYBRID"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.75" },
+          "source_count": { "expected_range": "0.8–1.0" },
+          "faithfulness": { "expected_range": ">0.65" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "Verify user_hits > 0 AND artifact_hits > 0 in trace metadata.",
+          "Note: HYBRID always calls all 3 retrievers (doc_hits=3, artifact_hits=3, user_hits=3 limits). Some may return 0.",
+          "Trace metadata doc_hits may be low — acceptable since this query isn't doc-focused.",
+          "Verify amit23.sharma appears in both user_hits and artifact context."
+        ]
+      },
+      "notes": "Tests HYBRID routing when docs are not relevant. doc_hits near 0 is expected and correct here."
+    },
+
+    {
+      "id": "HYB-003",
+      "category": "hybrid_all_three",
+      "query": "What is SparkSQL, who uses it in their work, and are there notebooks I can refer to?",
+      "description": "All three intents combined — should use all retrievers",
+      "expected": {
+        "intent": "HYBRID",
+        "confidence_range": "high",
+        "min_confidence": 0.78
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store", "artifact_store", "user_store"],
+        "expected_hits": { "doc_hits": 2, "artifact_hits": 3, "user_hits": 2 }
+      },
+      "langfuse": {
+        "trace_name": "chat · HYBRID",
+        "tags": ["intent:HYBRID"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.78" },
+          "source_count": { "expected_range": "0.8–1.0", "reason": "All 3 stores should contribute, total ~7 sources" },
+          "faithfulness": { "expected_range": ">0.6" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "This is the maximum coverage test — all 3 stores contribute.",
+          "If any store returns 0 hits, check independently with ART-004 (SQL) and USR-004 (Spark users).",
+          "source_count score should be highest across all HYBRID queries."
+        ]
+      },
+      "notes": "The richest test case. Useful as a daily smoke test — run this and check source_count + faithfulness."
+    },
+
+    {
+      "id": "HYB-004",
+      "category": "hybrid_implicit",
+      "query": "I want to get started with Spark on the platform",
+      "description": "Seemingly DOC_QA but a well-tuned classifier should route to HYBRID (docs + artifact examples)",
+      "expected": {
+        "intent": "HYBRID",
+        "confidence_range": "medium",
+        "min_confidence": 0.6,
+        "alternative_intent": "DOC_QA"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store", "artifact_store", "user_store"],
+        "expected_hits": { "doc_hits": 2, "artifact_hits": 3, "user_hits": 1 }
+      },
+      "langfuse": {
+        "trace_name": "chat · HYBRID",
+        "tags": ["intent:HYBRID"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": "0.6–0.9" },
+          "source_count": { "expected_range": ">0.4" },
+          "faithfulness": { "expected_range": ">0.6" },
+          "answer_relevancy": { "expected_range": ">0.75" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "intent_confidence may be 0.6–0.75 — ambiguity between DOC_QA and HYBRID is expected.",
+          "If routed to DOC_QA instead, check if classifier prompt distinguishes 'getting started' (HYBRID) from 'how to' (DOC_QA).",
+          "Low intent_confidence here is informative — flag for prompt tuning if consistently misclassified."
+        ]
+      },
+      "notes": "Boundary case between DOC_QA and HYBRID. Intent classifier confidence is the KPI to watch."
+    },
+
+    {
+      "id": "OOS-001",
+      "category": "oos_weather",
+      "query": "What's the weather like in Bangalore today?",
+      "description": "Completely off-topic — should be classified OUT_OF_SCOPE immediately",
+      "expected": {
+        "intent": "OUT_OF_SCOPE",
+        "confidence_range": "high",
+        "min_confidence": 0.9
+      },
+      "pipeline": {
+        "llm_calls": ["classify"],
+        "retrievers_used": [],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 },
+        "special": "Short-circuits after classify. No rewrite, no retrieve, no generate."
+      },
+      "langfuse": {
+        "trace_name": "chat · OUT_OF_SCOPE",
+        "tags": ["intent:OUT_OF_SCOPE"],
+        "scores_expected": {},
+        "scores_not_expected": ["response_length", "has_content", "intent_confidence", "source_count", "faithfulness"],
+        "verification_steps": [
+          "Trace should contain ONLY a 'classify' generation span.",
+          "No 'rewrite' span, no 'generate' span.",
+          "NO scores appear in the Scores panel — engine returns before score_response_quality is called.",
+          "This is correct behaviour. If scores appear, the engine is not short-circuiting properly.",
+          "Verify the response body contains the out-of-scope reply text."
+        ]
+      },
+      "notes": "Key invariant: OUT_OF_SCOPE traces must have 0 scores and only 1 LLM call. This saves token cost."
+    },
+
+    {
+      "id": "OOS-002",
+      "category": "oos_stock_price",
+      "query": "What is the current stock price of Google?",
+      "description": "Real-time external data — OUT_OF_SCOPE",
+      "expected": {
+        "intent": "OUT_OF_SCOPE",
+        "confidence_range": "high",
+        "min_confidence": 0.9
+      },
+      "pipeline": {
+        "llm_calls": ["classify"],
+        "retrievers_used": [],
+        "expected_hits": {}
+      },
+      "langfuse": {
+        "trace_name": "chat · OUT_OF_SCOPE",
+        "tags": ["intent:OUT_OF_SCOPE"],
+        "scores_expected": {},
+        "scores_not_expected": ["response_length", "has_content", "faithfulness"],
+        "verification_steps": [
+          "Same as OOS-001: single classify span, zero scores.",
+          "Confirm intent_confidence > 0.9 in the classify span output."
+        ]
+      },
+      "notes": "Pair with OOS-001 to confirm pattern: real-time external data consistently classified correctly."
+    },
+
+    {
+      "id": "OOS-003",
+      "category": "oos_general_coding",
+      "query": "Write me a Python function to reverse a string",
+      "description": "Generic coding help — not platform-related, OUT_OF_SCOPE",
+      "expected": {
+        "intent": "OUT_OF_SCOPE",
+        "confidence_range": "high",
+        "min_confidence": 0.82
+      },
+      "pipeline": {
+        "llm_calls": ["classify"],
+        "retrievers_used": [],
+        "expected_hits": {}
+      },
+      "langfuse": {
+        "trace_name": "chat · OUT_OF_SCOPE",
+        "tags": ["intent:OUT_OF_SCOPE"],
+        "scores_expected": {},
+        "scores_not_expected": ["response_length", "faithfulness"],
+        "verification_steps": [
+          "Single classify span, zero scores.",
+          "Note: confidence may be slightly lower than weather/stock queries — Python is tangentially related to data work."
+        ]
+      },
+      "notes": "Edge case: generic Python vs platform Python. Confidence < 0.82 here should trigger a classifier prompt review."
+    },
+
+    {
+      "id": "OOS-004",
+      "category": "oos_social",
+      "query": "Tell me a joke",
+      "description": "Casual social interaction — clearly OUT_OF_SCOPE",
+      "expected": {
+        "intent": "OUT_OF_SCOPE",
+        "confidence_range": "high",
+        "min_confidence": 0.95
+      },
+      "pipeline": {
+        "llm_calls": ["classify"],
+        "retrievers_used": [],
+        "expected_hits": {}
+      },
+      "langfuse": {
+        "trace_name": "chat · OUT_OF_SCOPE",
+        "tags": ["intent:OUT_OF_SCOPE"],
+        "scores_expected": {},
+        "scores_not_expected": ["response_length", "faithfulness"],
+        "verification_steps": [
+          "Should be highest-confidence OUT_OF_SCOPE classification across this category.",
+          "Single classify span, zero scores, immediate return."
+        ]
+      },
+      "notes": "Trivial OOS. Useful as a sanity baseline — if this fails classification, the model or prompt is broken."
+    },
+
+    {
+      "id": "OOS-005",
+      "category": "oos_external_tool",
+      "query": "How do I configure an AWS SageMaker endpoint?",
+      "description": "External cloud service — should be OUT_OF_SCOPE despite being ML-adjacent",
+      "expected": {
+        "intent": "OUT_OF_SCOPE",
+        "confidence_range": "high",
+        "min_confidence": 0.85
+      },
+      "pipeline": {
+        "llm_calls": ["classify"],
+        "retrievers_used": [],
+        "expected_hits": {}
+      },
+      "langfuse": {
+        "trace_name": "chat · OUT_OF_SCOPE",
+        "tags": ["intent:OUT_OF_SCOPE"],
+        "scores_expected": {},
+        "scores_not_expected": ["response_length", "faithfulness"],
+        "verification_steps": [
+          "ML-adjacent queries should still be OUT_OF_SCOPE when referencing external services.",
+          "If routed to DOC_QA instead, the classifier is confusing 'ML platform questions' with 'platform-specific questions'."
+        ]
+      },
+      "notes": "Important boundary: Kubeflow/Spark questions are in-scope; AWS SageMaker is not."
+    },
+
+    {
+      "id": "OOS-006",
+      "category": "oos_vague",
+      "query": "Help me",
+      "description": "Extremely vague — classifier has to choose between OUT_OF_SCOPE and DOC_QA",
+      "expected": {
+        "intent": "OUT_OF_SCOPE",
+        "confidence_range": "low-medium",
+        "min_confidence": 0.4,
+        "alternative_intent": "DOC_QA"
+      },
+      "pipeline": {
+        "llm_calls": ["classify"],
+        "retrievers_used": [],
+        "expected_hits": {}
+      },
+      "langfuse": {
+        "trace_name": "chat · OUT_OF_SCOPE",
+        "tags": ["intent:OUT_OF_SCOPE"],
+        "scores_expected": {},
+        "verification_steps": [
+          "Check intent_confidence — expect 0.4–0.6, reflecting genuine ambiguity.",
+          "Either OUT_OF_SCOPE or DOC_QA is acceptable. What matters is that confidence is LOW.",
+          "Low confidence on vague queries is correct behaviour — watch for false high-confidence classifications.",
+          "If routed to DOC_QA with high confidence, that is also defensible (chatbot guides user toward platform topics)."
+        ]
+      },
+      "notes": "Intentionally ambiguous. Use this to check that the classifier admits uncertainty (low confidence) rather than being overconfident."
+    },
+
+    {
+      "id": "EDGE-001",
+      "category": "edge_case_multi_turn_context",
+      "query": "Show me more examples from that workspace",
+      "description": "Follow-up query without context — pipeline receives no history, so retrieval will be poor",
+      "expected": {
+        "intent": "ARTIFACT_SEARCH",
+        "confidence_range": "medium",
+        "min_confidence": 0.55
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["artifact_store"],
+        "expected_hits": { "artifact_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · ARTIFACT_SEARCH",
+        "tags": ["intent:ARTIFACT_SEARCH"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.5–0.8" },
+          "has_content": { "expected": 0.0 },
+          "intent_confidence": { "expected_range": "0.5–0.8" },
+          "source_count": { "expected": 0.0 }
+        },
+        "verification_steps": [
+          "Verify has_content = 0.0 — without session history, 'that workspace' is unresolvable.",
+          "This is expected failure behaviour. The answer should ask the user to clarify.",
+          "If this is submitted WITH history in the session (history parameter populated), DOC_QA/ARTIFACT hits should improve.",
+          "Compare source_count with and without history to verify history propagation works."
+        ]
+      },
+      "notes": "Tests context-free multi-turn. Surfaces that session history must be passed for follow-ups to work."
+    },
+
+    {
+      "id": "EDGE-002",
+      "category": "edge_case_classifier_fallback",
+      "query": "xkcd fzorq brntp",
+      "description": "Nonsense query — classifier should return low-confidence classification, likely OUT_OF_SCOPE",
+      "expected": {
+        "intent": "OUT_OF_SCOPE",
+        "confidence_range": "low",
+        "min_confidence": 0.3
+      },
+      "pipeline": {
+        "llm_calls": ["classify"],
+        "retrievers_used": [],
+        "expected_hits": {}
+      },
+      "langfuse": {
+        "trace_name": "chat · OUT_OF_SCOPE",
+        "tags": ["intent:OUT_OF_SCOPE"],
+        "scores_expected": {},
+        "verification_steps": [
+          "Intent should be OUT_OF_SCOPE with low confidence.",
+          "Verify the classify span does NOT throw an error (classifier must be robust to garbage input).",
+          "Check reasoning field in classify output — should reflect inability to parse the query."
+        ]
+      },
+      "notes": "Robustness test. The classify span should succeed (no exception) even on garbage input."
+    },
+
+    {
+      "id": "EDGE-003",
+      "category": "edge_case_very_long_query",
+      "query": "I am a data engineer working on a new pipeline project and I need to understand how to set up a Kubeflow workspace, submit Spark jobs, configure resource limits, and also find some example notebooks that show how to do data transformations using both pandas and PySpark, and additionally I would like to know who in the team has experience with both SQL and Spark so I can collaborate with them",
+      "description": "Very long compound query — tests query rewriter truncation and HYBRID classification",
+      "expected": {
+        "intent": "HYBRID",
+        "confidence_range": "high",
+        "min_confidence": 0.75
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store", "artifact_store", "user_store"],
+        "expected_hits": { "doc_hits": 3, "artifact_hits": 3, "user_hits": 2 }
+      },
+      "langfuse": {
+        "trace_name": "chat · HYBRID",
+        "tags": ["intent:HYBRID"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.75" },
+          "source_count": { "expected_range": "0.8–1.0" },
+          "faithfulness": { "expected_range": ">0.6" },
+          "answer_relevancy": { "expected_range": ">0.7" },
+          "context_precision": { "expected_range": ">0.5" }
+        },
+        "verification_steps": [
+          "Check 'rewrite' span — output should be a compact, semantically dense version of the query.",
+          "The rewriter must truncate to 80 tokens (max_tokens=80 in QueryRewriter).",
+          "Verify all 3 retrievers return hits.",
+          "response_length score may be high but watch for truncation in the generate span (max_tokens=600)."
+        ]
+      },
+      "notes": "Stress test for query rewriter and HYBRID routing. The rewritten query quality directly affects retrieval."
+    },
+
+    {
+      "id": "EDGE-004",
+      "category": "edge_case_intent_boundary_doc_vs_artifact",
+      "query": "Show me how to read a CSV file in a Kubeflow notebook",
+      "description": "Sits between DOC_QA (how to) and ARTIFACT_SEARCH (show me examples) — tests classifier boundary",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "medium",
+        "min_confidence": 0.6,
+        "alternative_intent": "ARTIFACT_SEARCH"
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 1, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.8–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": "0.6–0.85" },
+          "source_count": { "expected_range": "0.0–0.6" },
+          "faithfulness": { "expected_range": "0.5–0.9" },
+          "answer_relevancy": { "expected_range": ">0.7" },
+          "context_precision": { "expected_range": "0.4–0.9" }
+        },
+        "verification_steps": [
+          "intent_confidence in the 0.6–0.85 range is expected for this boundary query.",
+          "Either DOC_QA or HYBRID is a valid classification — check reasoning in classify span.",
+          "If ARTIFACT_SEARCH, verify amit23.sharma CSV notebooks appear in artifact_hits."
+        ]
+      },
+      "notes": "Intentional boundary query. Tracks classifier behaviour at DOC_QA / ARTIFACT boundary over time."
+    },
+
+    {
+      "id": "EDGE-005",
+      "category": "edge_case_user_feedback_positive",
+      "query": "How do I create my first notebook in Kubeflow?",
+      "description": "Standard DOC_QA — designed to be submitted and then given thumbs-up feedback to test user_feedback scoring",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "high",
+        "min_confidence": 0.85
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 3, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.9–1.0" },
+          "has_content": { "expected": 1.0 },
+          "intent_confidence": { "expected_range": ">0.85" },
+          "source_count": { "expected_range": ">0.6" },
+          "faithfulness": { "expected_range": ">0.7" },
+          "answer_relevancy": { "expected_range": ">0.8" },
+          "context_precision": { "expected_range": ">0.6" },
+          "user_feedback": { "expected": 1.0, "note": "Submit thumbs-up via frontend after receiving response" }
+        },
+        "verification_steps": [
+          "Submit query and wait for response in the frontend.",
+          "Click thumbs-up in the UI.",
+          "In Langfuse: find the trace, go to Scores — user_feedback = 1.0 should appear within seconds.",
+          "Verify user_feedback is attached to the SAME trace_id returned in the response.",
+          "Check the /observability/feedback API endpoint responded with 200."
+        ]
+      },
+      "notes": "Use this to verify the end-to-end user feedback loop. Run with thumbs-up first, then repeat with thumbs-down (EDGE-006)."
+    },
+
+    {
+      "id": "EDGE-006",
+      "category": "edge_case_user_feedback_negative",
+      "query": "What is the procedure to delete a workspace?",
+      "description": "DOC_QA that may have no matching docs — designed for thumbs-down feedback test",
+      "expected": {
+        "intent": "DOC_QA",
+        "confidence_range": "high",
+        "min_confidence": 0.8
+      },
+      "pipeline": {
+        "llm_calls": ["classify", "rewrite", "generate"],
+        "retrievers_used": ["doc_store"],
+        "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 }
+      },
+      "langfuse": {
+        "trace_name": "chat · DOC_QA",
+        "tags": ["intent:DOC_QA"],
+        "scores_expected": {
+          "response_length": { "expected_range": "0.5–0.8" },
+          "has_content": { "expected": 0.0 },
+          "intent_confidence": { "expected_range": ">0.8" },
+          "source_count": { "expected": 0.0 },
+          "faithfulness": { "expected_range": "0.0–0.3" },
+          "answer_relevancy": { "expected_range": ">0.5" },
+          "user_feedback": { "expected": 0.0, "note": "Submit thumbs-down after receiving unhelpful response" }
+        },
+        "verification_steps": [
+          "Confirm has_content = 0.0 (answer is a fallback).",
+          "Click thumbs-down in the UI.",
+          "user_feedback = 0.0 should appear in Langfuse Scores panel.",
+          "Cross-reference: low has_content + low source_count + thumbs-down is the 'missing docs' signal.",
+          "This pattern across multiple traces reveals documentation gaps to prioritise."
+        ]
+      },
+      "notes": "Pair with EDGE-005. Correlation between has_content = 0 and user_feedback = 0 validates the has_content heuristic."
+    }
+
+  ],
+
+  "how_to_run": {
+    "manual": "Submit each query via the frontend chat UI at http://localhost:3002. Copy the trace_id from the response JSON. Look up in Langfuse at http://localhost:3001.",
+    "api": "POST http://localhost:8000/chat with body {\"query\": \"...\", \"session_id\": \"eval-run-001\"}. The trace_id is in the response.",
+    "langfuse_navigation": {
+      "find_trace": "Langfuse → Traces tab → filter by date/tag/trace name",
+      "check_spans": "Click trace row → expand generation spans (classify, rewrite, generate)",
+      "check_scores": "Click trace row → Scores tab → shows all layer1 + layer2 scores",
+      "check_metadata": "Click generate span → metadata panel → shows query, intent, confidence, source counts",
+      "check_layer2_delay": "RAGAS scores (faithfulness, answer_relevancy, context_precision) appear 10–30s after the trace, as they run in a background thread",
+      "aggregate_view": "Langfuse → Scores dashboard → select score name → view distribution over time"
+    },
+    "score_health_thresholds": {
+      "green": { "faithfulness": ">0.7", "answer_relevancy": ">0.75", "intent_confidence": ">0.8", "has_content": "1.0", "source_count": ">0.4" },
+      "amber": { "faithfulness": "0.5–0.7", "answer_relevancy": "0.6–0.75", "intent_confidence": "0.6–0.8", "has_content": "1.0", "source_count": "0.2–0.4" },
+      "red": { "faithfulness": "<0.5", "answer_relevancy": "<0.6", "intent_confidence": "<0.6", "has_content": "0.0", "source_count": "0.0" }
+    }
+  }
+}

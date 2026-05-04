@@ -1,0 +1,31 @@
+flowchart TD
+    Q[User query] --> T[Create request trace_id]
+    T --> C[IntentClassifier<br/>DOC_QA ARTIFACT_SEARCH USER_SEARCH HYBRID OUT_OF_SCOPE]
+    C --> O{Intent}
+    O -->|OUT_OF_SCOPE| B[Bounded refusal response]
+    O -->|USER_SEARCH| N[Name candidate resolution]
+    N -->|Exact match| P[Fetch profile directly<br/>no generation required]
+    N -->|Ambiguous| D[LLM disambiguation]
+    N -->|No name hit| R1[Semantic user-profile retrieval]
+    O -->|DOC_QA| R2[Retrieve platform_docs]
+    O -->|ARTIFACT_SEARCH| R3[Retrieve artifact_summaries]
+    O -->|HYBRID| R4[Retrieve docs + artifacts + users]
+    C --> W[QueryRewriter<br/>optimize retrieval query]
+    W --> R1
+    W --> R2
+    W --> R3
+    W --> R4
+    R1 --> PB[Intent-specific prompt builder]
+    R2 --> PB
+    R3 --> PB
+    R4 --> PB
+    PB --> G[Generate via LiteLLM]
+    G --> F[Format answer<br/>artifacts users sources trace_id]
+    P --> F
+    D --> F
+    B --> F
+    F --> E[Return response to UI]
+    F --> L1[Layer 1 heuristic scores]
+    F --> L2[Layer 2 background eval]
+    L1 --> LF[Langfuse trace]
+    L2 --> LF
