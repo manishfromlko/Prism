@@ -26,13 +26,13 @@ env:
     value: "kubeflow-intelligence-endpoint"
 
   - name: LLM_MODEL
-    value: "databricks-meta-llama-3-3-70b-instruct"
+    value: "gpt-4o-mini"
 
   - name: EVAL_MODEL
-    value: "databricks-meta-llama-3-1-405b-instruct"
+    value: "gpt-4o-mini"
 
   - name: JUDGE_MODEL
-    value: "databricks-meta-llama-3-1-405b-instruct"
+    value: "gpt-4o-mini"
 
   - name: MLFLOW_EXPERIMENT
     value: "/kubeflow-intelligence/chatbot"

@@ -9,10 +9,10 @@ Replicates the full Kubeflow Workspace Intelligence chatbot stack on Databricks,
 | Current (self-hosted) | Databricks Equivalent |
 |-----------------------|----------------------|
 | Milvus (3 collections) | Databricks Vector Search (3 indexes backed by Delta tables) |
-| LiteLLM proxy (port 4000) | Databricks Foundation Model APIs or external model endpoints via Model Serving |
-| OpenAI text-embedding-3-small | Databricks Model Serving external endpoint `text-embedding-3-small` |
-| gpt-4o-mini (classify / rewrite / generate) | `databricks-meta-llama-3-3-70b-instruct` or any served model |
-| gpt-4o (RAGAS eval / LLM judge) | `databricks-meta-llama-3-1-405b-instruct` or Azure OpenAI via serving |
+| LiteLLM proxy (port 4000) | Databricks Model Serving (external model endpoints for `gpt-4o-mini` and `text-embedding-3-small`) |
+| OpenAI text-embedding-3-small | Databricks Model Serving endpoint `text-embedding-3-small` |
+| gpt-4o-mini (classify / rewrite / generate) | Databricks Model Serving endpoint `gpt-4o-mini` |
+| gpt-4o (RAGAS eval / LLM judge) | Databricks Model Serving endpoint `gpt-4o-mini` |
 | Langfuse (traces + scores) | MLflow Tracing (MLflow ≥ 2.14, built into Databricks Runtime 15.4+) |
 | FastAPI on Docker | Databricks Apps |
 | Next.js webapp | Databricks Apps (separate app) |
@@ -28,7 +28,7 @@ Replicates the full Kubeflow Workspace Intelligence chatbot stack on Databricks,
 2. **Databricks Runtime 15.4 LTS ML** or later (ships MLflow 2.16, Python 3.11).
 3. A Unity Catalog **catalog** and **schema** you own (example names used below: `kubeflow.intelligence`).
 4. A **Vector Search endpoint** created in the workspace (one endpoint can host all 3 indexes).
-5. A **Model Serving endpoint** — either Foundation Model APIs (pay-per-token, zero setup) or an external model endpoint pointing at Azure OpenAI / OpenAI.
+5. Two **Model Serving endpoints** already registered: `gpt-4o-mini` (chat) and `text-embedding-3-small` (embeddings).
 6. Personal access token (PAT) or service principal stored in a **Databricks secret scope**.
 
 ---
@@ -168,59 +168,42 @@ After this step, indexes exist but are empty. Proceed to Steps 4–6, then run t
 
 ## Step 4 — Model Serving (LLM Endpoints)
 
-### Option A — Foundation Model APIs (zero setup, pay-per-token)
+Both models are already registered in your Databricks Model Serving workspace. No extra setup needed here.
 
-Already available in every workspace. Use these model names directly in your code:
+| Role | Endpoint name |
+|------|--------------|
+| Classify / rewrite / generate | `gpt-4o-mini` |
+| RAGAS eval + LLM judge | `gpt-4o-mini` |
+| Embeddings (Vector Search + RAGAS) | `text-embedding-3-small` |
 
-| Role | Recommended model name |
-|------|------------------------|
-| Classify / rewrite / generate | `databricks-meta-llama-3-3-70b-instruct` |
-| RAGAS eval + LLM judge | `databricks-meta-llama-3-1-405b-instruct` |
-| Embeddings | `text-embedding-3-small` |
-
-Call them with the standard OpenAI SDK — Databricks exposes an OpenAI-compatible REST API:
+The adapters call these via the standard OpenAI-compatible API that Databricks exposes on every Model Serving endpoint:
 
 ```python
 from openai import OpenAI
 
 client = OpenAI(
-    api_key=dbutils.secrets.get("kubeflow-scope", "databricks-token"),
-    base_url=f"{dbutils.secrets.get('kubeflow-scope', 'databricks-host')}/serving-endpoints",
+    api_key=os.environ["DATABRICKS_TOKEN"],
+    base_url=f"{os.environ['DATABRICKS_HOST']}/serving-endpoints",
 )
 
+# Chat — hits your registered gpt-4o-mini endpoint
 resp = client.chat.completions.create(
-    model="databricks-meta-llama-3-3-70b-instruct",
+    model="gpt-4o-mini",
     messages=[{"role": "user", "content": "Hello"}],
 )
-```
 
-### Option B — External Models (keep OpenAI gpt-4o-mini / gpt-4o)
-
-Register the external model once:
-
-```python
-import mlflow.deployments
-
-client = mlflow.deployments.get_deploy_client("databricks")
-
-client.create_endpoint(
-    name="openai-gpt4o-mini",
-    config={
-        "served_entities": [{
-            "external_model": {
-                "name": "gpt-4o-mini",
-                "provider": "openai",
-                "task": "llm/v1/chat",
-                "openai_config": {
-                    "openai_api_key": "{{secrets/kubeflow-scope/openai-api-key}}",
-                },
-            }
-        }]
-    },
+# Embeddings — hits your registered text-embedding-3-small endpoint
+emb = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=["some text"],
 )
 ```
 
-All existing code calls the same OpenAI-compatible API — only the `base_url` changes.
+> **Verify endpoints are healthy** before running the ingestion workflow:
+> ```bash
+> databricks serving-endpoints get --name gpt-4o-mini
+> databricks serving-endpoints get --name text-embedding-3-small
+> ```
 
 ---
 
@@ -233,7 +216,6 @@ databricks secrets create-scope kubeflow-scope
 # Store credentials
 databricks secrets put-secret kubeflow-scope databricks-host   --string-value "https://<workspace>.azuredatabricks.net"
 databricks secrets put-secret kubeflow-scope databricks-token  --string-value "<pat-or-sp-token>"
-databricks secrets put-secret kubeflow-scope openai-api-key    --string-value "<openai-key>"   # Option B only
 ```
 
 ---
@@ -355,8 +337,8 @@ from .scoring import score_trace
 
 logger = logging.getLogger(__name__)
 
-_EVAL_MODEL  = os.getenv("EVAL_MODEL",  "databricks-meta-llama-3-1-405b-instruct")
-_JUDGE_MODEL = os.getenv("JUDGE_MODEL", "databricks-meta-llama-3-1-405b-instruct")
+_EVAL_MODEL  = os.getenv("EVAL_MODEL",  "gpt-4o-mini")
+_JUDGE_MODEL = os.getenv("JUDGE_MODEL", "gpt-4o-mini")
 
 
 def _make_ragas_components():
@@ -682,9 +664,9 @@ env:
   - name: VECTOR_SEARCH_ENDPOINT
     value: "kubeflow-intelligence-endpoint"
   - name: EVAL_MODEL
-    value: "databricks-meta-llama-3-1-405b-instruct"
+    value: "gpt-4o-mini"
   - name: JUDGE_MODEL
-    value: "databricks-meta-llama-3-1-405b-instruct"
+    value: "gpt-4o-mini"
 ```
 
 ---
@@ -734,9 +716,9 @@ chat  [CHAIN span, root]
 | `DATABRICKS_TOKEN` | PAT or SP token | From secret scope |
 | `VECTOR_SEARCH_ENDPOINT` | `kubeflow-intelligence-endpoint` | Created in Step 3 |
 | `EMBEDDING_MODEL` | `text-embedding-3-small` | Used by managed embeddings |
-| `LLM_MODEL` | `databricks-meta-llama-3-3-70b-instruct` | classify / rewrite / generate |
-| `EVAL_MODEL` | `databricks-meta-llama-3-1-405b-instruct` | RAGAS eval |
-| `JUDGE_MODEL` | `databricks-meta-llama-3-1-405b-instruct` | profile_relevance LLM judge |
+| `LLM_MODEL` | `gpt-4o-mini` | classify / rewrite / generate |
+| `EVAL_MODEL` | `gpt-4o-mini` | RAGAS eval |
+| `JUDGE_MODEL` | `gpt-4o-mini` | profile_relevance LLM judge |
 | `MLFLOW_EXPERIMENT` | `/kubeflow-intelligence/chatbot` | MLflow experiment path |
 
 ---

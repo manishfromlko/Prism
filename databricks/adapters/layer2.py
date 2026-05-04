@@ -22,8 +22,8 @@ from .scoring import score_trace
 
 logger = logging.getLogger(__name__)
 
-_EVAL_MODEL  = os.getenv("EVAL_MODEL",  "databricks-meta-llama-3-1-405b-instruct")
-_JUDGE_MODEL = os.getenv("JUDGE_MODEL", "databricks-meta-llama-3-1-405b-instruct")
+_EVAL_MODEL  = os.getenv("EVAL_MODEL",  "gpt-4o-mini")
+_JUDGE_MODEL = os.getenv("JUDGE_MODEL", "gpt-4o-mini")
 
 try:
     from ragas.llms import llm_factory
