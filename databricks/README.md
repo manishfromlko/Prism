@@ -480,91 +480,178 @@ Replace the local ingestion CLI with a **Databricks Job** (multi-task workflow).
 
 ### Notebook: `databricks/jobs/01_ingest_artifacts.py`
 
+Three stages: `IngestionPipeline` scans the volume and writes a catalog JSON, `DocumentLoader` reads the catalog and extracts text, `TextProcessor` splits into chunks.
+
 ```python
-# Databricks notebook — Task 1: scan volumes, extract, embed, write Delta
-import os
-from databricks.sdk.runtime import dbutils
+import os, sys
 
-# Mount credentials from secrets
-os.environ["DATABRICKS_HOST"]  = dbutils.secrets.get("kubeflow-scope", "databricks-host")
-os.environ["DATABRICKS_TOKEN"] = dbutils.secrets.get("kubeflow-scope", "databricks-token")
-
+SCOPE       = "kubeflow-scope"
+REPO_PATH   = "/Workspace/Repos/manishfromlko@gmail.com/project-1"  # adjust if needed
 VOLUME_PATH = "/Volumes/kubeflow/intelligence/workspace_files"
 
-# Walk volume, extract text, write to Delta (reuses existing extractors/guards logic)
-from src.ingestion.extractors import extract_artifact
-from src.ingestion.guards import DocumentGuard
+os.environ["DATABRICKS_HOST"]  = dbutils.secrets.get(SCOPE, "databricks-host")
+os.environ["DATABRICKS_TOKEN"] = dbutils.secrets.get(SCOPE, "databricks-token")
+sys.path.insert(0, REPO_PATH)
 
+# Stage 1 — scan volume, classify files, write catalog JSON
+from src.ingestion.pipeline import IngestionPipeline
+pipeline = IngestionPipeline(root_path=VOLUME_PATH, mode="full")
+pipeline.run()
+catalog_path = f"{VOLUME_PATH}/.ingestion/ingestion_catalog.json"
+print(f"Catalog written: {catalog_path}")
+
+# Stage 2 — load documents, extract text, apply DocumentGuard
+from src.retrieval.document_loader import DocumentLoader
+from src.retrieval.config import RetrievalConfig
+config    = RetrievalConfig.from_env()
+loader    = DocumentLoader(catalog_path=catalog_path, config=config)
+documents = loader.load_documents(apply_guardrails=True)
+print(f"Documents loaded: {len(documents)}")
+
+# Stage 3 — chunk each document
+from src.retrieval.text_processor import TextProcessor
+processor = TextProcessor(config=config)
 rows = []
-for root, dirs, files in os.walk(VOLUME_PATH):
-    for fname in files:
-        path = os.path.join(root, fname)
-        artifact = extract_artifact(path)
-        if artifact and DocumentGuard.is_safe(artifact):
-            rows.append(artifact.to_dict())
+for doc in documents:
+    artifact_id = doc.metadata.get("artifact_id", "")
+    file_type   = doc.metadata.get("type", "text")
+    chunks      = processor.split_text(doc.page_content, content_type=file_type)
+    for i, chunk_text in enumerate(chunks):
+        rows.append({
+            "chunk_id":    f"{artifact_id}::{i}",
+            "artifact_id": artifact_id,
+            "chunk_text":  chunk_text,
+            "chunk_index": i,
+            "file_path":   doc.metadata.get("path", ""),
+            "file_type":   file_type,
+            "sha256_hash": doc.metadata.get("content_hash", ""),
+        })
+print(f"Total chunks: {len(rows)}")
 
-df = spark.createDataFrame(rows)
-df.write.mode("append").saveAsTable("kubeflow.intelligence.artifact_chunks")
-print(f"Wrote {df.count()} rows to artifact_chunks")
+# Stage 4 — upsert into Delta (delete stale chunks, append fresh)
+if rows:
+    df     = spark.createDataFrame(rows)
+    new_ids = list(set(r["artifact_id"] for r in rows))
+    ids_sql = ", ".join(f"'{i}'" for i in new_ids)
+    spark.sql(f"DELETE FROM kubeflow.intelligence.artifact_chunks WHERE artifact_id IN ({ids_sql})")
+    df.write.mode("append").saveAsTable("kubeflow.intelligence.artifact_chunks")
+    print(f"Wrote {len(rows)} chunks from {len(new_ids)} artifacts")
 ```
 
 ### Notebook: `databricks/jobs/02_generate_summaries.py`
 
 ```python
-# Task 2: generate LLM summaries for new/updated artifacts
-import os
-from databricks.sdk.runtime import dbutils
+import os, sys
 
-os.environ["DATABRICKS_HOST"]  = dbutils.secrets.get("kubeflow-scope", "databricks-host")
-os.environ["DATABRICKS_TOKEN"] = dbutils.secrets.get("kubeflow-scope", "databricks-token")
+SCOPE     = "kubeflow-scope"
+REPO_PATH = "/Workspace/Repos/manishfromlko@gmail.com/project-1"
 
-from src.retrieval.artifact_summary_generator import ArtifactSummaryGenerator
+os.environ["DATABRICKS_HOST"]  = dbutils.secrets.get(SCOPE, "databricks-host")
+os.environ["DATABRICKS_TOKEN"] = dbutils.secrets.get(SCOPE, "databricks-token")
+sys.path.insert(0, REPO_PATH)
 
-# Read only rows without a summary yet
+from src.retrieval.artifact_summary_generator import generate_artifact_summaries
+from src.retrieval.config import RetrievalConfig
+
+config       = RetrievalConfig.from_env()
+catalog_path = f"/Volumes/kubeflow/intelligence/workspace_files/.ingestion/ingestion_catalog.json"
+
+# Generate summaries from the catalog (skips artifacts that already have one)
 new_artifacts = spark.sql("""
-    SELECT a.artifact_id, a.chunk_text, a.file_type
-    FROM kubeflow.intelligence.artifact_chunks a
-    LEFT JOIN kubeflow.intelligence.artifact_summaries s
-      ON a.artifact_id = s.artifact_id
+    SELECT DISTINCT c.artifact_id, FIRST(c.file_type) AS file_type
+    FROM kubeflow.intelligence.artifact_chunks c
+    LEFT JOIN kubeflow.intelligence.artifact_summaries s ON c.artifact_id = s.artifact_id
     WHERE s.artifact_id IS NULL
+    GROUP BY c.artifact_id
 """).collect()
 
-gen = ArtifactSummaryGenerator()
-rows = []
+print(f"Artifacts needing summaries: {len(new_artifacts)}")
+
+from src.retrieval.config import make_openai_client
+from src.retrieval.artifact_summary_generator import _load_prompt_template, _call_llm, _extract_text_for_artifact
+import json
+
+client          = make_openai_client()
+prompt_template = _load_prompt_template()
+rows            = []
+
+import json as _json
+catalog = _json.load(open(catalog_path))
+artifacts_map = catalog.get("artifacts", {})
+
 for row in new_artifacts:
-    summary = gen.generate(row.chunk_text, row.file_type)
-    rows.append({"artifact_id": row.artifact_id, "artifact_summary": summary,
-                 "artifact_type": row.file_type})
+    artifact = artifacts_map.get(row.artifact_id)
+    if not artifact:
+        continue
+    try:
+        # reuse the full generate_artifact_summaries logic via direct call
+        text = _extract_text_for_artifact(artifact)
+        if not text:
+            continue
+        prompt = prompt_template.format(
+            artifact_id=artifact.get("artifact_id",""),
+            workspace_id=artifact.get("workspace_id",""),
+            file_name=artifact.get("file_name",""),
+            file_type=artifact.get("file_type",""),
+            content=text[:5000],
+        )
+        result = _call_llm(client, "gpt-4o-mini", prompt,
+                           temperature=0.0, max_tokens=220,
+                           top_p=1.0, frequency_penalty=0.0, presence_penalty=0.0)
+        rows.append({
+            "artifact_id":      row.artifact_id,
+            "artifact_summary": result.get("summary", ""),
+            "artifact_type":    row.file_type,
+            "file_path":        artifact.get("relative_path", ""),
+        })
+    except Exception as e:
+        print(f"SKIP {row.artifact_id}: {e}")
 
 if rows:
     df = spark.createDataFrame(rows)
     df.write.mode("append").saveAsTable("kubeflow.intelligence.artifact_summaries")
-    print(f"Generated {len(rows)} summaries")
+    print(f"Wrote {len(rows)} summaries")
 ```
 
 ### Notebook: `databricks/jobs/03_generate_user_profiles.py`
 
 ```python
-# Task 3: generate or refresh user profiles from summaries
-import os
-from databricks.sdk.runtime import dbutils
+import os, sys
 
-os.environ["DATABRICKS_HOST"]  = dbutils.secrets.get("kubeflow-scope", "databricks-host")
-os.environ["DATABRICKS_TOKEN"] = dbutils.secrets.get("kubeflow-scope", "databricks-token")
+SCOPE     = "kubeflow-scope"
+REPO_PATH = "/Workspace/Repos/manishfromlko@gmail.com/project-1"
 
-from src.retrieval.user_profile_from_summaries_generator import UserProfileFromSummariesGenerator
+os.environ["DATABRICKS_HOST"]  = dbutils.secrets.get(SCOPE, "databricks-host")
+os.environ["DATABRICKS_TOKEN"] = dbutils.secrets.get(SCOPE, "databricks-token")
+sys.path.insert(0, REPO_PATH)
+
+from src.retrieval.user_profile_from_summaries_generator import generate_user_profiles_from_summaries
+from src.retrieval.config import RetrievalConfig
+
+config = RetrievalConfig.from_env()
 
 summaries_by_user = spark.sql("""
-    SELECT artifact_id, artifact_summary,
-           split(artifact_id, '/')[0] AS user_id
+    SELECT split(artifact_id, ':')[0] AS user_id,
+           collect_list(artifact_summary) AS summaries
     FROM kubeflow.intelligence.artifact_summaries
-""").groupBy("user_id").agg({"artifact_summary": "collect_list"}).collect()
+    GROUP BY split(artifact_id, ':')[0]
+""").collect()
 
-gen = UserProfileFromSummariesGenerator()
-rows = []
-for row in summaries_by_user:
-    profile = gen.generate(row.user_id, row["collect_list(artifact_summary)"])
-    rows.append({"user_id": row.user_id, "user_profile": profile})
+print(f"Users to profile: {len(summaries_by_user)}")
+
+profiles = generate_user_profiles_from_summaries(
+    summaries_by_user=[{"user_id": r.user_id, "summaries": r.summaries} for r in summaries_by_user],
+    config=config,
+)
+
+rows = [
+    {
+        "user_id":      p["user_id"],
+        "user_profile": p["user_profile"],
+        "display_name": p["user_id"].replace(".", " ").title(),
+    }
+    for p in profiles
+]
 
 df = spark.createDataFrame(rows)
 df.write.mode("overwrite").saveAsTable("kubeflow.intelligence.user_profiles")
@@ -574,10 +661,15 @@ print(f"Wrote {len(rows)} user profiles")
 ### Notebook: `databricks/jobs/04_sync_vector_indexes.py`
 
 ```python
-# Task 4: trigger Vector Search index sync after Delta tables are updated
+import os
+
+os.environ["DATABRICKS_HOST"]  = dbutils.secrets.get("kubeflow-scope", "databricks-host")
+os.environ["DATABRICKS_TOKEN"] = dbutils.secrets.get("kubeflow-scope", "databricks-token")
+
 from databricks.vector_search.client import VectorSearchClient
 
-vsc = VectorSearchClient()
+vsc      = VectorSearchClient(workspace_url=os.environ["DATABRICKS_HOST"],
+                               personal_access_token=os.environ["DATABRICKS_TOKEN"])
 ENDPOINT = "kubeflow-intelligence-endpoint"
 
 for index_name in [
