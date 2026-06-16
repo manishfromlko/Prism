@@ -9,7 +9,8 @@
       "Bash(docker exec *)",
       "Bash(python generate_eval_slides.py)",
       "Bash(/Users/manish/mount/test/project-1/.venv/bin/python generate_eval_slides_v2.py)",
-      "Bash(/Users/manish/mount/test/project-1/.venv/bin/python generate_request_flow.py)"
+      "Bash(/Users/manish/mount/test/project-1/.venv/bin/python generate_request_flow.py)",
+      "Bash(xargs cat)"
     ],
     "additionalDirectories": [
       "/Users/manish/mount/test/project-1/webapp/app/api/user-profiles"
