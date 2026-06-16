@@ -1,60 +1,106 @@
-# Databricks notebook — Task 1: scan Unity Catalog Volume, extract, guard, write to Delta
+# Databricks notebook — Task 1: scan Unity Catalog Volume, extract, chunk, write to Delta
 #
-# Replaces: src/ingestion/pipeline.py (local filesystem walk + Milvus insert)
+# Replaces: src/ingestion/pipeline.py + src/retrieval/document_loader.py + indexer.py
 # Source:   /Volumes/kubeflow/intelligence/workspace_files/
 # Sink:     kubeflow.intelligence.artifact_chunks (Delta table)
+#
+# Pipeline:
+#   IngestionPipeline  → scans volume, classifies files, writes catalog JSON
+#   DocumentLoader     → reads catalog, extracts text, applies DocumentGuard
+#   TextProcessor      → splits text into chunks
+#   → write rows to Delta table (Vector Search embeds on next sync)
 
+# COMMAND ----------
 import os
 import sys
 
-# Inject secrets from Databricks secret scope into env
 SCOPE = "kubeflow-scope"
 os.environ["DATABRICKS_HOST"]  = dbutils.secrets.get(SCOPE, "databricks-host")
 os.environ["DATABRICKS_TOKEN"] = dbutils.secrets.get(SCOPE, "databricks-token")
 
-sys.path.insert(0, "/Workspace/Repos/<your-repo>/project-1")  # adjust to your repo path
+REPO_PATH    = "/Workspace/Repos/manishfromlko@gmail.com/project-1"  # adjust if needed
+VOLUME_PATH  = "/Volumes/kubeflow/intelligence/workspace_files"
 
-from src.ingestion.extractors import extract_artifact
-from src.ingestion.guards import DocumentGuard
-from src.ingestion.utils import compute_file_hash
+sys.path.insert(0, REPO_PATH)
 
-VOLUME_PATH = "/Volumes/kubeflow/intelligence/workspace_files"
+# COMMAND ----------
+# Step 1 — run ingestion pipeline to scan the volume and write catalog JSON
+# Catalog is saved to /Volumes/.../workspace_files/.ingestion/ingestion_catalog.json
 
+from src.ingestion.pipeline import IngestionPipeline
+
+pipeline = IngestionPipeline(root_path=VOLUME_PATH, mode="full")
+pipeline.run()
+
+catalog_path = f"{VOLUME_PATH}/.ingestion/ingestion_catalog.json"
+print(f"Catalog written to: {catalog_path}")
+
+# COMMAND ----------
+# Step 2 — load documents from catalog, extract text, apply DocumentGuard
+
+from src.retrieval.document_loader import DocumentLoader
+from src.retrieval.config import RetrievalConfig
+
+config = RetrievalConfig.from_env()
+loader = DocumentLoader(catalog_path=catalog_path, config=config)
+documents = loader.load_documents(apply_guardrails=True)
+
+print(f"Documents loaded: {len(documents)}")
+for doc in documents[:3]:
+    print(f"  {doc.metadata.get('artifact_id')}  [{doc.metadata.get('type')}]  "
+          f"{len(doc.page_content)} chars")
+
+# COMMAND ----------
+# Step 3 — chunk each document
+
+from src.retrieval.text_processor import TextProcessor
+
+processor = TextProcessor(config=config)
 rows = []
-for root, _dirs, files in os.walk(VOLUME_PATH):
-    for fname in files:
-        path = os.path.join(root, fname)
-        try:
-            artifact = extract_artifact(path)
-            if artifact is None:
-                continue
-            if not DocumentGuard.is_safe(artifact):
-                continue
-            sha256 = compute_file_hash(path)
-            for chunk in artifact.chunks:
-                rows.append({
-                    "chunk_id":    f"{artifact.artifact_id}::{chunk.index}",
-                    "artifact_id": artifact.artifact_id,
-                    "chunk_text":  chunk.text,
-                    "chunk_index": chunk.index,
-                    "file_path":   path,
-                    "file_type":   artifact.file_type,
-                    "sha256_hash": sha256,
-                    # metadata (MAP type) is excluded — Vector Search does not support MAP columns
-                })
-        except Exception as e:
-            print(f"SKIP {path}: {e}")
+
+for doc in documents:
+    artifact_id = doc.metadata.get("artifact_id", "")
+    file_type    = doc.metadata.get("type", "text")
+    file_path    = doc.metadata.get("path", "")
+    workspace_id = doc.metadata.get("workspace_id", "")
+    sha256       = doc.metadata.get("content_hash", "")
+
+    chunks = processor.split_text(doc.page_content, content_type=file_type)
+    for i, chunk_text in enumerate(chunks):
+        rows.append({
+            "chunk_id":    f"{artifact_id}::{i}",
+            "artifact_id": artifact_id,
+            "chunk_text":  chunk_text,
+            "chunk_index": i,
+            "file_path":   file_path,
+            "file_type":   file_type,
+            "sha256_hash": sha256,
+        })
+
+print(f"Total chunks: {len(rows)}")
+print(f"Total artifacts: {len(set(r['artifact_id'] for r in rows))}")
+
+# COMMAND ----------
+# Step 4 — inspect before writing (sanity check)
+
+display(spark.createDataFrame(rows[:20]))
+
+# COMMAND ----------
+# Step 5 — upsert into Delta table
+# Delete stale chunks for re-ingested artifacts, then append fresh rows
 
 if rows:
     df = spark.createDataFrame(rows)
-    # Upsert: delete existing chunks for updated files then append
-    existing = spark.table("kubeflow.intelligence.artifact_chunks")
-    new_ids = [r["artifact_id"] for r in rows]
+    new_ids = list(set(r["artifact_id"] for r in rows))
+
+    # Delete old chunks for any artifact being re-ingested
+    ids_sql = ", ".join(f"'{i}'" for i in new_ids)
     spark.sql(f"""
         DELETE FROM kubeflow.intelligence.artifact_chunks
-        WHERE artifact_id IN ({','.join(repr(i) for i in set(new_ids))})
+        WHERE artifact_id IN ({ids_sql})
     """)
+
     df.write.mode("append").saveAsTable("kubeflow.intelligence.artifact_chunks")
-    print(f"Wrote {len(rows)} chunks from {len(set(new_ids))} artifacts")
+    print(f"Wrote {len(rows)} chunks from {len(new_ids)} artifacts")
 else:
-    print("No new artifacts found")
+    print("No documents extracted — check volume path and catalog")

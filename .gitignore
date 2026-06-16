@@ -49,5 +49,5 @@ coverage/
 .next
 .vercel
 
-# dataset
-/dataset/ravi.verma/
+# dataset — large workspace files, stored in Unity Catalog Volume in Databricks
+dataset/
