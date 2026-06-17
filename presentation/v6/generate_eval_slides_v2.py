@@ -255,7 +255,7 @@ def slide2_vector_search(prs):
     bottom_bar(slide)
     slide_title(slide,
         "Retrieval  –  Step 2: Query Rewrite & Vector Search",
-        "Query is enriched before embedding, then routed to the correct Milvus collection")
+        "Query is enriched before embedding, then routed to the correct Qdrant collection")
 
     # ── Query Rewriter ────────────────────────────────────────────────────────
     rect(slide, 2.40, 0.98, 8.50, 1.54, TEALB, TEAL, 1.5)
@@ -264,7 +264,7 @@ def slide2_vector_search(prs):
         "LLM call  ·  gpt-4o-mini  ·  T=0.0  ·  max 80 tokens", 9, DARKSL)
     bullets(slide, 2.60, 1.58, 3.80,
             ["Expands query with synonyms and technical terms",
-             "Improves cosine similarity recall in Milvus"],
+             "Improves cosine similarity recall in Qdrant"],
             9, DARKSL, TEAL, 0.26)
 
     # example rewrite on right of rewriter box
@@ -305,9 +305,9 @@ def slide2_vector_search(prs):
 
         arrow(slide, x + 1.80, 3.56, x + 1.80, 3.82, fc, 1.4)
 
-        # Milvus collection box
+        # Qdrant collection box
         rect(slide, x, 3.82, 3.60, 2.12, WHITE, fc, 1.2)
-        txt(slide, x + 0.14, 3.90, 3.34, 0.26, "Milvus Collection", 9, MUTED, True)
+        txt(slide, x + 0.14, 3.90, 3.34, 0.26, "Qdrant Collection", 9, MUTED, True)
         yy = 4.20
         for ex in examples:
             dot(slide, x + 0.18, yy + 0.06, 0.09, fc)
@@ -326,7 +326,7 @@ def slide2_vector_search(prs):
     multi(slide, 0.36, 6.64, 12.60, 0.56, [
         ("Name Resolution:  ", 9, PURPLE, True),
         ("RapidFuzz string match against all user IDs  →  LLM disambiguation (user_resolve span)  →  "
-         "direct Milvus profile fetch  →  LLM judge scores profile_relevance.  "
+         "direct Qdrant profile fetch  →  LLM judge scores profile_relevance.  "
          "No generate step, no Layer 1 scores.", 9, DARKSL, False),
     ])
     # make it inline
@@ -340,7 +340,7 @@ def slide2_vector_search(prs):
     run1.font.bold = True; run1.font.color.rgb = PURPLE; run1.font.size = Pt(9)
     run2 = p.add_run()
     run2.text = ("RapidFuzz string match against all user IDs  →  LLM disambiguation (user_resolve span)  →  "
-                 "direct Milvus profile fetch  →  LLM judge scores profile_relevance.  "
+                 "direct Qdrant profile fetch  →  LLM judge scores profile_relevance.  "
                  "No generate step. No Layer 1 heuristic scores.")
     run2.font.color.rgb = DARKSL; run2.font.size = Pt(9)
 
@@ -513,7 +513,7 @@ def slide4_layer1(prs):
          "Capped at 1.0\n\n"
          "5 sources → 1.0   |   3 sources → 0.6\n"
          "1 source  → 0.2   |   0 sources → 0.0",
-         "Multiple relevant sources found in Milvus",
+         "Multiple relevant sources found in Qdrant",
          "Retrieval returned nothing — embedding or indexing issue"),
     ]
 

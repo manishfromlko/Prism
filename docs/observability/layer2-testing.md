@@ -18,8 +18,8 @@ cd rag-observability/langfuse && docker compose up -d
 # 2. LiteLLM proxy  (http://localhost:4000)
 cd rag-observability/litellm && docker compose up -d
 
-# 3. Milvus  (host 192.168.1.10:19530 per .env)
-#    Start however your local Milvus runs (Docker or standalone)
+# 3. Qdrant  (host 192.168.1.10:6333 per .env)
+#    Start however your local Qdrant runs (Docker or standalone)
 
 # Activate virtualenv
 source .venv/bin/activate
@@ -40,7 +40,7 @@ LANGFUSE_HOST=http://localhost:3001
 ## Test 1 — Unit: verify RAGAS components initialise
 
 Checks that the async LLM + embedding wrappers can reach LiteLLM and produce scores.
-Does **not** require Langfuse or Milvus.
+Does **not** require Langfuse or Qdrant.
 
 ```bash
 python - <<'EOF'

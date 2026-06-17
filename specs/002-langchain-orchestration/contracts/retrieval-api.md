@@ -43,7 +43,7 @@ Check system health and status.
 
 ### Response
 - `status` (string): `healthy`, `degraded`, `unhealthy`
-- `vector_store` (object): Milvus status
+- `vector_store` (object): Qdrant status
   - `connected` (boolean)
   - `collection_count` (integer)
   - `total_vectors` (integer)

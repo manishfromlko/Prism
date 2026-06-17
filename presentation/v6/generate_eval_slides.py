@@ -234,7 +234,7 @@ def slide_retrieval(prs):
         ("Name Resolver",  8.5, PINK,  True,  PP_ALIGN.LEFT),
         ("RapidFuzz string match", 7, DARKSL, False, PP_ALIGN.LEFT),
         ("→ LLM disambiguation", 7, DARKSL, False, PP_ALIGN.LEFT),
-        ("→ Milvus profile fetch", 7, DARKSL, False, PP_ALIGN.LEFT),
+        ("→ Qdrant profile fetch", 7, DARKSL, False, PP_ALIGN.LEFT),
     ])
 
     # ── Step 5: Routing summary ──────────────────────────────────────────────────

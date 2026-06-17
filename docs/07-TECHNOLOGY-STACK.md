@@ -18,7 +18,7 @@
 
 | Technology | Used for |
 | --- | --- |
-| Milvus | Vector database for artifact chunks, summaries, user profiles, and platform docs |
+| Qdrant | Vector database for artifact chunks, summaries, user profiles, and platform docs |
 | JSON files | Ingestion catalog and audit log |
 | HNSW index | Approximate nearest-neighbor search |
 | Cosine similarity | Default vector distance metric |
@@ -50,10 +50,10 @@
 
 | Technology | Used for |
 | --- | --- |
-| Docker Compose | Local Milvus, backend, webapp, and optional observability stacks |
+| Docker Compose | Local Qdrant, backend, webapp, and optional observability stacks |
 | Airflow | Optional scheduled ingestion |
 | Databricks | Optional cloud-native migration target |
-| Databricks Vector Search | Databricks replacement for Milvus |
+| Databricks Vector Search | Databricks replacement for Qdrant |
 | Databricks Model Serving | Databricks replacement for OpenAI/LiteLLM endpoint management |
 
 ## Dependency Files
@@ -65,11 +65,11 @@
 | `uv.lock` | Locked Python dependency graph |
 | `webapp/package.json` | Frontend scripts and dependencies |
 | `webapp/package-lock.json` | Locked Node dependency graph |
-| `docker-compose.yml` | Local Milvus/backend/webapp services |
+| `docker-compose.yml` | Local Qdrant/backend/webapp services |
 | `docker-compose.airflow.yml` | Optional Airflow stack |
 
 ## Version Notes
 
 - Use `EMBEDDING_DIMENSION=1536` with `text-embedding-3-small`.
-- Keep the Milvus schema dimension and embedding model dimension in sync.
+- Keep the Qdrant schema dimension and embedding model dimension in sync.
 - The current local code expects an OpenAI-compatible embedding service. Older compose defaults that mention `sentence-transformers/all-MiniLM-L6-v2` should be reviewed before use.

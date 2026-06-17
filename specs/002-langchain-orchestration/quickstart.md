@@ -6,19 +6,19 @@ This guide provides quick setup and usage instructions for the vector retrieval 
 
 - Completed data ingestion pipeline (see `specs/001-data-ingestion-pipeline/quickstart.md`)
 - Python 3.11+ with virtual environment
-- Running Milvus instance (local or cloud)
+- Running Qdrant instance (local or cloud)
 
 ## Installation
 
 1. **Install additional dependencies:**
    ```bash
-   pip install langchain pymilvus sentence-transformers fastapi uvicorn
+   pip install langchain qdrant-client sentence-transformers fastapi uvicorn
    ```
 
-2. **Start Milvus (if running locally):**
+2. **Start Qdrant (if running locally):**
    ```bash
    # Using Docker
-   docker run -p 19530:19530 -p 9091:9091 milvusdb/milvus:latest standalone
+   docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant:latest
    ```
 
 ## Configuration
@@ -27,8 +27,8 @@ Create a configuration file or environment variables:
 
 ```python
 # src/retrieval/config.py
-MILVUS_HOST = "localhost"
-MILVUS_PORT = 19530
+QDRANT_HOST = "localhost"
+QDRANT_PORT = 6333
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 COLLECTION_NAME = "kubeflow_artifacts"
 ```
@@ -104,7 +104,7 @@ PYTHONPATH=src python -m pytest tests/retrieval/ -v
 
 ## Troubleshooting
 
-- **Milvus connection issues**: Check if Milvus is running on correct host/port
+- **Qdrant connection issues**: Check if Qdrant is running on correct host/port
 - **Embedding model errors**: Verify model name and internet connection for downloads
 - **Memory issues**: Reduce batch size in embedding generation for large datasets
 - **API timeouts**: Increase timeout values for large similarity searches
@@ -114,5 +114,5 @@ PYTHONPATH=src python -m pytest tests/retrieval/ -v
 - Use GPU for embedding generation if available
 - Batch document processing for efficiency
 - Implement caching for frequently queried embeddings
-- Monitor Milvus resource usage and scale as needed</content>
+- Monitor Qdrant resource usage and scale as needed</content>
 <parameter name="filePath">/Users/manish/mount/projects/project-1/specs/002-langchain-orchestration/quickstart.md

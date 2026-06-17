@@ -94,4 +94,4 @@ A security reviewer needs the pipeline to detect unsupported or sensitive files 
 - Authentication and access control for workspace sources are provided outside this feature; this feature focuses on ingestion and cleaning.
 - Webapp profiling, retrieval, and generation are separate features that consume the cleaned ingestion output.
 - Binary-only artifacts may be cataloged at the metadata level without full content extraction.
-- Milvus collection design and retrieval API contracts will be defined in subsequent feature work.
+- Qdrant collection design and retrieval API contracts will be defined in subsequent feature work.

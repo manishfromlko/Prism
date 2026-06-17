@@ -326,7 +326,7 @@ def make_slide(prs):
     arrow(slide, lx, ly, OL + OW, OT + 1.54, PURPLE, 1.3)
 
     # ══════════════════════════════════════════════════════════════════════════
-    # RIGHT-BOTTOM — Data Plane  (Milvus + OpenAI)
+    # RIGHT-BOTTOM — Data Plane  (Qdrant + OpenAI)
     # ══════════════════════════════════════════════════════════════════════════
     DPL, DPT, DPW, DPH = RL, 5.1, 8.38, 2.2
 
@@ -335,7 +335,7 @@ def make_slide(prs):
     # Arrow from LiteLLM down into Data Plane
     arrow(slide, CPL + 2.78, CPT + CPH, CPL + 2.78, DPT + 0.2, INK, 1.5)
 
-    # ── 4 Milvus Collections (2x2 grid) ───────────────────────────────────
+    # ── 4 Qdrant Collections (2x2 grid) ───────────────────────────────────
     cx, cy, cw, ch = DPL + 0.22, DPT + 0.28, 2.55, 0.75
 
     # Collection configs: (col, row, label, sub, fill, line, fc)
@@ -354,10 +354,10 @@ def make_slide(prs):
                   [(name, 9.5, fc, True),
                    (sub,  8.5, MUTED, False)])
 
-    # Milvus label
+    # Qdrant label
     mw = 2 * cw + 0.22
     txt(slide, cx + mw / 2 - 0.6, DPT + DPH - 0.28, 1.2, 0.24,
-        "Milvus", size=9.5, color=AMBER, bold=True, align=PP_ALIGN.CENTER)
+        "Qdrant", size=9.5, color=AMBER, bold=True, align=PP_ALIGN.CENTER)
 
     # ── OpenAI API box (right side) ───────────────────────────────────────
     oax = DPL + 5.7
@@ -382,7 +382,7 @@ def make_slide(prs):
         "Supporting Infrastructure",
         size=8.5, color=INK, bold=False)
     infra = [
-        "- Docker Compose (Milvus, LiteLLM + Postgres, Langfuse stack)",
+        "- Docker Compose (Qdrant, LiteLLM + Postgres, Langfuse stack)",
         "- Python 3.11 / uvicorn / FastAPI — port 8000",
         "- Node.js 18+ / Next.js 15 — port 3002",
         "- Airflow DAG: Ingest → Embed → Summarise → Profile",
@@ -410,9 +410,9 @@ def make_slide(prs):
         "Architecture mirrors the On-Prem LLM Serving diagram:\n"
         "LEFT = Observability Plane (Langfuse for traces/scores, Prometheus+Grafana for ops metrics, RAGAS for eval)\n"
         "RIGHT-TOP = Control Plane (Next.js BFF → FastAPI → ChatEngine intent router → LiteLLM AI Gateway)\n"
-        "RIGHT-BOTTOM = Data Plane (4 Milvus collections in 2x2 + OpenAI API external)\n"
+        "RIGHT-BOTTOM = Data Plane (4 Qdrant collections in 2x2 + OpenAI API external)\n"
         "BOTTOM-LEFT = Supporting Infrastructure (Docker, Airflow ingestion DAG)\n"
-        "Key data flow: User → Next.js → FastAPI → LiteLLM → OpenAI/Milvus → response\n"
+        "Key data flow: User → Next.js → FastAPI → LiteLLM → OpenAI/Qdrant → response\n"
         "Observability: LiteLLM sends callback to Langfuse; RAGAS runs async post-response."
     )
 

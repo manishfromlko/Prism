@@ -6,19 +6,19 @@ flowchart TD
     A4 --> B1[5. Retrieval Indexer]
     B1 --> B2[6. DocumentLoader builds chunks]
     B2 --> B3[7. EmbeddingService generates vectors]
-    B3 --> B4[8. Milvus collection: kubeflow_artifacts]
+    B3 --> B4[8. Qdrant collection: kubeflow_artifacts]
 
     A4 --> C1[9. Artifact Summary Indexer]
     C1 --> C2[10. LLM summary + tags]
-    C2 --> C3[11. Milvus: artifact_summaries]
+    C2 --> C3[11. Qdrant: artifact_summaries]
 
     C3 --> D1[12. Profile Indexer from Summaries]
     D1 --> D2[13. LLM user profiles + skills]
-    D2 --> D3[14. Milvus: user_profiles]
+    D2 --> D3[14. Qdrant: user_profiles]
 
     E1[15. platform_documents/*.docx] --> E2[16. Doc ingestion + chunking]
     E2 --> E3[17. Embeddings]
-    E3 --> E4[18. Milvus: platform_docs]
+    E3 --> E4[18. Qdrant: platform_docs]
 
     F1[19. User Query via Webapp] --> F2[20. Next.js /api/chat proxy]
     F2 --> F3[21. FastAPI /chat endpoint]

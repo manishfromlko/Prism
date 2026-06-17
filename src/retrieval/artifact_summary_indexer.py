@@ -1,6 +1,6 @@
 """
 Artifact summary indexer: generates artifact summaries from ingestion catalog and
-stores them in the Milvus artifact_summaries collection.
+stores them in the Qdrant artifact_summaries collection.
 
 Usage:
     python -m src.retrieval.artifact_summary_indexer \
@@ -59,7 +59,7 @@ def run_artifact_summary_indexing(catalog_path: str, mode: str = "incremental") 
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Index artifact summaries into Milvus")
+    parser = argparse.ArgumentParser(description="Index artifact summaries into Qdrant")
     parser.add_argument(
         "--catalog",
         default=os.getenv("INGESTION_CATALOG_PATH", "dataset/.ingestion/ingestion_catalog.json"),

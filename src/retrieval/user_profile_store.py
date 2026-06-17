@@ -1,11 +1,13 @@
-"""Milvus collection for user workspace profiles."""
+"""Qdrant collection for user workspace profiles."""
 
 import logging
 from typing import Dict, List, Optional
 
-from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections, utility
+from qdrant_client import QdrantClient
+from qdrant_client.http import models
 
 from .config import RetrievalConfig
+from .qdrant_utils import ensure_collection, field_filter, make_client, scroll_payloads, stable_point_id
 
 logger = logging.getLogger(__name__)
 
@@ -13,111 +15,77 @@ COLLECTION_NAME = "user_profiles"
 
 
 class UserProfileStore:
-    """Manages the user_profiles Milvus collection."""
+    """Manages the user_profiles Qdrant collection."""
 
     def __init__(self, config: RetrievalConfig):
         self.config = config
-        self.collection: Optional[Collection] = None
-        self._loaded = False
+        self.client: Optional[QdrantClient] = None
+        self.collection: Optional[str] = None
         self._connect()
 
     def _connect(self):
-        connections.connect("default", uri=f"http://{self.config.milvus_host}:{self.config.milvus_port}")
-        logger.info(f"Connected to Milvus at {self.config.milvus_host}:{self.config.milvus_port}")
+        self.client = make_client(self.config)
+        logger.info(f"Connected to Qdrant at {self.config.qdrant_host}:{self.config.qdrant_port}")
 
-    def _schema(self) -> CollectionSchema:
-        fields = [
-            FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
-            FieldSchema(name="user_id", dtype=DataType.VARCHAR, max_length=255),
-            FieldSchema(name="user_profile", dtype=DataType.VARCHAR, max_length=500),
-            FieldSchema(name="vector", dtype=DataType.FLOAT_VECTOR, dim=self.config.embedding_dimension),
-            FieldSchema(name="tags", dtype=DataType.VARCHAR, max_length=1000),
-        ]
-        return CollectionSchema(fields, description="User workspace profiles")
-
-    def create_collection(self, drop_if_exists: bool = False):
-        if utility.has_collection(COLLECTION_NAME):
-            if drop_if_exists:
-                utility.drop_collection(COLLECTION_NAME)
-                logger.info(f"Dropped existing collection: {COLLECTION_NAME}")
-            else:
-                self.collection = Collection(COLLECTION_NAME)
-                return
-
-        self.collection = Collection(COLLECTION_NAME, schema=self._schema())
-        self.collection.create_index(
-            "vector",
-            {"index_type": "HNSW", "metric_type": "COSINE", "params": {"M": 8, "efConstruction": 64}},
-        )
-        logger.info(f"Created collection: {COLLECTION_NAME}")
+    def _ensure_client(self) -> QdrantClient:
+        if not self.client:
+            raise RuntimeError("Qdrant client not initialized")
+        return self.client
 
     def _ensure_loaded(self):
-        if not self._loaded and self.collection:
-            self.collection.load()
-            self._loaded = True
+        self.collection = COLLECTION_NAME
+
+    def create_collection(self, drop_if_exists: bool = False):
+        ensure_collection(
+            self._ensure_client(),
+            COLLECTION_NAME,
+            self.config.embedding_dimension,
+            drop_if_exists=drop_if_exists,
+        )
+        self.collection = COLLECTION_NAME
 
     def upsert_profiles(self, profiles: List[Dict]) -> int:
         if not self.collection:
-            raise RuntimeError("Collection not initialized — call create_collection() first")
+            raise RuntimeError("Collection not initialized - call create_collection() first")
+        if not profiles:
+            return 0
 
-        self._ensure_loaded()
-        for p in profiles:
-            try:
-                self.collection.delete(f'user_id == "{p["user_id"]}"')
-            except Exception:
-                pass
-
-        data = [
-            [p["user_id"] for p in profiles],
-            [p["user_profile"][:500] for p in profiles],
-            [p["vector"] for p in profiles],
-            [p["tags"][:1000] for p in profiles],
+        points = [
+            models.PointStruct(
+                id=stable_point_id(COLLECTION_NAME, p["user_id"]),
+                vector=p["vector"],
+                payload={
+                    "user_id": p["user_id"],
+                    "user_profile": p["user_profile"][:500],
+                    "tags": p["tags"][:1000],
+                },
+            )
+            for p in profiles
         ]
-        result = self.collection.insert(data)
-        self.collection.flush()
-        self._loaded = False
-        logger.info(f"Upserted {len(result.primary_keys)} user profiles")
-        return len(result.primary_keys)
+        self._ensure_client().upsert(collection_name=COLLECTION_NAME, points=points, wait=True)
+        logger.info(f"Upserted {len(points)} user profiles")
+        return len(points)
 
     def get_all_profiles(self) -> List[Dict]:
         if not self.collection:
             return []
         try:
-            self._ensure_loaded()
-            rows = self.collection.query(
-                expr='user_id != ""',
-                output_fields=["id", "user_id", "user_profile", "tags"],
-                limit=1000,
-            )
-            return rows
+            return scroll_payloads(self._ensure_client(), COLLECTION_NAME, limit=1000)
         except Exception as e:
             logger.error(f"Failed to query all profiles: {e}")
             return []
 
     def get_all_user_ids(self) -> List[str]:
-        """Return a flat list of every user_id in the collection."""
-        if not self.collection:
-            return []
-        try:
-            self._ensure_loaded()
-            rows = self.collection.query(
-                expr='user_id != ""',
-                output_fields=["user_id"],
-                limit=1000,
-            )
-            return [r["user_id"] for r in rows if r.get("user_id")]
-        except Exception as e:
-            logger.error(f"Failed to list user_ids: {e}")
-            return []
+        return [r["user_id"] for r in self.get_all_profiles() if r.get("user_id")]
 
     def get_profile(self, user_id: str) -> Optional[Dict]:
         if not self.collection:
             return None
         try:
-            self._ensure_loaded()
-            rows = self.collection.query(
-                expr=f'user_id == "{user_id}"',
-                output_fields=["id", "user_id", "user_profile", "tags"],
+            rows = scroll_payloads(
+                self._ensure_client(),
+                COLLECTION_NAME,
+                scroll_filter=field_filter(user_id=user_id),
                 limit=1,
             )
             return rows[0] if rows else None
@@ -125,11 +93,35 @@ class UserProfileStore:
             logger.error(f"Failed to get profile for {user_id}: {e}")
             return None
 
+    def similarity_search(self, vector: List[float], top_k: int = 5) -> List[Dict]:
+        if not self.collection:
+            return []
+        try:
+            response = self._ensure_client().query_points(
+                collection_name=COLLECTION_NAME,
+                query=vector,
+                limit=top_k,
+                with_payload=True,
+                with_vectors=False,
+            )
+            results = getattr(response, "points", response)
+            return [
+                {
+                    "user_id": (hit.payload or {}).get("user_id"),
+                    "user_profile": (hit.payload or {}).get("user_profile"),
+                    "tags": (hit.payload or {}).get("tags", ""),
+                    "score": hit.score,
+                }
+                for hit in results
+            ]
+        except Exception as e:
+            logger.error(f"User similarity search failed: {e}")
+            return []
+
     def count(self) -> int:
         if not self.collection:
             return 0
         try:
-            self._ensure_loaded()
-            return self.collection.num_entities
+            return self._ensure_client().count(collection_name=COLLECTION_NAME, exact=True).count
         except Exception:
             return 0

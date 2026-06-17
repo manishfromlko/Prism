@@ -9,6 +9,10 @@ dependencies = [
     "langfuse>=4.5.1",
     "psutil>=7.2.2",
     "python-docx>=1.2.0",
+    "qdrant-client>=1.9.0",
     "ragas>=0.2.0",
     "rapidfuzz>=3.14.5",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

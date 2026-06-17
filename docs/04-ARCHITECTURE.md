@@ -19,10 +19,10 @@ flowchart TB
 
     subgraph Stores
         catalog["JSON catalog and audit files"]
-        artifacts[(Milvus kubeflow_artifacts)]
-        summaries[(Milvus artifact_summaries)]
-        profiles[(Milvus user_profiles)]
-        docs[(Milvus platform_docs)]
+        artifacts[(Qdrant kubeflow_artifacts)]
+        summaries[(Qdrant artifact_summaries)]
+        profiles[(Qdrant user_profiles)]
+        docs[(Qdrant platform_docs)]
     end
 
     subgraph Runtime
@@ -49,7 +49,7 @@ flowchart TB
 | --- | --- | --- |
 | Ingestion pipeline | `src/ingestion/pipeline.py`, `src/ingestion/cli.py` | Discover workspace folders, classify supported files, extract notebook/script metadata, write catalog and audit JSON. |
 | Retrieval backend | `src/retrieval/api.py` | FastAPI app, startup service wiring, health/metrics, workspace, search, profile, summary, chatbot, admin, and observability endpoints. |
-| Vector store adapter | `src/retrieval/vector_store.py` | Milvus connection, collection creation, vector insert/search/update/delete for artifact chunks. |
+| Vector store adapter | `src/retrieval/vector_store.py` | Qdrant connection, collection creation, vector insert/search/update/delete for artifact chunks. |
 | Embedding service | `src/retrieval/embeddings.py` | OpenAI-compatible embedding generation and in-process cache. |
 | Artifact summaries | `src/retrieval/artifact_summary_*` | LLM-generated artifact summaries and `artifact_summaries` collection management. |
 | User profiles | `src/retrieval/user_profile_*`, `profile_from_summaries_indexer.py` | LLM-generated user profiles and `user_profiles` collection management. |
@@ -64,16 +64,16 @@ flowchart TB
 sequenceDiagram
     participant API as FastAPI startup
     participant Config as RetrievalConfig
-    participant Milvus as Milvus
+    participant Qdrant as Qdrant
     participant Catalog as Ingestion catalog
     participant Chat as ChatEngine
 
     API->>Config: Load .env and defaults
-    API->>Milvus: Connect and create kubeflow_artifacts
-    API->>Milvus: Load artifact collection
-    API->>Milvus: Try load user_profiles
-    API->>Milvus: Try load artifact_summaries
-    API->>Milvus: Try load platform_docs
+    API->>Qdrant: Connect and create kubeflow_artifacts
+    API->>Qdrant: Load artifact collection
+    API->>Qdrant: Try load user_profiles
+    API->>Qdrant: Try load artifact_summaries
+    API->>Qdrant: Try load platform_docs
     API->>Chat: Initialize only if docs, summaries, profiles, embeddings are ready
     API->>Catalog: Warm workspace catalog cache
 ```
@@ -88,13 +88,13 @@ sequenceDiagram
     participant Browser
     participant Next as Next.js /api route
     participant API as FastAPI
-    participant Milvus
+    participant Qdrant
 
     User->>Browser: Search, browse, or chat
     Browser->>Next: Fetch /api/search, /api/chat, etc.
     Next->>API: Fetch PYTHON_API_URL endpoint
-    API->>Milvus: Retrieve vectors or stored rows
-    Milvus-->>API: Results
+    API->>Qdrant: Retrieve vectors or stored rows
+    Qdrant-->>API: Results
     API-->>Next: Backend JSON
     Next-->>Browser: Webapp-shaped JSON
 ```
@@ -103,7 +103,7 @@ sequenceDiagram
 
 | Shape | Use case | Notes |
 | --- | --- | --- |
-| Local developer | Daily coding and demos | Milvus in Docker, FastAPI via Uvicorn, Next.js dev server. |
-| Docker Compose | Integrated local services | `docker-compose.yml` defines Milvus, backend, and webapp, but review environment values before relying on it. |
+| Local developer | Daily coding and demos | Qdrant in Docker, FastAPI via Uvicorn, Next.js dev server. |
+| Docker Compose | Integrated local services | `docker-compose.yml` defines Qdrant, backend, and webapp, but review environment values before relying on it. |
 | Airflow | Scheduled local or VM ingestion | DAG runs incremental ingestion daily. |
-| Databricks | Cloud-native migration | Replaces Milvus with Vector Search, filesystem with Unity Catalog volumes, LiteLLM with Model Serving, and Airflow with Workflows. |
+| Databricks | Cloud-native migration | Replaces Qdrant with Vector Search, filesystem with Unity Catalog volumes, LiteLLM with Model Serving, and Airflow with Workflows. |

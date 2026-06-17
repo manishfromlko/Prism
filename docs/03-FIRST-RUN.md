@@ -2,10 +2,10 @@
 
 This is the end-to-end local runbook for a new machine.
 
-## 1. Start Milvus
+## 1. Start Qdrant
 
 ```bash
-docker compose up -d milvus
+docker compose up -d qdrant
 ```
 
 Wait a few seconds, then confirm the container is running:
@@ -39,7 +39,7 @@ python -m src.retrieval.indexer \
   --mode full
 ```
 
-This populates the Milvus collection named by `MILVUS_COLLECTION`, defaulting to `kubeflow_artifacts`.
+This populates the Qdrant collection named by `QDRANT_COLLECTION`, defaulting to `kubeflow_artifacts`.
 
 ## 4. Generate Artifact Summaries
 
@@ -49,7 +49,7 @@ python -m src.retrieval.artifact_summary_indexer \
   --mode full
 ```
 
-This creates or updates the `artifact_summaries` Milvus collection.
+This creates or updates the `artifact_summaries` Qdrant collection.
 
 ## 5. Start the FastAPI Backend
 

@@ -35,10 +35,10 @@ flowchart TD
 
     subgraph DataPlane["Data & Model Plane"]
       CAT[Ingestion Catalog JSON]
-      VS[(Milvus: kubeflow_artifacts)]
-      AS[(Milvus: artifact_summaries)]
-      US[(Milvus: user_profiles)]
-      PD[(Milvus: platform_docs)]
+      VS[(Qdrant: kubeflow_artifacts)]
+      AS[(Qdrant: artifact_summaries)]
+      US[(Qdrant: user_profiles)]
+      PD[(Qdrant: platform_docs)]
       OAI[OpenAI Embeddings + Chat]
     end
 

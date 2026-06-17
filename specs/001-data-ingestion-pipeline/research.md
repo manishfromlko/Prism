@@ -11,7 +11,7 @@
 - Decision: Build a source-first pipeline with local filesystem discovery, metadata cataloging, content classification, and explicit provenance storage in a lightweight staging store.
 - Rationale: The project requires visibility into user workspaces before any LLM generation, so ingestion must extract authoritative workspace and file-level evidence first.
 - Alternatives considered:
-  - Direct ingestion into Milvus: rejected because vectorization should be a downstream stage after cleaning and metadata extraction.
+  - Direct ingestion into Qdrant: rejected because vectorization should be a downstream stage after cleaning and metadata extraction.
   - Pure file scan without provenance: rejected because auditability and guardrails demand source lineage for every record.
 
 ## Decision: Incremental update strategy
@@ -27,8 +27,8 @@
 - Alternatives considered:
   - Ingest everything and filter later: rejected because it violates the constitution's requirement for responsible ingestion and audit readiness.
 
-## Decision: Milvus collections for future retrieval
-- Decision: Plan for separate Milvus collections: one for user-level summaries and one for notebook/document-level embeddings.
+## Decision: Qdrant collections for future retrieval
+- Decision: Plan for separate Qdrant collections: one for user-level summaries and one for notebook/document-level embeddings.
 - Rationale: The constitution and feature plan call for dual-collection representation; the ingestion stage will populate notebook/document metadata that later feeds the notebook-level collection and aggregated user signals that feed the user-level collection.
 - Alternatives considered:
   - Single monolithic embedding collection: rejected because it would make user-profile retrieval less precise and harder to maintain.

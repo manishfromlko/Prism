@@ -10,19 +10,19 @@ flowchart TD
     A4 --> B1[5. Artifact Indexer]:::step
     B1 --> B2[6. Chunking + Loader]:::step
     B2 --> B3[7. Embedding Generation]:::ai
-    B3 --> B4[8. Milvus kubeflow_artifacts]:::store
+    B3 --> B4[8. Qdrant kubeflow_artifacts]:::store
 
     A4 --> C1[9. Summary Indexer]:::step
     C1 --> C2[10. LLM Summarization + Tagging]:::ai
-    C2 --> C3[11. Milvus artifact_summaries]:::store
+    C2 --> C3[11. Qdrant artifact_summaries]:::store
 
     C3 --> D1[12. Profile Indexer]:::step
     D1 --> D2[13. LLM User Profiling]:::ai
-    D2 --> D3[14. Milvus user_profiles]:::store
+    D2 --> D3[14. Qdrant user_profiles]:::store
 
     E1[15. Platform Docs]:::store --> E2[16. Doc Parsing + Chunking]:::step
     E2 --> E3[17. Embedding Generation]:::ai
-    E3 --> E4[18. Milvus platform_docs]:::store
+    E3 --> E4[18. Qdrant platform_docs]:::store
 
     F1[19. User Query from UI]:::step --> F2[20. Next.js API Proxy]:::step
     F2 --> F3[21. FastAPI Endpoint]:::step

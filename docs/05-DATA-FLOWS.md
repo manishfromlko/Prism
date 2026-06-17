@@ -31,7 +31,7 @@ flowchart LR
     existing --> filter["Only new artifact_ids"]
     drop --> embed["EmbeddingService"]
     filter --> embed
-    embed --> milvus[(kubeflow_artifacts)]
+    embed --> qdrant[(kubeflow_artifacts)]
 ```
 
 Full mode rebuilds the artifact collection. Incremental mode skips already indexed `artifact_id` values.
@@ -116,12 +116,12 @@ sequenceDiagram
     actor Operator
     participant API as FastAPI admin endpoint
     participant Worker as Thread executor
-    participant Milvus
+    participant Qdrant
     participant Cache as In-memory services
 
     Operator->>API: POST /admin/sync
     API->>Worker: run_indexing(mode)
-    Worker->>Milvus: Insert new vectors
+    Worker->>Qdrant: Insert new vectors
     Worker-->>API: inserted/skipped counts
     API->>Cache: Refresh catalog loader
     API-->>Operator: SyncResponse

@@ -1,6 +1,6 @@
 # Data Stores and Schemas
 
-The local stack uses JSON files for ingestion metadata and Milvus for vector-backed runtime data. There is no relational database in the current local implementation.
+The local stack uses JSON files for ingestion metadata and Qdrant for vector-backed runtime data. There is no relational database in the current local implementation.
 
 ## JSON Catalog
 
@@ -81,7 +81,7 @@ Each record describes a guardrail decision, usually skipped files:
 }
 ```
 
-## Milvus Collections
+## Qdrant Collections
 
 ### `kubeflow_artifacts`
 
@@ -89,11 +89,11 @@ Created by `src/retrieval/vector_store.py`.
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `id` | `INT64`, primary, auto id | Milvus entity id |
-| `artifact_id` | `VARCHAR(255)` | Catalog artifact id |
-| `vector` | `FLOAT_VECTOR(EMBEDDING_DIMENSION)` | Default dimension `1536` |
-| `content` | `VARCHAR(5000)` | Truncated document text |
-| `metadata` | `JSON` | Workspace, path, file type, size, extracted metadata |
+| `id` | UUID point id | Deterministic id derived from collection and artifact id |
+| `vector` | Dense vector | Default dimension `1536` |
+| `artifact_id` | Payload string | Catalog artifact id |
+| `content` | Payload string | Truncated document text |
+| `metadata` | Payload object | Workspace, path, file type, size, extracted metadata |
 
 Index: HNSW, cosine similarity by default.
 
@@ -103,12 +103,12 @@ Created by `src/retrieval/artifact_summary_store.py`.
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `id` | `INT64`, primary, auto id | Milvus entity id |
-| `user_id` | `VARCHAR(255)` | Workspace/user id |
-| `artifact_id` | `VARCHAR(500)` | Artifact id |
-| `artifact_summary` | `VARCHAR(1500)` | LLM-generated summary |
-| `vector` | `FLOAT_VECTOR(EMBEDDING_DIMENSION)` | Summary embedding |
-| `tags` | `VARCHAR(1000)` | Comma-separated tags |
+| `id` | UUID point id | Deterministic id derived from `artifact_id` |
+| `vector` | Dense vector | Summary embedding |
+| `user_id` | Payload string | Workspace/user id |
+| `artifact_id` | Payload string | Artifact id |
+| `artifact_summary` | Payload string | LLM-generated summary |
+| `tags` | Payload string | Comma-separated tags |
 
 ### `user_profiles`
 
@@ -116,11 +116,11 @@ Created by `src/retrieval/user_profile_store.py`.
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `id` | `INT64`, primary, auto id | Milvus entity id |
-| `user_id` | `VARCHAR(255)` | Workspace/user id |
-| `user_profile` | `VARCHAR(500)` | LLM-generated short profile |
-| `vector` | `FLOAT_VECTOR(EMBEDDING_DIMENSION)` | Profile embedding |
-| `tags` | `VARCHAR(1000)` | Comma-separated tags |
+| `id` | UUID point id | Deterministic id derived from `user_id` |
+| `vector` | Dense vector | Profile embedding |
+| `user_id` | Payload string | Workspace/user id |
+| `user_profile` | Payload string | LLM-generated short profile |
+| `tags` | Payload string | Comma-separated tags |
 
 ### `platform_docs`
 
@@ -128,12 +128,12 @@ Created by `src/retrieval/chatbot/doc_store.py`.
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `id` | `INT64`, primary, auto id | Milvus entity id |
-| `doc_id` | `VARCHAR(255)` | Source document id |
-| `chunk_id` | `VARCHAR(512)` | Unique chunk id |
-| `chunk_text` | `VARCHAR(4000)` | Extracted platform doc chunk |
-| `source_file` | `VARCHAR(255)` | `.docx` filename |
-| `vector` | `FLOAT_VECTOR(EMBEDDING_DIMENSION)` | Chunk embedding |
+| `id` | UUID point id | Deterministic id derived from `chunk_id` |
+| `vector` | Dense vector | Chunk embedding |
+| `doc_id` | Payload string | Source document id |
+| `chunk_id` | Payload string | Unique chunk id |
+| `chunk_text` | Payload string | Extracted platform doc chunk |
+| `source_file` | Payload string | `.docx` filename |
 
 ## Relationships
 

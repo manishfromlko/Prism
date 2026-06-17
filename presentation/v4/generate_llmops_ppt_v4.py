@@ -27,7 +27,7 @@ deck = [
         "title": "Kubeflow Workspace Intelligence",
         "subtitle": "RAG-based chatbot with LLMOps observability and evaluation",
         "body": "Production-style assistant for workspace knowledge, notebook discovery, platform docs QA, and user expertise profiling.",
-        "footer": "FastAPI | Next.js | Milvus | LiteLLM | Langfuse | RAGAS",
+        "footer": "FastAPI | Next.js | Qdrant | LiteLLM | Langfuse | RAGAS",
         "notes": "Frame this as a production-style LLMOps system, not a generic chatbot wrapper. The project connects ingestion, retrieval, generation, tracing, and evaluation into one inspectable system.",
     },
     {
@@ -45,7 +45,7 @@ deck = [
         "title": "Solution Overview",
         "bullets": [
             "Intent-routed RAG assistant over platform docs, artifact summaries, and user profiles",
-            "Semantic retrieval backed by OpenAI embeddings and Milvus collections",
+            "Semantic retrieval backed by OpenAI embeddings and Qdrant collections",
             "LiteLLM and Langfuse provide request-level visibility across classify, rewrite, and generate",
             "RAGAS and LLM-as-judge evaluate groundedness and relevance after the answer returns",
         ],
@@ -80,7 +80,7 @@ deck = [
         "bullets": [
             "Next.js acts as a BFF and proxies to FastAPI",
             "FastAPI orchestrates search, chat, sync, metrics, and feedback",
-            "Milvus stores separate knowledge collections",
+            "Qdrant stores separate knowledge collections",
             "LiteLLM and Langfuse make LLM calls observable",
         ],
         "notes": "Walk left to right: users access the Next.js UI; server-side routes call FastAPI; FastAPI orchestrates ingestion-backed retrieval, chat routing, LLM generation, tracing, and scoring.",
@@ -93,7 +93,7 @@ deck = [
             "Online path classifies the query, retrieves context, generates an answer, and returns trace_id",
             "Evaluation path posts quality scores to the same Langfuse trace asynchronously",
         ],
-        "notes": "Use this slide to show that RAG has two lifecycles: building the knowledge layer and serving a user query. They meet at Milvus, and observability follows the online request.",
+        "notes": "Use this slide to show that RAG has two lifecycles: building the knowledge layer and serving a user query. They meet at Qdrant, and observability follows the online request.",
     },
     {
         "kind": "bullets",
@@ -102,7 +102,7 @@ deck = [
             "Scan workspace directories and classify supported files",
             "Extract notebook/script metadata: tools, table references, database targets",
             "Convert artifacts into LangChain documents and extract notebook cell text",
-            "Chunk by content type, embed with text-embedding-3-small, and upsert to Milvus",
+            "Chunk by content type, embed with text-embedding-3-small, and upsert to Qdrant",
         ],
         "notes": "Chunking is content-aware: recursive splitting for notebooks, code splitting for scripts, markdown splitting for markdown. Incremental indexing avoids re-embedding unchanged artifacts.",
     },
@@ -256,7 +256,7 @@ deck = [
         "kind": "bullets",
         "title": "Production Readiness: Deployment and Operations",
         "bullets": [
-            "Containerize FastAPI, Next.js, LiteLLM, Langfuse, and Milvus with environment-specific configs",
+            "Containerize FastAPI, Next.js, LiteLLM, Langfuse, and Qdrant with environment-specific configs",
             "Run ingestion/indexing as scheduled jobs with idempotent full and incremental modes",
             "Add CI for unit, integration, retrieval, and API contract tests",
             "Define runbooks for stale indexes, failed LLM calls, high cost, and low evaluation scores",
@@ -455,7 +455,7 @@ def make_architecture(prs, item, index):
     add_box(slide, 2.8, 3.6, 1.85, 0.62, "artifact_summaries\nnotebook summaries", RGBColor(255, 247, 237), AMBER, 9.5)
     add_box(slide, 0.75, 4.45, 1.85, 0.62, "user_profiles\nexpertise vectors", RGBColor(255, 247, 237), AMBER, 9.5)
     add_box(slide, 2.8, 4.45, 1.85, 0.62, "platform_docs\ndoc chunks", RGBColor(255, 247, 237), AMBER, 9.5)
-    add_box(slide, 1.85, 5.32, 1.75, 0.42, "Milvus", RGBColor(254, 243, 199), AMBER, 12, True)
+    add_box(slide, 1.85, 5.32, 1.75, 0.42, "Qdrant", RGBColor(254, 243, 199), AMBER, 12, True)
 
     add_label(slide, 5.4, 3.15, 4.3, 0.28, "LLMOps Layer")
     add_box(slide, 5.4, 3.6, 1.65, 0.68, "LiteLLM\nproxy", RGBColor(237, 233, 254), PURPLE, 11, True)
@@ -485,7 +485,7 @@ def make_data_flow(prs, item, index):
         (2.12, "Ingestion\ncatalog"),
         (3.6, "Parse +\nchunk"),
         (5.08, "Embeddings"),
-        (6.55, "Milvus\ncollections"),
+        (6.55, "Qdrant\ncollections"),
         (8.03, "Summaries\nprofiles docs"),
     ]
     colors = [WHITE, RGBColor(220, 252, 231), RGBColor(219, 234, 254), RGBColor(237, 233, 254), RGBColor(254, 243, 199), RGBColor(255, 247, 237)]

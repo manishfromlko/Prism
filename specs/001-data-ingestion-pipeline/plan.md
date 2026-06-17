@@ -25,7 +25,7 @@ This phase establishes trusted source evidence for later retrieval and user prof
 **Target Platform**: macOS/Linux server or container runtime  
 **Project Type**: backend ingestion service / data pipeline  
 **Performance Goals**: complete representative workspace ingestion within minutes; enable daily incremental refresh for new/changed artifacts  
-**Constraints**: enforce guardrails for sensitive/unsupported files, preserve provenance, avoid hallucinated profiling inputs, and keep the pipeline modular for later Milvus integration  
+**Constraints**: enforce guardrails for sensitive/unsupported files, preserve provenance, avoid hallucinated profiling inputs, and keep the pipeline modular for later Qdrant integration  
 **Scale/Scope**: starts with the local sample workspace tree; designed to support many users and thousands of notebooks and artifacts  
 
 ## Constitution Check

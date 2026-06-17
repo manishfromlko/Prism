@@ -11,10 +11,10 @@
 
 ```bash
 python -m pip install --upgrade pip
-python -m pip install langchain litellm pymilvus pydantic pytest
+python -m pip install langchain litellm qdrant-client pydantic pytest
 ```
 
-> Note: The initial ingestion pipeline is backend-first. Additional dependencies for Langfuse, Milvus, and frontend UI are added later when retrieval and generation features are implemented.
+> Note: The initial ingestion pipeline is backend-first. Additional dependencies for Langfuse, Qdrant, and frontend UI are added later when retrieval and generation features are implemented.
 
 ## Code quality
 
@@ -56,4 +56,4 @@ Incremental mode only processes files that have been added or modified since the
 
 ## Next step
 
-After the ingestion pipeline is working, the next feature is the retriever stage. That stage will consume the cleaned metadata output and populate the notebook-level and user-level Milvus collections.
+After the ingestion pipeline is working, the next feature is the retriever stage. That stage will consume the cleaned metadata output and populate the notebook-level and user-level Qdrant collections.

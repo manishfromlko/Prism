@@ -71,6 +71,6 @@ sequenceDiagram
 ## Important Failure Modes
 
 - `/chat` returns `503` when any required chatbot collection is missing.
-- Embedding dimension mismatch causes Milvus insert/search errors.
+- Embedding dimension mismatch causes Qdrant insert/search errors.
 - LiteLLM not running can break chatbot LLM calls because `make_openai_client()` points at `LITELLM_BASE_URL`.
 - Empty or stale `artifact_summaries` will produce weak user profiles.

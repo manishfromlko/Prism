@@ -42,7 +42,7 @@ User Query
     │       ▼
     │   [user_resolve]  LLM disambiguation
     │       │
-    │       ├─ exact_uid found ──────────────────► Return raw Milvus profile
+    │       ├─ exact_uid found ──────────────────► Return raw Qdrant profile
     │       │                                       Layer 2: profile_relevance (LLM judge)
     │       │                                       No Layer 1 scores
     │       │
@@ -52,7 +52,7 @@ User Query
     └─ DOC_QA / ARTIFACT_SEARCH / semantic USER_SEARCH / HYBRID
             │
             ▼
-        [vector retrieve]  Milvus similarity search
+        [vector retrieve]  Qdrant similarity search
             │  DOC_QA:          doc_store       top-5 chunks
             │  ARTIFACT_SEARCH: artifact_store  top-5 summaries
             │  USER_SEARCH:     user_store       top-5 profiles

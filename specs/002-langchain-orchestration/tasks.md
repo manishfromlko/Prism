@@ -2,13 +2,13 @@
 
 ## Phase 1: Foundation Setup (Priority: P1) ✅
 
-**Goal**: Establish Langchain and Milvus infrastructure with core dependencies and configuration.
+**Goal**: Establish Langchain and Qdrant infrastructure with core dependencies and configuration.
 
-- [X] T001 [P1] Set up project dependencies for Langchain, Milvus, and embeddings in `requirements.txt` or `pyproject.toml`
+- [X] T001 [P1] Set up project dependencies for Langchain, Qdrant, and embeddings in `requirements.txt` or `pyproject.toml`
 - [X] T002 [P1] Create `src/retrieval/` package structure with base modules
 - [X] T003 [P1] Implement configuration management in `src/retrieval/config.py` for models and connections
 - [X] T004 [P1] Create embedding service class in `src/retrieval/embeddings.py` with sentence transformers
-- [X] T005 [P1] Implement basic Milvus vector store integration in `src/retrieval/vector_store.py`
+- [X] T005 [P1] Implement basic Qdrant vector store integration in `src/retrieval/vector_store.py`
 - [X] T006 [P1] Add unit tests for configuration, embeddings, and vector store components
 
 ## Phase 2: Document Processing (Priority: P1) ✅
@@ -33,9 +33,9 @@
 
 ## Phase 4: Vector Storage Integration (Priority: P2) ✅
 
-**Goal**: Store and index vectors in Milvus with efficient search capabilities.
+**Goal**: Store and index vectors in Qdrant with efficient search capabilities.
 
-- [X] T017 [P2] Implement Milvus collection management and schema definition
+- [X] T017 [P2] Implement Qdrant collection management and schema definition
 - [X] T018 [P2] Add vector insertion and update operations with error handling
 - [X] T019 [P2] Create indexing strategies for optimal search performance
 - [X] T020 [P2] Implement vector similarity search functionality

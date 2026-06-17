@@ -4,7 +4,7 @@
 .
 ├── src/
 │   ├── ingestion/            # Dataset scanning, metadata extraction, catalog/audit writes
-│   ├── retrieval/            # FastAPI, Milvus stores, indexing, retrieval, profiling, chatbot
+│   ├── retrieval/            # FastAPI, Qdrant stores, indexing, retrieval, profiling, chatbot
 │   └── observability/        # Trace scoring and background evaluation helpers
 ├── webapp/                   # Next.js frontend and proxy API routes
 ├── dataset/                  # Example/user workspace artifacts
@@ -59,4 +59,4 @@ Run:
 pytest
 ```
 
-Some integration tests may require Milvus, catalog data, or environment variables.
+Some integration tests may require Qdrant, catalog data, or environment variables.

@@ -15,9 +15,10 @@ load_dotenv(override=True)
 class RetrievalConfig(BaseModel):
     """Configuration for the vector retrieval system."""
 
-    # Milvus
-    milvus_host: str = Field(default="127.0.0.1")
-    milvus_port: int = Field(default=19530)
+    # Qdrant
+    qdrant_host: str = Field(default="127.0.0.1")
+    qdrant_port: int = Field(default=6333)
+    qdrant_api_key: Optional[str] = Field(default=None)
     collection_name: str = Field(default="kubeflow_artifacts")
 
     # Embedding — OpenAI text-embedding-3-small (1536-dim)
@@ -48,11 +49,14 @@ class RetrievalConfig(BaseModel):
     def from_env(cls) -> "RetrievalConfig":
         """Create config from environment variables (after .env is loaded)."""
         return cls(
-            milvus_host=os.getenv("MILVUS_HOST", "127.0.0.1"),
-            milvus_port=int(os.getenv("MILVUS_PORT", "19530")),
-            collection_name=os.getenv("MILVUS_COLLECTION", "kubeflow_artifacts"),
+            qdrant_host=os.getenv("QDRANT_HOST", "127.0.0.1"),
+            qdrant_port=int(os.getenv("QDRANT_PORT", "6333")),
+            qdrant_api_key=os.getenv("QDRANT_API_KEY"),
+            collection_name=os.getenv("QDRANT_COLLECTION", "kubeflow_artifacts"),
             embedding_model=os.getenv("EMBEDDING_MODEL", "text-embedding-3-small"),
             embedding_dimension=int(os.getenv("EMBEDDING_DIMENSION", "1536")),
+            chunk_size=int(os.getenv("CHUNK_SIZE", "1000")),
+            chunk_overlap=int(os.getenv("CHUNK_OVERLAP", "200")),
             batch_size=int(os.getenv("BATCH_SIZE", "32")),
             ingestion_catalog_path=os.getenv(
                 "INGESTION_CATALOG_PATH",

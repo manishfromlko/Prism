@@ -4,7 +4,7 @@ Single slide: Chat Engine — full request flow diagram.
 Paths captured (matching engine.py exactly):
   A  OUT_OF_SCOPE    → classify only → return hardcoded reply (no scores)
   B  USER_SEARCH     → classify → rewrite → RapidFuzz → LLM resolver
-       B1 exact_uid  → fetch Milvus profile → LLM judge (profile_relevance) → return
+       B1 exact_uid  → fetch Qdrant profile → LLM judge (profile_relevance) → return
        B2 ambiguous  → return disambiguation answer (no scores at all)
        B3 no-name    → falls through to vector retrieval → normal generate path
   C  Normal path     → classify → rewrite → vector retrieve → build prompt
@@ -227,7 +227,7 @@ def build(prs):
     # [5] Vector Retrieval
     rnd(slide, SX, 4.90, SW, 0.76, GREENBG, GREEN, 1.4)
     multi(slide, SX + 0.12, 4.94, SW - 0.24, 0.68, [
-        ("Vector Retrieval  (Milvus similarity search)", 9.5, GREEN,  True),
+        ("Vector Retrieval  (Qdrant similarity search)", 9.5, GREEN,  True),
         ("DOC_QA  →  platform_docs   top-5 chunks",     8,   DARKSL, False),
         ("ARTIFACT  →  artifact_summaries   top-5",     8,   DARKSL, False),
         ("USER_SEARCH  →  user_profiles   top-5",       8,   DARKSL, False),
@@ -334,7 +334,7 @@ def build(prs):
 
     rnd(slide, EX, 6.04, EW, 0.52, GREENBG, GREEN, 1.4)
     multi(slide, EX + 0.12, 6.08, EW - 0.24, 0.44, [
-        ("Fetch Milvus profile directly", 9.5, GREEN, True),
+        ("Fetch Qdrant profile directly", 9.5, GREEN, True),
         ("user_store.get_profile(exact_uid)  →  raw profile text", 8, DARKSL, False),
     ])
     arr(slide, EX + EW / 2, 6.56, EX + EW / 2, 6.70, GREEN, 1.4)

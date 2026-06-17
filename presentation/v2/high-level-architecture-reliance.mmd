@@ -9,7 +9,7 @@ flowchart LR
     BFF --> API[FastAPI Orchestration Layer]:::app
 
     API --> ING[Ingestion Catalog JSON]:::data
-    API --> MILVUS[(Milvus Vector DB)]:::data
+    API --> QDRANT[(Qdrant Vector DB)]:::data
     API --> OPENAI[OpenAI Embeddings + LLM]:::ai
     API --> PROMPTS[PromptOps Store<br/>prompts/*]:::ai
 
@@ -17,16 +17,16 @@ flowchart LR
     PIPE --> ING
 
     ING --> IDX[Artifact Indexer]:::app
-    IDX --> MILVUS
+    IDX --> QDRANT
     IDX --> OPENAI
 
     DOCS[(Platform Docs<br/>.docx)]:::data --> DOCING[Doc Ingestion Pipeline]:::app
-    DOCING --> MILVUS
+    DOCING --> QDRANT
     DOCING --> OPENAI
 
-    SUM[Summary Indexer]:::app --> MILVUS
+    SUM[Summary Indexer]:::app --> QDRANT
     SUM --> OPENAI
-    PROF[Profile Indexer]:::app --> MILVUS
+    PROF[Profile Indexer]:::app --> QDRANT
     PROF --> OPENAI
 
     AIR[Airflow Scheduler]:::app --> PIPE

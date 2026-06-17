@@ -9,7 +9,7 @@ This directory is the canonical documentation home for the project. Earlier note
 3. [First Run](./03-FIRST-RUN.md) - exact commands for ingestion, indexing, API, chatbot, and webapp.
 4. [Architecture](./04-ARCHITECTURE.md) - system components and Mermaid diagrams.
 5. [Data Flows](./05-DATA-FLOWS.md) - ingestion, retrieval, chatbot, admin, and observability flows.
-6. [Data Stores and Schemas](./06-DATABASE-SCHEMA.md) - JSON catalog and Milvus collections.
+6. [Data Stores and Schemas](./06-DATABASE-SCHEMA.md) - JSON catalog and Qdrant collections.
 7. [Technology Stack](./07-TECHNOLOGY-STACK.md) - runtime technologies and key dependencies.
 
 ## Component Guides
@@ -28,7 +28,7 @@ This directory is the canonical documentation home for the project. Earlier note
 
 ## What This Project Does
 
-Kubeflow Workspace Intelligence scans user workspace folders, extracts metadata from notebooks, scripts, and text files, indexes the material into Milvus, generates artifact summaries and user profiles with an LLM, and exposes search, browsing, profile, and chatbot experiences through a FastAPI backend and Next.js frontend.
+Kubeflow Workspace Intelligence scans user workspace folders, extracts metadata from notebooks, scripts, and text files, indexes the material into Qdrant, generates artifact summaries and user profiles with an LLM, and exposes search, browsing, profile, and chatbot experiences through a FastAPI backend and Next.js frontend.
 
 ```mermaid
 flowchart LR
@@ -37,12 +37,12 @@ flowchart LR
     catalog --> indexer["Artifact indexer"]
     catalog --> summaries["Summary generator"]
     summaries --> profiles["Profile generator"]
-    indexer --> milvus[(Milvus: kubeflow_artifacts)]
-    summaries --> summaryStore[(Milvus: artifact_summaries)]
-    profiles --> profileStore[(Milvus: user_profiles)]
+    indexer --> qdrant[(Qdrant: kubeflow_artifacts)]
+    summaries --> summaryStore[(Qdrant: artifact_summaries)]
+    profiles --> profileStore[(Qdrant: user_profiles)]
     docs["platform_documents/*.docx"] --> docIngest["Doc ingestion"]
-    docIngest --> docStore[(Milvus: platform_docs)]
-    milvus --> api["FastAPI backend"]
+    docIngest --> docStore[(Qdrant: platform_docs)]
+    qdrant --> api["FastAPI backend"]
     summaryStore --> api
     profileStore --> api
     docStore --> api

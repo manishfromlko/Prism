@@ -1,11 +1,13 @@
-"""Milvus collection management for artifact-level summaries."""
+"""Qdrant collection management for artifact-level summaries."""
 
 import logging
 from typing import Dict, List, Optional
 
-from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections, utility
+from qdrant_client import QdrantClient
+from qdrant_client.http import models
 
 from .config import RetrievalConfig
+from .qdrant_utils import ensure_collection, field_filter, make_client, scroll_payloads, stable_point_id
 
 logger = logging.getLogger(__name__)
 
@@ -13,49 +15,34 @@ COLLECTION_NAME = "artifact_summaries"
 
 
 class ArtifactSummaryStore:
-    """Manages the artifact_summaries Milvus collection."""
+    """Manages the artifact_summaries Qdrant collection."""
 
     def __init__(self, config: RetrievalConfig):
         self.config = config
-        self.collection: Optional[Collection] = None
-        self._loaded = False
+        self.client: Optional[QdrantClient] = None
+        self.collection: Optional[str] = None
         self._connect()
 
     def _connect(self):
-        connections.connect("default", uri=f"http://{self.config.milvus_host}:{self.config.milvus_port}")
-        logger.info(f"Connected to Milvus at {self.config.milvus_host}:{self.config.milvus_port}")
+        self.client = make_client(self.config)
+        logger.info(f"Connected to Qdrant at {self.config.qdrant_host}:{self.config.qdrant_port}")
 
-    def _schema(self) -> CollectionSchema:
-        fields = [
-            FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
-            FieldSchema(name="user_id", dtype=DataType.VARCHAR, max_length=255),
-            FieldSchema(name="artifact_id", dtype=DataType.VARCHAR, max_length=500),
-            FieldSchema(name="artifact_summary", dtype=DataType.VARCHAR, max_length=1500),
-            FieldSchema(name="vector", dtype=DataType.FLOAT_VECTOR, dim=self.config.embedding_dimension),
-            FieldSchema(name="tags", dtype=DataType.VARCHAR, max_length=1000),
-        ]
-        return CollectionSchema(fields, description="Artifact-level summaries and tags")
-
-    def create_collection(self, drop_if_exists: bool = False):
-        if utility.has_collection(COLLECTION_NAME):
-            if drop_if_exists:
-                utility.drop_collection(COLLECTION_NAME)
-                logger.info(f"Dropped existing collection: {COLLECTION_NAME}")
-            else:
-                self.collection = Collection(COLLECTION_NAME)
-                return
-
-        self.collection = Collection(COLLECTION_NAME, schema=self._schema())
-        self.collection.create_index(
-            "vector",
-            {"index_type": "HNSW", "metric_type": "COSINE", "params": {"M": 8, "efConstruction": 64}},
-        )
-        logger.info(f"Created collection: {COLLECTION_NAME}")
+    def _ensure_client(self) -> QdrantClient:
+        if not self.client:
+            raise RuntimeError("Qdrant client not initialized")
+        return self.client
 
     def _ensure_loaded(self):
-        if not self._loaded and self.collection:
-            self.collection.load()
-            self._loaded = True
+        self.collection = COLLECTION_NAME
+
+    def create_collection(self, drop_if_exists: bool = False):
+        ensure_collection(
+            self._ensure_client(),
+            COLLECTION_NAME,
+            self.config.embedding_dimension,
+            drop_if_exists=drop_if_exists,
+        )
+        self.collection = COLLECTION_NAME
 
     def upsert_summaries(self, summaries: List[Dict]) -> int:
         if not self.collection:
@@ -63,36 +50,28 @@ class ArtifactSummaryStore:
         if not summaries:
             return 0
 
-        self._ensure_loaded()
-        for s in summaries:
-            try:
-                self.collection.delete(f'artifact_id == "{s["artifact_id"]}"')
-            except Exception:
-                pass
-
-        data = [
-            [s["user_id"] for s in summaries],
-            [s["artifact_id"] for s in summaries],
-            [s["artifact_summary"][:1500] for s in summaries],
-            [s["vector"] for s in summaries],
-            [s["tags"][:1000] for s in summaries],
+        points = [
+            models.PointStruct(
+                id=stable_point_id(COLLECTION_NAME, s["artifact_id"]),
+                vector=s["vector"],
+                payload={
+                    "user_id": s["user_id"],
+                    "artifact_id": s["artifact_id"],
+                    "artifact_summary": s["artifact_summary"][:1500],
+                    "tags": s["tags"][:1000],
+                },
+            )
+            for s in summaries
         ]
-        result = self.collection.insert(data)
-        self.collection.flush()
-        self._loaded = False
-        logger.info(f"Upserted {len(result.primary_keys)} artifact summaries")
-        return len(result.primary_keys)
+        self._ensure_client().upsert(collection_name=COLLECTION_NAME, points=points, wait=True)
+        logger.info(f"Upserted {len(points)} artifact summaries")
+        return len(points)
 
     def get_all_summaries(self, limit: int = 10000) -> List[Dict]:
         if not self.collection:
             return []
         try:
-            self._ensure_loaded()
-            return self.collection.query(
-                expr='user_id != ""',
-                output_fields=["id", "user_id", "artifact_id", "artifact_summary", "tags"],
-                limit=limit,
-            )
+            return scroll_payloads(self._ensure_client(), COLLECTION_NAME, limit=limit)
         except Exception as e:
             logger.error(f"Failed to query all artifact summaries: {e}")
             return []
@@ -101,10 +80,10 @@ class ArtifactSummaryStore:
         if not self.collection:
             return []
         try:
-            self._ensure_loaded()
-            return self.collection.query(
-                expr=f'user_id == "{user_id}"',
-                output_fields=["id", "user_id", "artifact_id", "artifact_summary", "tags"],
+            return scroll_payloads(
+                self._ensure_client(),
+                COLLECTION_NAME,
+                scroll_filter=field_filter(user_id=user_id),
                 limit=limit,
             )
         except Exception as e:
@@ -115,13 +94,39 @@ class ArtifactSummaryStore:
         if not self.collection:
             return None
         try:
-            self._ensure_loaded()
-            rows = self.collection.query(
-                expr=f'user_id == "{user_id}" && artifact_id == "{artifact_id}"',
-                output_fields=["id", "user_id", "artifact_id", "artifact_summary", "tags"],
+            rows = scroll_payloads(
+                self._ensure_client(),
+                COLLECTION_NAME,
+                scroll_filter=field_filter(user_id=user_id, artifact_id=artifact_id),
                 limit=1,
             )
             return rows[0] if rows else None
         except Exception as e:
             logger.error(f"Failed to get summary for {user_id}/{artifact_id}: {e}")
             return None
+
+    def similarity_search(self, vector: List[float], top_k: int = 5) -> List[Dict]:
+        if not self.collection:
+            return []
+        try:
+            response = self._ensure_client().query_points(
+                collection_name=COLLECTION_NAME,
+                query=vector,
+                limit=top_k,
+                with_payload=True,
+                with_vectors=False,
+            )
+            results = getattr(response, "points", response)
+            return [
+                {
+                    "user_id": (hit.payload or {}).get("user_id"),
+                    "artifact_id": (hit.payload or {}).get("artifact_id"),
+                    "artifact_summary": (hit.payload or {}).get("artifact_summary"),
+                    "tags": (hit.payload or {}).get("tags", ""),
+                    "score": hit.score,
+                }
+                for hit in results
+            ]
+        except Exception as e:
+            logger.error(f"Artifact similarity search failed: {e}")
+            return []

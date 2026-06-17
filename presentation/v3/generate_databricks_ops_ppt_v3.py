@@ -22,7 +22,7 @@ slides = [
     ]),
     ("Current-to-Target Mapping", [
         "Filesystem ingestion -> Databricks Workspace/Repos/Jobs metadata ingestion.",
-        "Milvus vector store -> Mosaic AI Vector Search indexes.",
+        "Qdrant vector store -> Mosaic AI Vector Search indexes.",
         "Airflow orchestration -> Databricks Workflows with job dependencies and schedules.",
     ]),
     ("Target Platform Capabilities", [

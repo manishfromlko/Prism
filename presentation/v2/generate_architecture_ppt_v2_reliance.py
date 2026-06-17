@@ -37,7 +37,7 @@ slides_content = [
         "Experience layer: Next.js web portal with integrated assistant.",
         "Orchestration layer: FastAPI endpoints for search/profile/chat/admin sync.",
         "Intelligence layer: classification, rewrite, retrieval, and constrained generation.",
-        "Data plane: ingestion catalog + Milvus collections + OpenAI model endpoints.",
+        "Data plane: ingestion catalog + Qdrant collections + OpenAI model endpoints.",
     ]),
     ("Layered Design Principles", [
         "BFF abstraction decouples browser clients from backend schema volatility.",
@@ -113,7 +113,7 @@ slides_content = [
     ("Scalability Considerations", [
         "Independent collection scaling enables domain-specific performance tuning.",
         "Incremental indexing supports cost governance under growing data volume.",
-        "Key watchpoints: embedding throughput, Milvus QPS/latency, prompt-token economics.",
+        "Key watchpoints: embedding throughput, Qdrant QPS/latency, prompt-token economics.",
     ]),
     ("GenAI Maturity Roadmap", [
         "Completed baseline: ingestion, retrieval API, web UX, summaries/profiles, chatbot.",

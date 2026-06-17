@@ -24,7 +24,7 @@ Accuracy note:
 - **Kubeflow Workspace Intelligence**
 - RAG-based chatbot with LLMOps observability and evaluation
 - Production-style assistant for workspace knowledge, notebook discovery, platform docs QA, and user expertise profiling
-- FastAPI | Next.js | Milvus | LiteLLM | Langfuse | RAGAS
+- FastAPI | Next.js | Qdrant | LiteLLM | Langfuse | RAGAS
 
 ### Speaker Notes
 Frame this as a production-style LLMOps system, not a generic chatbot wrapper. The project connects ingestion, retrieval, generation, tracing, and evaluation into one inspectable workflow for data scientists and ML engineers.
@@ -50,7 +50,7 @@ The problem is discovery plus trust. Notebooks hold institutional memory, but th
 
 ### Content
 - Intent-routed RAG assistant over platform docs, artifact summaries, and user profiles
-- Semantic retrieval backed by OpenAI embeddings and Milvus collections
+- Semantic retrieval backed by OpenAI embeddings and Qdrant collections
 - LiteLLM and Langfuse provide request-level visibility across classify, rewrite, and generate
 - RAGAS and LLM-as-judge evaluate groundedness and relevance after the answer returns
 
@@ -91,7 +91,7 @@ The implementation goes beyond the initial prompt. In addition to notebook searc
 ### Content
 - Next.js acts as a BFF and proxies to FastAPI
 - FastAPI orchestrates search, chat, sync, metrics, and feedback
-- Milvus stores separate knowledge collections
+- Qdrant stores separate knowledge collections
 - LiteLLM and Langfuse make LLM calls observable
 
 ### Speaker Notes
@@ -123,7 +123,7 @@ Native PowerPoint data-flow diagram plus Mermaid source:
 - `presentation/v4/data-flow-v4.mmd`
 
 Diagram structure:
-- Offline build: Workspace files -> ingestion catalog -> parse/chunk -> embeddings -> Milvus collections -> summaries/profiles/docs
+- Offline build: Workspace files -> ingestion catalog -> parse/chunk -> embeddings -> Qdrant collections -> summaries/profiles/docs
 - Online serving: User query -> classify/rewrite -> retrieve context -> prompt/generate -> answer + sources + trace_id
 - Evaluation: response/context -> RAGAS or LLM judge -> Langfuse scores
 
@@ -135,10 +135,10 @@ Diagram structure:
 - Scan workspace directories and classify supported files
 - Extract notebook/script metadata: tools, table references, database targets
 - Convert artifacts into LangChain documents and extract notebook cell text
-- Chunk by content type, embed with `text-embedding-3-small`, and upsert to Milvus
+- Chunk by content type, embed with `text-embedding-3-small`, and upsert to Qdrant
 
 ### Speaker Notes
-The ingestion phase creates the structured catalog. The retrieval indexer then loads that catalog, extracts notebook cell content, applies guardrails, chunks documents by type, generates embeddings, and inserts vectors into Milvus. Incremental indexing avoids re-embedding unchanged artifacts.
+The ingestion phase creates the structured catalog. The retrieval indexer then loads that catalog, extracts notebook cell content, applies guardrails, chunks documents by type, generates embeddings, and inserts vectors into Qdrant. Incremental indexing avoids re-embedding unchanged artifacts.
 
 ---
 
@@ -326,7 +326,7 @@ This is how production readiness can be met operationally: make quality measurab
 ## Slide 22: Production Readiness: Deployment and Operations
 
 ### Content
-- Containerize FastAPI, Next.js, LiteLLM, Langfuse, and Milvus with environment-specific configs
+- Containerize FastAPI, Next.js, LiteLLM, Langfuse, and Qdrant with environment-specific configs
 - Run ingestion/indexing as scheduled jobs with idempotent full and incremental modes
 - Add CI for unit, integration, retrieval, and API contract tests
 - Define runbooks for stale indexes, failed LLM calls, high cost, and low evaluation scores

@@ -1,7 +1,7 @@
-"""Generate user profiles from artifact summaries stored in Milvus.
+"""Generate user profiles from artifact summaries stored in Qdrant.
 
 Unlike user_profile_generator.py (which reads raw source files), this module
-pulls pre-generated artifact summaries from the artifact_summaries Milvus
+pulls pre-generated artifact summaries from the artifact_summaries Qdrant
 collection and feeds them as context to the LLM.  This produces more concise,
 signal-dense profiles because the LLM works from already-distilled summaries
 rather than raw code.
@@ -66,7 +66,7 @@ def generate_profiles_from_summaries(
     model: str = "gpt-4o-mini",
 ) -> List[Dict]:
     """
-    Read artifact summaries from Milvus, call gpt-4o-mini once per user, and
+    Read artifact summaries from Qdrant, call gpt-4o-mini once per user, and
     return profile dicts ready for embedding and upsert.
 
     Each dict has: id, user_id, user_profile, tags.
@@ -81,7 +81,7 @@ def generate_profiles_from_summaries(
     all_summaries = summary_store.get_all_summaries()
     if not all_summaries:
         logger.warning(
-            "No artifact summaries found in Milvus. "
+            "No artifact summaries found in Qdrant. "
             "Run `python -m src.retrieval.artifact_summary_indexer --mode full` first."
         )
         return []

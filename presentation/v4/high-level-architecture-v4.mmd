@@ -18,7 +18,7 @@ flowchart LR
 
     API --> ORCH
 
-    subgraph KNOWLEDGE["Milvus Knowledge Collections"]
+    subgraph KNOWLEDGE["Qdrant Knowledge Collections"]
       ART[(kubeflow_artifacts<br/>raw artifact chunks)]:::data
       SUM[(artifact_summaries<br/>summary vectors)]:::data
       PROF[(user_profiles<br/>expertise vectors)]:::data

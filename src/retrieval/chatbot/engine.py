@@ -19,7 +19,7 @@ Observability (Layer 1):
 
 USER_SEARCH flow:
   1. String-match + RapidFuzz against full user roster (no vector search)
-  2. Single high-confidence hit → fetch raw profile from Milvus, return (no LLM)
+  2. Single high-confidence hit -> fetch raw profile from Qdrant, return (no LLM)
   3. Multiple/ambiguous → LLM disambiguation (no vector search)
   4. Zero hits → fall through to vector retrieval (semantic query: "who works on NLP?")
 """

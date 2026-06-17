@@ -16,7 +16,7 @@
       "rewrite": "LLM call — runs for all intents EXCEPT OUT_OF_SCOPE",
       "generate": "LLM call — runs for DOC_QA, ARTIFACT_SEARCH, semantic USER_SEARCH, HYBRID",
       "user_resolve": "LLM call — runs only for USER_SEARCH when fuzzy name match is found",
-      "vector_retrieve": "Milvus similarity search — runs for DOC_QA, ARTIFACT_SEARCH, semantic USER_SEARCH, HYBRID"
+      "vector_retrieve": "Qdrant similarity search — runs for DOC_QA, ARTIFACT_SEARCH, semantic USER_SEARCH, HYBRID"
     },
     "score_ranges": {
       "response_length": "peaks at 1.0 for 300–2000 chars; 0.5 at 50 chars; penalised above 2000",
@@ -520,7 +520,7 @@
         "llm_calls": ["classify", "rewrite", "user_resolve"],
         "retrievers_used": [],
         "expected_hits": { "doc_hits": 0, "artifact_hits": 0, "user_hits": 0 },
-        "special": "Returns raw Milvus profile directly. No generate step. exact_match=True."
+        "special": "Returns raw Qdrant profile directly. No generate step. exact_match=True."
       },
       "langfuse": {
         "trace_name": "chat · USER_SEARCH",
@@ -531,7 +531,7 @@
         "scores_not_expected": ["response_length", "has_content", "source_count", "faithfulness", "answer_relevancy", "context_precision"],
         "verification_steps": [
           "Trace should show only 2–3 generation spans: classify, rewrite, user_resolve.",
-          "NO 'generate' span — answer is raw profile from Milvus, not LLM generated.",
+          "NO 'generate' span — answer is raw profile from Qdrant, not LLM generated.",
           "Layer 1 scores (response_length, has_content, etc.) should NOT appear — engine returns before scoring.",
           "profile_relevance appears in Scores panel within ~5s (LLM judge background thread).",
           "Expected profile_relevance = 1.0 since the profile directly answers 'show me the profile of ajay11.yadav'.",

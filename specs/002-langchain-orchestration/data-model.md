@@ -91,8 +91,8 @@ class WorkspaceProfile(BaseModel):
 
 ```python
 class RetrievalConfig(BaseModel):
-    milvus_host: str = "localhost"
-    milvus_port: int = 19530
+    qdrant_host: str = "localhost"
+    qdrant_port: int = 6333
     collection_name: str = "kubeflow_artifacts"
     embedding_model: str = "all-MiniLM-L6-v2"
     chunk_size: int = 1000
@@ -104,7 +104,7 @@ class RetrievalConfig(BaseModel):
 
 ## Storage Schema
 
-### Milvus Collection Schema
+### Qdrant Collection Schema
 
 ```
 Collection: kubeflow_artifacts
@@ -126,7 +126,7 @@ Indexes:
 
 1. **Ingestion Catalog** → Document Loader → **ProcessedDocument**
 2. **ProcessedDocument** → Embedding Service → **EmbeddingRecord**
-3. **EmbeddingRecord** → Vector Store → **Milvus Collection**
+3. **EmbeddingRecord** → Vector Store → **Qdrant Collection**
 4. **Query** → Retriever → **SearchResult**
 
 ### Incremental Updates

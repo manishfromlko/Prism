@@ -171,7 +171,7 @@ def make_slide(prs):
          "~8 min", "~1–2 min",
          WHITE, SLATE, MUTED, False),
         (3.65,  "02", "Artifact Embedding",
-         "OpenAI embed (batch 32)\n+ Milvus vector insert",
+         "OpenAI embed (batch 32)\n+ Qdrant vector insert",
          "~1.8 hrs", "~8–10 min",
          BLUEBG, BLUE, BLUE, False),
         (6.85,  "03", "Artifact Summaries",

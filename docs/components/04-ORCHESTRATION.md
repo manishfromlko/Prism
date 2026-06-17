@@ -69,9 +69,9 @@ The Databricks path replaces local components:
 
 | Local | Databricks |
 | --- | --- |
-| Milvus | Databricks Vector Search |
+| Qdrant | Databricks Vector Search |
 | Filesystem `dataset/` | Unity Catalog volumes |
-| JSON/Milvus batch outputs | Delta tables and Vector Search indexes |
+| JSON/Qdrant batch outputs | Delta tables and Vector Search indexes |
 | LiteLLM/OpenAI direct calls | Databricks Model Serving endpoints |
 | Airflow/manual scripts | Databricks Workflows |
 | FastAPI container | Databricks Apps |

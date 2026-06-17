@@ -128,11 +128,6 @@ async def startup_event():
         profiler = WorkspaceProfiler(config, config.ingestion_catalog_path)
         vector_store.create_collection()
 
-        # Pre-load kubeflow_artifacts collection into Milvus memory
-        if vector_store.collection:
-            vector_store.collection.load()
-            vector_store._collection_loaded = True
-
         # Load user_profiles collection (non-fatal if not yet indexed)
         try:
             user_profile_store = UserProfileStore(config)
@@ -418,7 +413,7 @@ async def query_documents(request: QueryRequest):
 
 @app.post("/admin/sync", response_model=SyncResponse)
 async def sync_data(request: SyncRequest):
-    """Re-index the ingestion catalog into Milvus (incremental or full)."""
+    """Re-index the ingestion catalog into Qdrant (incremental or full)."""
     if not config:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
@@ -522,7 +517,7 @@ async def sync_profiles():
 @app.post("/admin/sync-profiles-from-summaries")
 async def sync_profiles_from_summaries():
     """
-    Re-generate and re-index user profiles using artifact summaries from Milvus
+    Re-generate and re-index user profiles using artifact summaries from Qdrant
     as LLM context (gpt-4o-mini, ≤5-line summaries).
 
     Requires the artifact_summaries collection to be populated first.
@@ -599,7 +594,7 @@ async def list_artifact_summaries(workspace_id: str):
 
 @app.post("/admin/sync-artifact-summaries")
 async def sync_artifact_summaries(force_full: bool = False):
-    """Generate and index artifact summaries into Milvus."""
+    """Generate and index artifact summaries into Qdrant."""
     if not config:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
@@ -717,7 +712,7 @@ async def post_feedback(request: FeedbackRequest):
 
 @app.post("/admin/ingest-docs")
 async def ingest_docs(drop_existing: bool = False):
-    """Ingest Word documents from platform_documents/ into the platform_docs Milvus collection."""
+    """Ingest Word documents from platform_documents/ into the platform_docs Qdrant collection."""
     global doc_chunk_store, chat_engine
     try:
         import asyncio

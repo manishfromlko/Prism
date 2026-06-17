@@ -1,12 +1,12 @@
 """
-Indexer: reads the ingestion catalog and populates Milvus with embeddings.
+Indexer: reads the ingestion catalog and populates Qdrant with embeddings.
 
 Run after ingestion to bring the vector store in sync with the catalog:
 
     python -m src.retrieval.indexer --catalog dataset/.ingestion/ingestion_catalog.json
 
 Modes:
-    incremental (default) — only indexes artifact_ids not already in Milvus
+    incremental (default) — only indexes artifact_ids not already in Qdrant
     full                  — drops and recreates the collection, then indexes everything
 """
 
@@ -26,27 +26,9 @@ logger = logging.getLogger(__name__)
 
 
 def _get_indexed_ids(store: VectorStore) -> Set[str]:
-    """Return the set of artifact_ids already present in Milvus."""
+    """Return the set of artifact_ids already present in Qdrant."""
     try:
-        store.collection.load()
-        # Paginate in chunks of 16 384 (Milvus per-query max)
-        ids: Set[str] = set()
-        offset = 0
-        chunk = 16_384
-        while True:
-            rows = store.collection.query(
-                expr='artifact_id != ""',
-                output_fields=["artifact_id"],
-                limit=chunk,
-                offset=offset,
-            )
-            if not rows:
-                break
-            ids.update(r["artifact_id"] for r in rows)
-            if len(rows) < chunk:
-                break
-            offset += chunk
-        return ids
+        return store.list_artifact_ids()
     except Exception as e:
         logger.warning(f"Could not query existing artifact IDs: {e}")
         return set()
@@ -54,7 +36,7 @@ def _get_indexed_ids(store: VectorStore) -> Set[str]:
 
 def run_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
     """
-    Index catalog artifacts into Milvus.
+    Index catalog artifacts into Qdrant.
 
     Returns a summary dict: {inserted, skipped, errors, total}.
     """
@@ -68,7 +50,7 @@ def run_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
         already_indexed: Set[str] = set()
     else:
         store.create_collection(drop_if_exists=False)
-        logger.info("Incremental mode: querying existing artifact IDs from Milvus")
+        logger.info("Incremental mode: querying existing artifact IDs from Qdrant")
         already_indexed = _get_indexed_ids(store)
         logger.info(f"Already indexed: {len(already_indexed)} artifacts")
 
@@ -93,15 +75,13 @@ def run_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
     embeddings = embedder.generate_embeddings(texts)
 
     artifact_ids = [doc.metadata.get("artifact_id", "") for doc in new_docs]
-    # Milvus VARCHAR max_length is measured in UTF-8 bytes; truncate to 4 900 bytes
-    # and decode back to str to stay safely under the 5 000-byte schema limit.
     contents = [
         doc.page_content.encode("utf-8")[:4900].decode("utf-8", errors="ignore")
         for doc in new_docs
     ]
     metadatas = [doc.metadata for doc in new_docs]
 
-    logger.info("Inserting vectors into Milvus...")
+    logger.info("Inserting vectors into Qdrant...")
     store.insert_vectors(artifact_ids, embeddings, contents, metadatas)
 
     result = {
@@ -119,7 +99,7 @@ def run_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Index ingestion catalog artifacts into Milvus"
+        description="Index ingestion catalog artifacts into Qdrant"
     )
     parser.add_argument(
         "--catalog",

@@ -67,7 +67,7 @@ result = evaluate(Dataset.from_dict(data), metrics=[faithfulness, answer_relevan
 
 ## Layer 3 — Application + Vector DB Metrics: Prometheus + Grafana
 
-**What it covers:** infrastructure health — FastAPI request metrics and Milvus retrieval metrics.
+**What it covers:** infrastructure health — FastAPI request metrics and Qdrant retrieval metrics.
 
 ### FastAPI instrumentation
 
@@ -83,29 +83,26 @@ Exposes at `/metrics`:
 - `http_requests_total` — throughput and error rate
 - `http_request_size_bytes` / `http_response_size_bytes`
 
-### Milvus instrumentation
+### Qdrant instrumentation
 
-Milvus ships a built-in Prometheus exporter. Enable it in `milvus.yaml`:
-```yaml
-metrics:
-  enabled: true
-  port: 9091
+Qdrant exposes Prometheus metrics from its HTTP service:
+```bash
+curl http://localhost:6333/metrics
 ```
 
-Key Milvus metrics:
-- `milvus_query_latency_ms` — vector search latency
-- `milvus_search_request_count` — search QPS
-- `milvus_cache_hit_rate` — index cache efficiency
-- `milvus_num_entities` — collection size over time
+Key Qdrant metrics:
+- request latency and response counters for vector queries
+- collection and segment counts
+- storage and optimizer activity
 
 ### Grafana dashboards
 
 Point Grafana at the Prometheus datasource and build two dashboards:
 
 1. **API dashboard** — request rate, P50/P95/P99 latency, error rate per endpoint
-2. **Retrieval dashboard** — Milvus search latency, QPS, cache hit rate, collection growth
+2. **Retrieval dashboard** — Qdrant search latency, QPS, cache hit rate, collection growth
 
-Milvus provides an official Grafana dashboard JSON that can be imported directly.
+Qdrant provides an official Grafana dashboard JSON that can be imported directly.
 
 ---
 
@@ -147,7 +144,7 @@ Incoming Request
        │                                    (LLM traces)
        ├──► QueryRewriter   (LiteLLM) ──► Langfuse
        │
-       ├──► Milvus Search ────────────► Prometheus ──► Grafana
+       ├──► Qdrant Search ────────────► Prometheus ──► Grafana
        │                              (retrieval metrics)
        │
        └──► LLM Generate   (LiteLLM) ──► Langfuse
@@ -177,4 +174,4 @@ Query logs ──► Evidently ──► Drift reports (scheduled)
 - **RAGAS is the differentiator:** most teams instrument latency and cost; few measure faithfulness and context relevance — this is what separates LLMOps from plain observability
 - **Langfuse as the correlation layer:** LLM traces + RAGAS scores in one place means you can correlate "this query cost $0.002 and had faithfulness=0.4" — actionable signal for prompt/retrieval tuning
 - **Evidently closes the feedback loop:** production query drift → triggers re-evaluation → drives re-indexing or prompt updates
-- **Milvus + Prometheus:** retrieval is a first-class citizen in the monitoring stack, not an afterthought
+- **Qdrant + Prometheus:** retrieval is a first-class citizen in the monitoring stack, not an afterthought

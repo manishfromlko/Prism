@@ -168,10 +168,10 @@ STAGE_DATA = [
             "Load catalog  →  191 docs / workspace avg",
             "Chunk + guardrail filter (1 rejected / WS avg)",
             "OpenAI embed: batch_size=32  →  3,125 batches",
-            "Upsert 100K vectors into Milvus (1536-dim)",
+            "Upsert 100K vectors into Qdrant (1536-dim)",
         ],
         src="ingestion_catalog.json\n(100K artifact records)",
-        dst="kubeflow_artifacts\n(Milvus — 100K vectors)",
+        dst="kubeflow_artifacts\n(Qdrant — 100K vectors)",
         dst_color=PURPLE,
         seq="~1 hr 35 min  (sequential)",
         par="~9 min  (20 workers)",
@@ -185,10 +185,10 @@ STAGE_DATA = [
             "1 LLM call per artifact  (gpt-4o-mini)",
             "Max 220 output tokens  ·  JSON response",
             "Rate: 22 artifacts/min per worker",
-            "Embed summaries  →  upsert to Milvus",
+            "Embed summaries  →  upsert to Qdrant",
         ],
         src="ingestion_catalog.json\n(100K artifacts)",
-        dst="artifact_summaries\n(Milvus — 100K entries)",
+        dst="artifact_summaries\n(Qdrant — 100K entries)",
         dst_color=REDBRD,
         seq="~75 hrs 50 min  (sequential)",
         par="~4 hrs 2 min  (20 workers)",
@@ -204,8 +204,8 @@ STAGE_DATA = [
             "Profile text + skill tags generated",
             "Embed + upsert into user_profiles",
         ],
-        src="artifact_summaries\n(Milvus — per workspace)",
-        dst="user_profiles\n(Milvus — 500 profiles)",
+        src="artifact_summaries\n(Qdrant — per workspace)",
+        dst="user_profiles\n(Qdrant — 500 profiles)",
         dst_color=PINK,
         seq="~33 min  (sequential)",
         par="~4 min  (20 workers)",
@@ -290,7 +290,7 @@ def make_full_load(prs):
             tb(slide, x + 0.27, yy, SW - 0.38, 0.24, op, 8.5, INK)
             yy += 0.25
 
-        # ── Source → Milvus ───────────────────────────────────────────────────
+        # ── Source → Qdrant ───────────────────────────────────────────────────
         io_y = ops_y + 1.32
         # Source box
         src_b = box(slide, x + 0.1, io_y, SW - 0.2, 0.48, PANEL, SLATE, 0.7)
@@ -300,11 +300,11 @@ def make_full_load(prs):
         ])
         # Arrow down
         arr(slide, x + SW/2, io_y + 0.48, x + SW/2, io_y + 0.62, c, 1.2)
-        # Destination Milvus box
+        # Destination Qdrant box
         dst_b = box(slide, x + 0.1, io_y + 0.62, SW - 0.2, 0.48,
                     bg, sd["dst_color"], 1.0)
         multi(slide, x + 0.14, io_y + 0.64, SW - 0.28, 0.43, [
-            ("OUT → Milvus: ", 8, sd["dst_color"], True, PP_ALIGN.LEFT),
+            ("OUT → Qdrant: ", 8, sd["dst_color"], True, PP_ALIGN.LEFT),
             (sd["dst"].split("\n")[-1], 8.5, INK, True, PP_ALIGN.LEFT),
         ])
 
@@ -387,7 +387,7 @@ def make_full_load(prs):
     metrics = [
         ("100,000 LLM calls", PURPBG, PURPLE),
         ("3,125 embed batches", BLUEBG, BLUE),
-        ("4 Milvus collections updated", AMBERBG, AMBER),
+        ("4 Qdrant collections updated", AMBERBG, AMBER),
         ("Bottleneck: Stage 3 — Summaries", WARN, REDBRD),
     ]
     mx = 2.38
@@ -513,7 +513,7 @@ def make_incremental(prs):
 
     proc_stages = [
         ("Stage 2 — Re-Embed",
-         "500 artifacts  →  16 API batches (batch_size=32)  →  Milvus upsert",
+         "500 artifacts  →  16 API batches (batch_size=32)  →  Qdrant upsert",
          "~1 min", PURPLE, PURPBG, "kubeflow_artifacts  (partial upsert)"),
         ("Stage 3 — Re-Summarise",
          "500 LLM calls (gpt-4o-mini)  ·  5 workers × 100 artifacts  ·  ~50 s/round",
@@ -524,13 +524,13 @@ def make_incremental(prs):
     ]
 
     py = HASH_Y
-    for i, (title, desc, timing, col, bg, milvus) in enumerate(proc_stages):
+    for i, (title, desc, timing, col, bg, qdrant) in enumerate(proc_stages):
         pb = box(slide, PROC_X, py, PROC_W, PROC_H + 0.22, bg, col, 1.1, radius=True)
 
         multi(slide, PROC_X + 0.12, py + 0.05, PROC_W - 0.2, PROC_H + 0.14, [
             (title, 10, col, True, PP_ALIGN.LEFT),
             (desc,  8.2, INK, False, PP_ALIGN.LEFT),
-            (f"↳  {milvus}", 8, MUTED, False, PP_ALIGN.LEFT),
+            (f"↳  {qdrant}", 8, MUTED, False, PP_ALIGN.LEFT),
         ])
 
         # Timing badge

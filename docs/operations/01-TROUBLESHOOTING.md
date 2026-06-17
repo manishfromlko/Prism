@@ -13,7 +13,7 @@ Common causes:
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| Milvus connection error | Milvus is not running or wrong host/port | `docker compose up -d milvus`; verify `MILVUS_HOST=127.0.0.1`, `MILVUS_PORT=19530`. |
+| Qdrant connection error | Qdrant is not running or wrong host/port | `docker compose up -d qdrant`; verify `QDRANT_HOST=127.0.0.1`, `QDRANT_PORT=6333`. |
 | Embedding errors | Missing or invalid OpenAI credentials | Set `OPENAI_API_KEY`. |
 | Catalog warning | `dataset/.ingestion/ingestion_catalog.json` missing | Run ingestion. |
 | Chat engine not ready | Missing docs/summaries/profiles collections | Run summary, profile, and doc ingestion steps. |
@@ -69,7 +69,7 @@ PYTHON_API_URL=http://localhost:8000 npm run dev
 
 Remember: browser calls go to Next.js `/api/*`; Next.js route handlers call `PYTHON_API_URL`.
 
-## Milvus Dimension Mismatch
+## Qdrant Dimension Mismatch
 
 If inserts fail with vector dimension errors, make sure these match:
 

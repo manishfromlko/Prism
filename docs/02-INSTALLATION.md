@@ -41,20 +41,20 @@ The webapp uses Next.js 15, React 18, Tailwind CSS, shadcn-style UI components, 
 
 ## Docker Setup
 
-Docker is required for the local Milvus vector database.
+Docker is required for the local Qdrant vector database.
 
 ```bash
-docker compose up -d milvus
+docker compose up -d qdrant
 ```
 
 Verify:
 
 ```bash
 docker ps
-docker logs kubeflow-milvus
+docker logs kubeflow-qdrant
 ```
 
-The compose service exposes Milvus on `localhost:19530`.
+The compose service exposes Qdrant on `localhost:6333`.
 
 ## Environment Variables
 
@@ -62,9 +62,9 @@ Create `.env` in the repository root:
 
 ```bash
 OPENAI_API_KEY=<your-openai-api-key>
-MILVUS_HOST=127.0.0.1
-MILVUS_PORT=19530
-MILVUS_COLLECTION=kubeflow_artifacts
+QDRANT_HOST=127.0.0.1
+QDRANT_PORT=6333
+QDRANT_COLLECTION=kubeflow_artifacts
 EMBEDDING_MODEL=text-embedding-3-small
 EMBEDDING_DIMENSION=1536
 INGESTION_CATALOG_PATH=dataset/.ingestion/ingestion_catalog.json
@@ -113,4 +113,4 @@ See [Orchestration](./components/04-ORCHESTRATION.md).
 
 ## Optional Databricks Setup
 
-The `databricks/` directory contains a migration path that replaces Milvus, LiteLLM, local FastAPI hosting, and filesystem storage with Databricks-native services. It is not required for local development.
+The `databricks/` directory contains a migration path that replaces Qdrant, LiteLLM, local FastAPI hosting, and filesystem storage with Databricks-native services. It is not required for local development.

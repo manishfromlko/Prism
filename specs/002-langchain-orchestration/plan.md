@@ -2,13 +2,13 @@
 
 ## Overview
 
-This feature implements Langchain-based orchestration for processing ingested Kubeflow workspace data, generating embeddings, storing vectors in Milvus database, and enabling intelligent retrieval queries. It transforms the static JSON catalog from the ingestion pipeline into a dynamic, queryable knowledge base for the generative AI profiling webapp.
+This feature implements Langchain-based orchestration for processing ingested Kubeflow workspace data, generating embeddings, storing vectors in Qdrant database, and enabling intelligent retrieval queries. It transforms the static JSON catalog from the ingestion pipeline into a dynamic, queryable knowledge base for the generative AI profiling webapp.
 
 ## Goals
 
 - Process ingested workspace artifacts into Langchain documents
 - Generate high-quality embeddings for semantic search
-- Store and index vectors in Milvus for efficient retrieval
+- Store and index vectors in Qdrant for efficient retrieval
 - Provide Langchain-powered query capabilities
 - Enable profiling insights through vector similarity search
 
@@ -18,20 +18,20 @@ This feature implements Langchain-based orchestration for processing ingested Ku
 
 1. **Document Processor**: Loads artifacts from ingestion catalog, converts to Langchain documents
 2. **Embedding Service**: Generates vector embeddings using configured models
-3. **Vector Store**: Milvus integration for vector storage and indexing
+3. **Vector Store**: Qdrant integration for vector storage and indexing
 4. **Retrieval Engine**: Langchain retrievers for similarity search
 5. **Query API**: REST endpoints for vector queries and profiling
 
 ### Data Flow
 
 ```
-Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Model → Milvus Vector DB → Retriever → Query API → Profiling Insights
+Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Model → Qdrant Vector DB → Retriever → Query API → Profiling Insights
 ```
 
 ### Technology Stack
 
 - **Langchain**: Orchestration framework for LLM applications
-- **Milvus**: Open-source vector database for similarity search
+- **Qdrant**: Open-source vector database for similarity search
 - **Sentence Transformers**: Embedding model for document vectors
 - **FastAPI**: API framework for query endpoints
 - **Pydantic**: Data validation and serialization
@@ -39,10 +39,10 @@ Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Mod
 ## Implementation Phases
 
 ### Phase 1: Foundation Setup (Priority: P1)
-**Goal**: Establish Langchain and Milvus infrastructure
+**Goal**: Establish Langchain and Qdrant infrastructure
 
 - Set up Langchain environment and core dependencies
-- Configure Milvus connection and collection schema
+- Configure Qdrant connection and collection schema
 - Create base document processing classes
 - Implement basic embedding generation
 - Add configuration management for models and connections
@@ -50,7 +50,7 @@ Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Mod
 **Deliverables**:
 - `src/retrieval/config.py` - Configuration classes
 - `src/retrieval/embeddings.py` - Embedding service
-- `src/retrieval/vector_store.py` - Milvus integration
+- `src/retrieval/vector_store.py` - Qdrant integration
 - Unit tests for core components
 
 ### Phase 2: Document Processing (Priority: P1)
@@ -84,9 +84,9 @@ Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Mod
 - Model selection and configuration
 
 ### Phase 4: Vector Storage Integration (Priority: P2)
-**Goal**: Store and index vectors in Milvus
+**Goal**: Store and index vectors in Qdrant
 
-- Implement Milvus collection management
+- Implement Qdrant collection management
 - Add vector insertion and update operations
 - Create indexing strategies for efficient search
 - Implement vector similarity search
@@ -95,7 +95,7 @@ Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Mod
 **Deliverables**:
 - Enhanced `src/retrieval/vector_store.py`
 - `src/retrieval/index_manager.py` - Collection and index management
-- Integration tests with Milvus
+- Integration tests with Qdrant
 - Data migration utilities
 
 ### Phase 5: Retrieval Engine (Priority: P3)
@@ -133,7 +133,7 @@ Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Mod
 
 ### External Dependencies
 - `langchain` - Core orchestration framework
-- `pymilvus` - Milvus Python client
+- `qdrant-client` - Qdrant Python client
 - `sentence-transformers` - Embedding models
 - `fastapi` - API framework
 - `uvicorn` - ASGI server
@@ -147,7 +147,7 @@ Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Mod
 
 ### Unit Testing
 - Component isolation tests for each module
-- Mock external dependencies (Milvus, embedding models)
+- Mock external dependencies (Qdrant, embedding models)
 - Configuration and error handling validation
 
 ### Integration Testing
@@ -164,7 +164,7 @@ Ingestion Catalog (JSON) → Document Loader → Text Splitter → Embedding Mod
 
 - [ ] Documents successfully loaded from ingestion catalog
 - [ ] Embeddings generated for all processable artifacts
-- [ ] Vectors stored and indexed in Milvus collection
+- [ ] Vectors stored and indexed in Qdrant collection
 - [ ] Similarity search returns relevant results
 - [ ] API endpoints respond correctly to queries
 - [ ] System handles incremental updates from ingestion

@@ -25,13 +25,13 @@ slides_content = [
     ("System Overview", [
         "Frontend: Next.js webapp with App Router and React Query.",
         "Backend: FastAPI orchestration layer for search, profiling, chat, and admin sync.",
-        "Data/AI plane: Milvus vector collections + OpenAI embeddings/LLM calls.",
+        "Data/AI plane: Qdrant vector collections + OpenAI embeddings/LLM calls.",
     ]),
     ("Reference Architecture (Layered)", [
         "Experience layer: dashboard, search, workspace details, chat panel.",
         "Application layer: API proxy routes + FastAPI endpoint orchestration.",
         "Intelligence layer: retrieval services, classifiers, rewriters, prompt pipelines.",
-        "Data layer: ingestion catalog, Milvus collections, platform docs corpus.",
+        "Data layer: ingestion catalog, Qdrant collections, platform docs corpus.",
     ]),
     ("Ingestion Pipeline Architecture", [
         "IngestionPipeline scans workspace folders and classifies artifact types.",
@@ -44,7 +44,7 @@ slides_content = [
         "Airflow DAG schedules daily incremental refresh for operational continuity.",
     ]),
     ("Vector Retrieval Architecture", [
-        "Indexer converts catalog artifacts into embeddings and inserts into Milvus.",
+        "Indexer converts catalog artifacts into embeddings and inserts into Qdrant.",
         "Hybrid and vector retrievers support semantic discovery across artifacts.",
         "Response contracts include score + metadata for downstream UX rendering.",
     ]),
@@ -107,7 +107,7 @@ slides_content = [
     ("Scalability and Performance Posture", [
         "Incremental indexing controls compute cost and ingestion latency.",
         "Collection separation isolates workloads by domain and intent.",
-        "Bottlenecks to monitor: embedding throughput, Milvus query latency, token cost.",
+        "Bottlenecks to monitor: embedding throughput, Qdrant query latency, token cost.",
     ]),
     ("Roadmap Alignment", [
         "Completed: ingestion, retrieval API, frontend, summaries/profiles, chatbot.",

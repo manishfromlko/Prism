@@ -6,7 +6,7 @@ A generative AI-powered web application for profiling and analyzing Kubeflow wor
 
 ```
 Phase 1: Data Ingestion       →  dataset/.ingestion/ingestion_catalog.json
-Phase 2: Vector Retrieval     →  Milvus (port 19530) + FastAPI (port 8000)
+Phase 2: Vector Retrieval     →  Qdrant (port 6333) + FastAPI (port 8000)
 Phase 3: Webapp Frontend      →  Next.js (port 3000) — proxies /api/* to FastAPI
 Phase 4: LLM Generation       →  User profiles, artifact summaries, AI chatbot
 ```
@@ -20,7 +20,7 @@ via `PYTHON_API_URL` (default: `http://localhost:8000`).
 ## Prerequisites
 
 - Python 3.11+
-- Docker (for Milvus vector database)
+- Docker (for Qdrant vector database)
 - Node.js 18+
 - OpenAI API key (embeddings + LLM generation)
 
@@ -86,22 +86,23 @@ For subsequent runs, process only changed files:
 python -m src.ingestion.cli --root dataset/ --mode incremental
 ```
 
-### Step 4 — Start Milvus (vector database)
+### Step 4 — Start Qdrant (vector database)
 
 ```bash
 docker run -d \
-  --name milvus \
-  -p 19530:19530 \
-  -p 9091:9091 \
-  milvusdb/milvus:v2.6.14 standalone
+  --name qdrant \
+  -p 6333:6333 \
+  -p 6334:6334 \
+  -v qdrant_storage:/qdrant/storage \
+  qdrant/qdrant:v1.12.6
 ```
 
 Wait ~10 seconds, then verify:
 ```bash
-docker logs milvus 2>&1 | tail -5
+curl http://localhost:6333/readyz
 ```
 
-### Step 5 — Index workspace artifacts into Milvus
+### Step 5 — Index workspace artifacts into Qdrant
 
 ```bash
 python -m src.retrieval.indexer \
@@ -133,7 +134,7 @@ curl -X POST "http://localhost:8000/admin/sync-artifact-summaries?force_full=tru
 
 ### Step 7 — Generate and index user profiles
 
-User profiles summarise each workspace owner's areas of expertise. They are generated from artifact summaries and stored in the `user_profiles` Milvus collection.
+User profiles summarise each workspace owner's areas of expertise. They are generated from artifact summaries and stored in the `user_profiles` Qdrant collection.
 
 ```bash
 # Requires artifact summaries to be indexed first (Step 6)
@@ -169,7 +170,7 @@ What the ingestion pipeline does:
 2. Extracts plain text from each document
 3. Splits text into overlapping chunks (800 chars, 150-char overlap)
 4. Embeds all chunks with OpenAI `text-embedding-3-small`
-5. Stores chunks in the `platform_docs` Milvus collection
+5. Stores chunks in the `platform_docs` Qdrant collection
 
 The chatbot is fully functional once Steps 6, 7, and 8 are complete.
 
@@ -344,9 +345,9 @@ All prompt templates are stored in `prompts/chatbot/` — no prompt text is hard
 | `OPENAI_API_KEY` | — | **Required.** OpenAI API key for embeddings and LLM calls |
 | `EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI embedding model |
 | `EMBEDDING_DIMENSION` | `1536` | Must match the model's output dimension |
-| `MILVUS_HOST` | `localhost` | Milvus server host |
-| `MILVUS_PORT` | `19530` | Milvus server port |
-| `MILVUS_COLLECTION` | `kubeflow_artifacts` | Primary artifact collection name |
+| `QDRANT_HOST` | `localhost` | Qdrant server host |
+| `QDRANT_PORT` | `6333` | Qdrant server port |
+| `QDRANT_COLLECTION` | `kubeflow_artifacts` | Primary artifact collection name |
 | `INGESTION_CATALOG_PATH` | `dataset/.ingestion/ingestion_catalog.json` | Path to the ingestion catalog |
 | `BATCH_SIZE` | `32` | Embeddings per OpenAI API request |
 | `PROFILE_LLM_MODEL` | `gpt-4o-mini` | LLM model for profile generation and chatbot |
@@ -364,7 +365,7 @@ PYTHON_API_URL=http://localhost:8002
 
 ---
 
-## Milvus Collections
+## Qdrant Collections
 
 | Collection | Description | Key fields |
 |---|---|---|
@@ -441,7 +442,7 @@ project-1/
 │       ├── api.py                   # FastAPI application (all endpoints)
 │       ├── config.py                # RetrievalConfig (env-driven)
 │       ├── embeddings.py            # OpenAI embeddings + MD5 cache
-│       ├── vector_store.py          # kubeflow_artifacts Milvus collection
+│       ├── vector_store.py          # kubeflow_artifacts Qdrant collection
 │       ├── indexer.py               # CLI: embed + insert workspace artifacts
 │       ├── retriever.py             # VectorRetriever + HybridRetriever
 │       ├── document_loader.py
@@ -461,8 +462,8 @@ project-1/
 │           ├── prompt_loader.py     # File-based prompt loader (lru_cache)
 │           ├── classifier.py        # Intent classification
 │           ├── query_rewriter.py    # Semantic query rewriting
-│           ├── doc_store.py         # platform_docs Milvus collection
-│           ├── doc_ingestion.py     # Word doc → chunks → embeddings → Milvus
+│           ├── doc_store.py         # platform_docs Qdrant collection
+│           ├── doc_ingestion.py     # Word doc → chunks → embeddings → Qdrant
 │           ├── retrievers.py        # DocRetriever, ArtifactRetriever, UserRetriever
 │           ├── prompts.py           # Prompt builder functions (load from files)
 │           ├── formatter.py         # Output schema enforcer

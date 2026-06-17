@@ -1,6 +1,6 @@
 """
 Profile indexer: generates user profiles from the ingestion catalog and
-stores them in the Milvus user_profiles collection.
+stores them in the Qdrant user_profiles collection.
 
 Usage:
     python -m src.retrieval.profile_indexer \
@@ -43,7 +43,7 @@ def run_profile_indexing(catalog_path: str) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Index user profiles into Milvus")
+    parser = argparse.ArgumentParser(description="Index user profiles into Qdrant")
     parser.add_argument(
         "--catalog",
         default=os.getenv("INGESTION_CATALOG_PATH", "dataset/.ingestion/ingestion_catalog.json"),

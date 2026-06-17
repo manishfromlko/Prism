@@ -1,7 +1,7 @@
 """
 Drop-in replacement for src/retrieval/vector_store.py in a Databricks environment.
 
-Uses Databricks Vector Search (managed embeddings) instead of Milvus.
+Uses Databricks Vector Search (managed embeddings) instead of Qdrant.
 The index must be created with embedding_source_column pointing at the text field
 so that similarity_search() accepts query_text (not a raw vector).
 

@@ -9,7 +9,7 @@ The project has five moving parts:
 | Part | Path | What it does |
 | --- | --- | --- |
 | Ingestion | `src/ingestion/` | Scans `dataset/`, classifies files, extracts metadata, writes a JSON catalog. |
-| Retrieval | `src/retrieval/` | Embeds artifacts, stores vectors in Milvus, serves FastAPI endpoints. |
+| Retrieval | `src/retrieval/` | Embeds artifacts, stores vectors in Qdrant, serves FastAPI endpoints. |
 | Chatbot | `src/retrieval/chatbot/` | Classifies user intent, retrieves docs/artifacts/users, generates answers. |
 | Webapp | `webapp/` | Next.js UI; calls local `/api/*` route handlers that proxy to FastAPI. |
 | Operations | `airflow/`, `databricks/`, `rag-observability/`, `evaluation/` | Optional scheduling, cloud migration, tracing, metrics, and evaluation. |
@@ -21,7 +21,7 @@ flowchart TB
     user["Browser user"] --> next["Next.js webapp :3000"]
     next --> routes["Next.js API routes /api/*"]
     routes --> fastapi["FastAPI backend :8000"]
-    fastapi --> milvus["Milvus :19530"]
+    fastapi --> qdrant["Qdrant :6333"]
     fastapi --> openai["OpenAI or LiteLLM-compatible API"]
     fastapi --> catalog["dataset/.ingestion/ingestion_catalog.json"]
 ```
@@ -36,13 +36,13 @@ The browser never calls Python directly. The webapp calls its own API routes, an
 - Node.js 18+
 - An OpenAI API key for embeddings and LLM generation
 
-Milvus, FastAPI, and the webapp are enough for the core product. LiteLLM, Langfuse, Airflow, and Databricks are optional operational layers.
+Qdrant, FastAPI, and the webapp are enough for the core product. LiteLLM, Langfuse, Airflow, and Databricks are optional operational layers.
 
 ## Happy Path
 
 ```bash
 uv sync
-docker compose up -d milvus
+docker compose up -d qdrant
 python -m src.ingestion.cli --root dataset --mode full
 python -m src.retrieval.indexer --catalog dataset/.ingestion/ingestion_catalog.json --mode full
 python -m src.retrieval.artifact_summary_indexer --catalog dataset/.ingestion/ingestion_catalog.json --mode full
@@ -64,10 +64,10 @@ Open `http://localhost:3000`.
 | Feature | Required data |
 | --- | --- |
 | Workspace list and workspace profile | `dataset/.ingestion/ingestion_catalog.json` |
-| Semantic artifact search | Milvus `kubeflow_artifacts` collection |
-| Artifact summary pages and artifact chatbot search | Milvus `artifact_summaries` collection |
-| User profile pages and people search | Milvus `user_profiles` collection |
-| Platform docs Q&A | Milvus `platform_docs` collection populated from `platform_documents/*.docx` |
+| Semantic artifact search | Qdrant `kubeflow_artifacts` collection |
+| Artifact summary pages and artifact chatbot search | Qdrant `artifact_summaries` collection |
+| User profile pages and people search | Qdrant `user_profiles` collection |
+| Platform docs Q&A | Qdrant `platform_docs` collection populated from `platform_documents/*.docx` |
 | Chatbot | `artifact_summaries`, `user_profiles`, `platform_docs`, and LLM access |
 
 ## Recommended Reading Order

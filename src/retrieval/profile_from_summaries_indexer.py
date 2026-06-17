@@ -1,6 +1,6 @@
 """
 Profile-from-summaries indexer: generates user profiles by using pre-indexed
-artifact summaries from Milvus as LLM context, then stores the resulting
+artifact summaries from Qdrant as LLM context, then stores the resulting
 profiles in the user_profiles collection.
 
 This is the preferred indexer on branch 006-user-profiles-with-llm.
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 def run_profile_indexing_from_summaries(drop_existing: bool = True) -> dict:
     """
-    Generate user profiles from Milvus artifact summaries and index them into
+    Generate user profiles from Qdrant artifact summaries and index them into
     the user_profiles collection.
 
     Args:
@@ -63,13 +63,13 @@ def run_profile_indexing_from_summaries(drop_existing: bool = True) -> dict:
     store.create_collection(drop_if_exists=drop_existing)
     inserted = store.upsert_profiles(profiles)
 
-    logger.info(f"Done — inserted {inserted} user profiles into Milvus.")
+    logger.info(f"Done - inserted {inserted} user profiles into Qdrant.")
     return {"inserted": inserted, "total": len(profiles)}
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Index user profiles (from artifact summaries) into Milvus"
+        description="Index user profiles (from artifact summaries) into Qdrant"
     )
     parser.add_argument(
         "--no-drop",

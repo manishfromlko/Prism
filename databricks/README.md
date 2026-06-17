@@ -8,7 +8,7 @@ Replicates the full Kubeflow Workspace Intelligence chatbot stack on Databricks,
 
 | Current (self-hosted) | Databricks Equivalent |
 |-----------------------|----------------------|
-| Milvus (3 collections) | Databricks Vector Search (3 indexes backed by Delta tables) |
+| Qdrant (3 collections) | Databricks Vector Search (3 indexes backed by Delta tables) |
 | LiteLLM proxy (port 4000) | Databricks Model Serving (external model endpoints for `gpt-4o-mini` and `text-embedding-3-small`) |
 | OpenAI text-embedding-3-small | Databricks Model Serving endpoint `text-embedding-3-small` |
 | gpt-4o-mini (classify / rewrite / generate) | Databricks Model Serving endpoint `gpt-4o-mini` |
@@ -698,7 +698,7 @@ for index_name in [
 
 ---
 
-## Step 8 — Replace `VectorStore` (Milvus → Databricks Vector Search)
+## Step 8 — Replace `VectorStore` (Qdrant → Databricks Vector Search)
 
 ```python
 # databricks/adapters/vector_store.py

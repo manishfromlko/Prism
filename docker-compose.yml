@@ -1,19 +1,16 @@
 version: "3.8"
 
 services:
-  milvus:
-    image: milvusdb/milvus:v2.2.6
-    container_name: kubeflow-milvus
+  qdrant:
+    image: qdrant/qdrant:v1.12.6
+    container_name: kubeflow-qdrant
     ports:
-      - "19530:19530"
+      - "6333:6333"
+      - "6334:6334"
     environment:
       TZ: UTC
-    command: ["milvus", "run", "standalone"]
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:19121/healthz"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
+    volumes:
+      - qdrant_storage:/qdrant/storage
 
   backend:
     build:
@@ -23,12 +20,12 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MILVUS_HOST=milvus
-      - MILVUS_PORT=19530
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
       - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - INGESTION_CATALOG_PATH=/data/catalog.json
     depends_on:
-      - milvus
+      - qdrant
     volumes:
       - ./src:/app/src:ro
       - ./requirements.txt:/app/requirements.txt:ro
@@ -45,3 +42,6 @@ services:
       - NEXT_PUBLIC_API_URL=http://backend:8000
     depends_on:
       - backend
+
+volumes:
+  qdrant_storage:

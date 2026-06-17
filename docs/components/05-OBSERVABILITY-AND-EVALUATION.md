@@ -91,7 +91,7 @@ python evaluation/run_eval.py
 Before running evaluation, make sure:
 
 - FastAPI is up.
-- Milvus contains `artifact_summaries`, `user_profiles`, and `platform_docs`.
+- Qdrant contains `artifact_summaries`, `user_profiles`, and `platform_docs`.
 - LiteLLM/Langfuse is configured if you want trace-level validation.
 
 ## Key Invariants

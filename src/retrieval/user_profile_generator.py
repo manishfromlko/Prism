@@ -192,7 +192,7 @@ def generate_profiles(
     Read catalog, call the LLM once per workspace, and return profile dicts.
 
     Each dict has: id, user_id, user_profile, tech_tags, data_tags.
-    The caller adds 'vector' before indexing into Milvus.
+    The caller adds 'vector' before indexing into Qdrant.
     """
     with open(catalog_path) as f:
         catalog = json.load(f)
