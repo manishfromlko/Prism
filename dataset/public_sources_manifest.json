@@ -158,5 +158,85 @@
     "source_project": "scikit-learn",
     "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/preprocessing/plot_scaling_importance.py",
     "license": "BSD-3-Clause"
+  },
+  {
+    "workspace": "priya2.patel",
+    "focus": "Distributed linear regression with Spark MLlib",
+    "local_path": "dataset/priya2.patel/mllib/linear_regression_with_sgd_example.py",
+    "source_project": "Apache Spark",
+    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/linear_regression_with_sgd_example.py",
+    "license": "Apache-2.0"
+  },
+  {
+    "workspace": "priyam.patel",
+    "focus": "Decision-tree classification in Spark MLlib",
+    "local_path": "dataset/priyam.patel/mllib/decision_tree_classification_example.py",
+    "source_project": "Apache Spark",
+    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/decision_tree_classification_example.py",
+    "license": "Apache-2.0"
+  },
+  {
+    "workspace": "priyanka.patel",
+    "focus": "Frequent-pattern mining for data discovery",
+    "local_path": "dataset/priyanka.patel/mllib/fpgrowth_example.py",
+    "source_project": "Apache Spark",
+    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/fpgrowth_example.py",
+    "license": "Apache-2.0"
+  },
+  {
+    "workspace": "ananya2.iyer",
+    "focus": "Principal component analysis with distributed matrices",
+    "local_path": "dataset/ananya2.iyer/mllib/pca_rowmatrix_example.py",
+    "source_project": "Apache Spark",
+    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/pca_rowmatrix_example.py",
+    "license": "Apache-2.0"
+  },
+  {
+    "workspace": "anaya.iyer",
+    "focus": "Text feature extraction using TF-IDF",
+    "local_path": "dataset/anaya.iyer/mllib/tf_idf_example.py",
+    "source_project": "Apache Spark",
+    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/tf_idf_example.py",
+    "license": "Apache-2.0"
+  },
+  {
+    "workspace": "arjun2.menon",
+    "focus": "Lasso model selection for regression",
+    "local_path": "dataset/arjun2.menon/sklearn/lasso_model_selection.py",
+    "source_project": "scikit-learn",
+    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/linear_model/plot_lasso_model_selection.py",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "workspace": "aarav.mehraa",
+    "focus": "Principal component visualization for discovery",
+    "local_path": "dataset/aarav.mehraa/sklearn/pca_iris.py",
+    "source_project": "scikit-learn",
+    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/decomposition/plot_pca_iris.py",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "workspace": "kavya.nairr",
+    "focus": "Density-based clustering and anomaly discovery",
+    "local_path": "dataset/kavya.nairr/sklearn/dbscan.py",
+    "source_project": "scikit-learn",
+    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/cluster/plot_dbscan.py",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "workspace": "rahul.nayar",
+    "focus": "Gradient boosting regression and feature importance",
+    "local_path": "dataset/rahul.nayar/sklearn/gradient_boosting_regression.py",
+    "source_project": "scikit-learn",
+    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/ensemble/plot_gradient_boosting_regression.py",
+    "license": "BSD-3-Clause"
+  },
+  {
+    "workspace": "rohit.sharmma",
+    "focus": "MLflow logistic regression experiment logging",
+    "local_path": "dataset/rohit.sharmma/mlflow/sklearn_logistic_regression_train.py",
+    "source_project": "MLflow",
+    "source_url": "https://raw.githubusercontent.com/mlflow/mlflow/master/examples/sklearn_logistic_regression/train.py",
+    "license": "Apache-2.0"
   }
 ]

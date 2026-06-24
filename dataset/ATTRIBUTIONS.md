@@ -22,3 +22,13 @@ The added workspaces below use compact examples from permissively licensed publi
 - `karan.malhotra`: scikit-learn (BSD-3-Clause), https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/ensemble/plot_forest_importances.py
 - `pooja.joshi`: scikit-learn (BSD-3-Clause), https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/feature_selection/plot_feature_selection_pipeline.py
 - `aditya.kulkarni`: scikit-learn (BSD-3-Clause), https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/preprocessing/plot_scaling_importance.py
+- `priya2.patel`: Apache Spark (Apache-2.0), https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/linear_regression_with_sgd_example.py
+- `priyam.patel`: Apache Spark (Apache-2.0), https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/decision_tree_classification_example.py
+- `priyanka.patel`: Apache Spark (Apache-2.0), https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/fpgrowth_example.py
+- `ananya2.iyer`: Apache Spark (Apache-2.0), https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/pca_rowmatrix_example.py
+- `anaya.iyer`: Apache Spark (Apache-2.0), https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/tf_idf_example.py
+- `arjun2.menon`: scikit-learn (BSD-3-Clause), https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/linear_model/plot_lasso_model_selection.py
+- `aarav.mehraa`: scikit-learn (BSD-3-Clause), https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/decomposition/plot_pca_iris.py
+- `kavya.nairr`: scikit-learn (BSD-3-Clause), https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/cluster/plot_dbscan.py
+- `rahul.nayar`: scikit-learn (BSD-3-Clause), https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/ensemble/plot_gradient_boosting_regression.py
+- `rohit.sharmma`: MLflow (Apache-2.0), https://raw.githubusercontent.com/mlflow/mlflow/master/examples/sklearn_logistic_regression/train.py
