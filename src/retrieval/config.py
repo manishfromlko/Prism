@@ -72,5 +72,8 @@ config = RetrievalConfig.from_env()
 
 
 def make_openai_client() -> OpenAI:
-    """Return an OpenAI-compatible client pointed at the LiteLLM proxy."""
+    """Return an OpenAI client, preferring direct OpenAI over LiteLLM."""
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if openai_api_key:
+        return OpenAI(api_key=openai_api_key)
     return OpenAI(api_key=config.litellm_api_key, base_url=config.litellm_base_url)

@@ -11,6 +11,12 @@ services:
       TZ: UTC
     volumes:
       - qdrant_storage:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/6333'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
   backend:
     build:
@@ -19,27 +25,38 @@ services:
     container_name: kubeflow-backend
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
-      - EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
-      - INGESTION_CATALOG_PATH=/data/catalog.json
+      - QDRANT_COLLECTION=kubeflow_artifacts
+      - EMBEDDING_MODEL=text-embedding-3-small
+      - EMBEDDING_DIMENSION=1536
+      - INGESTION_CATALOG_PATH=/data/.ingestion/ingestion_catalog.json
     depends_on:
-      - qdrant
+      qdrant:
+        condition: service_healthy
     volumes:
       - ./src:/app/src:ro
       - ./requirements.txt:/app/requirements.txt:ro
-      - ./dataset:/data:ro
+      - ./dataset:/data
+      - ./platform_documents:/app/platform_documents:ro
+      - ./prompts:/app/prompts:ro
 
   webapp:
     build:
       context: ./webapp
       dockerfile: Dockerfile
+      args:
+        PYTHON_API_URL: http://backend:8000
     container_name: kubeflow-webapp
     ports:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://backend:8000
+      - PYTHON_API_URL=http://backend:8000
+      - HOSTNAME=0.0.0.0
     depends_on:
       - backend
 

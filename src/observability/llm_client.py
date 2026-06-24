@@ -43,7 +43,7 @@ def litellm_metadata(
     tags: Optional[List[str]] = None,
     trace_metadata: Optional[Dict] = None,
     trace_user_id: Optional[str] = None,
-) -> dict:
+) -> Optional[dict]:
     """
     Build the extra_body dict to pass trace context to the LiteLLM proxy.
     The proxy forwards this to Langfuse so all generations in one request
@@ -75,6 +75,9 @@ def litellm_metadata(
             trace_metadata={"query": query, "intent": intent, "confidence": confidence},
         )
     """
+    if os.getenv("OPENAI_API_KEY"):
+        return None
+
     metadata: dict = {"trace_id": trace_id, "generation_name": generation_name}
     if session_id:
         metadata["session_id"] = session_id
