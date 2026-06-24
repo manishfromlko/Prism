@@ -10,7 +10,7 @@ rather than raw code.
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 from .artifact_summary_store import ArtifactSummaryStore
 from .config import RetrievalConfig, make_openai_client
@@ -64,6 +64,7 @@ def _build_summaries_context(summaries: List[Dict]) -> str:
 def generate_profiles_from_summaries(
     config: RetrievalConfig,
     model: str = "gpt-4o-mini",
+    user_ids: Optional[Set[str]] = None,
 ) -> List[Dict]:
     """
     Read artifact summaries from Qdrant, call gpt-4o-mini once per user, and
@@ -89,10 +90,16 @@ def generate_profiles_from_summaries(
     summaries_by_user: Dict[str, List[Dict]] = {}
     for s in all_summaries:
         uid = s.get("user_id", "")
-        if uid:
+        if uid and (user_ids is None or uid in user_ids):
             summaries_by_user.setdefault(uid, []).append(s)
 
-    logger.info(f"Found summaries for {len(summaries_by_user)} users")
+    if user_ids is None:
+        logger.info(f"Found summaries for {len(summaries_by_user)} users")
+    else:
+        logger.info(
+            f"Found summaries for {len(summaries_by_user)} of "
+            f"{len(user_ids)} requested users"
+        )
 
     prompt_template = _load_prompt_template()
     client = make_openai_client()

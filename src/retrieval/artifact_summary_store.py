@@ -59,6 +59,7 @@ class ArtifactSummaryStore:
                     "artifact_id": s["artifact_id"],
                     "artifact_summary": s["artifact_summary"][:1500],
                     "tags": s["tags"][:1000],
+                    "content_hash": s.get("content_hash", ""),
                 },
             )
             for s in summaries
@@ -75,6 +76,47 @@ class ArtifactSummaryStore:
         except Exception as e:
             logger.error(f"Failed to query all artifact summaries: {e}")
             return []
+
+    def get_summary_index(self, limit: int = 10000) -> Dict[str, Dict]:
+        """Return existing summaries keyed by artifact_id."""
+        return {
+            row["artifact_id"]: row
+            for row in self.get_all_summaries(limit=limit)
+            if row.get("artifact_id")
+        }
+
+    def set_content_hashes(self, artifact_hashes: Dict[str, str]) -> int:
+        """Backfill content_hash payloads for existing summary points."""
+        if not self.collection or not artifact_hashes:
+            return 0
+
+        client = self._ensure_client()
+        for artifact_id, content_hash in artifact_hashes.items():
+            client.set_payload(
+                collection_name=COLLECTION_NAME,
+                payload={"content_hash": content_hash},
+                points=[stable_point_id(COLLECTION_NAME, artifact_id)],
+                wait=True,
+            )
+        logger.info(f"Backfilled content_hash for {len(artifact_hashes)} artifact summaries")
+        return len(artifact_hashes)
+
+    def delete_summaries(self, artifact_ids: List[str]) -> int:
+        """Delete summaries for artifacts that no longer exist in the catalog."""
+        if not self.collection or not artifact_ids:
+            return 0
+
+        point_ids = [
+            stable_point_id(COLLECTION_NAME, artifact_id)
+            for artifact_id in artifact_ids
+        ]
+        self._ensure_client().delete(
+            collection_name=COLLECTION_NAME,
+            points_selector=models.PointIdsList(points=point_ids),
+            wait=True,
+        )
+        logger.info(f"Deleted {len(point_ids)} stale artifact summaries")
+        return len(point_ids)
 
     def get_workspace_summaries(self, user_id: str, limit: int = 1000) -> List[Dict]:
         if not self.collection:

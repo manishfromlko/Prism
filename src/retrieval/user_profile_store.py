@@ -66,6 +66,23 @@ class UserProfileStore:
         logger.info(f"Upserted {len(points)} user profiles")
         return len(points)
 
+    def delete_profiles(self, user_ids: List[str]) -> int:
+        """Delete profiles for users that no longer have summaries."""
+        if not self.collection or not user_ids:
+            return 0
+
+        point_ids = [
+            stable_point_id(COLLECTION_NAME, user_id)
+            for user_id in user_ids
+        ]
+        self._ensure_client().delete(
+            collection_name=COLLECTION_NAME,
+            points_selector=models.PointIdsList(points=point_ids),
+            wait=True,
+        )
+        logger.info(f"Deleted {len(point_ids)} user profiles")
+        return len(point_ids)
+
     def get_all_profiles(self) -> List[Dict]:
         if not self.collection:
             return []

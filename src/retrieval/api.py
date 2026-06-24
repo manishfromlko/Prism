@@ -515,10 +515,14 @@ async def sync_profiles():
 
 
 @app.post("/admin/sync-profiles-from-summaries")
-async def sync_profiles_from_summaries():
+async def sync_profiles_from_summaries(
+    force_full: bool = False,
+    user_ids: Optional[str] = None,
+):
     """
-    Re-generate and re-index user profiles using artifact summaries from Qdrant
-    as LLM context (gpt-4o-mini, ≤5-line summaries).
+    Re-generate and upsert user profiles using artifact summaries from Qdrant
+    as LLM context (gpt-4o-mini, ≤5-line summaries). By default this updates
+    the existing collection in place; pass force_full=true to drop/rebuild.
 
     Requires the artifact_summaries collection to be populated first.
     Call POST /admin/sync-artifact-summaries before this endpoint.
@@ -528,15 +532,29 @@ async def sync_profiles_from_summaries():
     try:
         import asyncio
         loop = asyncio.get_event_loop()
+        selected_user_ids = (
+            [value.strip() for value in user_ids.split(",") if value.strip()]
+            if user_ids
+            else None
+        )
         result = await loop.run_in_executor(
             None,
-            lambda: run_profile_indexing_from_summaries(drop_existing=True),
+            lambda: run_profile_indexing_from_summaries(
+                drop_existing=force_full,
+                user_ids=selected_user_ids,
+            ),
         )
         global user_profile_store
         user_profile_store = UserProfileStore(config)
         user_profile_store.create_collection(drop_if_exists=False)
         user_profile_store._ensure_loaded()
-        return {"status": "completed", "profiles_indexed": result["inserted"]}
+        return {
+            "status": "completed",
+            "mode": "full" if force_full else "incremental",
+            "profiles_indexed": result["inserted"],
+            "profiles_deleted": result.get("deleted", 0),
+            "target_user_ids": result.get("target_user_ids"),
+        }
     except Exception as e:
         logger.error(f"Profile sync from summaries failed: {e}")
         raise HTTPException(status_code=500, detail=f"Profile sync from summaries failed: {e}")
@@ -608,7 +626,13 @@ async def sync_artifact_summaries(force_full: bool = False):
         global artifact_summary_store
         artifact_summary_store = ArtifactSummaryStore(config)
         artifact_summary_store.create_collection(drop_if_exists=False)
-        return {"status": "completed", "mode": mode, "summaries_indexed": result["inserted"]}
+        return {
+            "status": "completed",
+            "mode": mode,
+            "summaries_indexed": result["inserted"],
+            "summaries_skipped": result.get("skipped", 0),
+            "affected_user_ids": result.get("affected_user_ids", []),
+        }
     except Exception as e:
         logger.error(f"Artifact summary sync failed: {e}")
         raise HTTPException(status_code=500, detail=f"Artifact summary sync failed: {e}")

@@ -3,7 +3,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional, Set
 
 from .config import make_openai_client
 
@@ -77,6 +77,7 @@ def generate_artifact_summaries(
     top_p: float = 1.0,
     frequency_penalty: float = 0.0,
     presence_penalty: float = 0.0,
+    artifact_ids: Optional[Set[str]] = None,
 ) -> List[Dict]:
     with open(catalog_path, "r", encoding="utf-8") as f:
         catalog = json.load(f)
@@ -97,6 +98,8 @@ def generate_artifact_summaries(
         )
 
         if not workspace_id or not artifact_id:
+            continue
+        if artifact_ids is not None and artifact_id not in artifact_ids:
             continue
         if artifact_type not in {"notebook", "script", "text"}:
             continue
@@ -140,6 +143,7 @@ def generate_artifact_summaries(
                 "artifact_id": artifact_id,
                 "artifact_summary": summary_text,
                 "tags": tags,
+                "content_hash": artifact.get("content_hash", ""),
             })
         except Exception as e:
             logger.error(f"Failed to summarize artifact {artifact_id}: {e}")
