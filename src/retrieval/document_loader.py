@@ -26,22 +26,33 @@ class DocumentLoader:
         self.catalog_path = Path(catalog_path)
         self.config = config or RetrievalConfig()
         self._catalog: Optional[Dict] = None
+        self._catalog_mtime_ns: Optional[int] = None
 
     def load_catalog(self, force: bool = False) -> Dict:
-        """Load the ingestion catalog from JSON file. Cached after first load.
+        """Load the ingestion catalog from JSON file.
+
+        The catalog is cached, but automatically refreshed when the backing
+        file changes. This keeps long-running API containers in sync after an
+        ingestion job rewrites the catalog.
 
         Args:
             force: Re-read from disk even if already cached
         """
-        if self._catalog is not None and not force:
-            return self._catalog
-
         if not self.catalog_path.exists():
             raise FileNotFoundError(f"Catalog file not found: {self.catalog_path}")
+
+        current_mtime_ns = self.catalog_path.stat().st_mtime_ns
+        if (
+            self._catalog is not None
+            and self._catalog_mtime_ns == current_mtime_ns
+            and not force
+        ):
+            return self._catalog
 
         try:
             with open(self.catalog_path, 'r', encoding='utf-8') as f:
                 self._catalog = json.load(f)
+            self._catalog_mtime_ns = current_mtime_ns
             logger.info(f"Loaded catalog with {len(self._catalog.get('artifacts', {}))} artifacts")
             return self._catalog
         except Exception as e:
