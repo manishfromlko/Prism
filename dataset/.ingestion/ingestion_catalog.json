@@ -1,0 +1,3759 @@
+{
+  "artifacts": {
+    "karan.malhotra:README.md": {
+      "artifact_id": "karan.malhotra:README.md",
+      "workspace_id": "karan.malhotra",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 380,
+      "last_modified_at": "2026-06-24T17:43:24.224105",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "e68d3df84644572b952fc7687765580531c9c8a77f001504d2d4c1a611c09c7a",
+      "capture_source": {
+        "source_path": "/data/karan.malhotra/README.md"
+      }
+    },
+    "karan.malhotra:sklearn/forest_importances.py": {
+      "artifact_id": "karan.malhotra:sklearn/forest_importances.py",
+      "workspace_id": "karan.malhotra",
+      "relative_path": "sklearn/forest_importances.py",
+      "file_name": "forest_importances.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 4260,
+      "last_modified_at": "2026-06-24T17:43:24.219551",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "sklearn.datasets",
+            "sklearn.ensemble",
+            "sklearn.inspection",
+            "sklearn.model_selection",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "6143e0e588f5e57d1809220592d8f81e6365b34fda34bbab7490ed7055cf73d6",
+      "capture_source": {
+        "source_path": "/data/karan.malhotra/sklearn/forest_importances.py"
+      }
+    },
+    "ishaan.kapoor:README.md": {
+      "artifact_id": "ishaan.kapoor:README.md",
+      "workspace_id": "ishaan.kapoor",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 398,
+      "last_modified_at": "2026-06-24T17:43:19.891407",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "d6a6d2c93239b51d41a8a49019380b5f6cf723c5db8ed934709551baf427098c",
+      "capture_source": {
+        "source_path": "/data/ishaan.kapoor/README.md"
+      }
+    },
+    "ishaan.kapoor:spark_ml/random_forest_classifier_example.py": {
+      "artifact_id": "ishaan.kapoor:spark_ml/random_forest_classifier_example.py",
+      "workspace_id": "ishaan.kapoor",
+      "relative_path": "spark_ml/random_forest_classifier_example.py",
+      "file_name": "random_forest_classifier_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 3195,
+      "last_modified_at": "2026-06-24T17:43:19.888213",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.ml",
+            "pyspark.ml.classification",
+            "pyspark.ml.evaluation",
+            "pyspark.ml.feature",
+            "pyspark.sql",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "36744f60160875d62452bdd47824947e3472093ea9126dc5a9d1a1d056923767",
+      "capture_source": {
+        "source_path": "/data/ishaan.kapoor/spark_ml/random_forest_classifier_example.py"
+      }
+    },
+    "ananya.iyer:README.md": {
+      "artifact_id": "ananya.iyer:README.md",
+      "workspace_id": "ananya.iyer",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 354,
+      "last_modified_at": "2026-06-24T17:43:19.643493",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "2c730a821736a51cd0c7c28c81b02ec514d1d7173a54336d21711b11517ce238",
+      "capture_source": {
+        "source_path": "/data/ananya.iyer/README.md"
+      }
+    },
+    "ananya.iyer:spark_sql/basic.py": {
+      "artifact_id": "ananya.iyer:spark_sql/basic.py",
+      "workspace_id": "ananya.iyer",
+      "relative_path": "spark_sql/basic.py",
+      "file_name": "basic.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 6331,
+      "last_modified_at": "2026-06-24T17:43:19.639100",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "global_temp.people",
+            "people",
+            "pyspark.sql",
+            "pyspark.sql.types",
+            "the"
+          ]
+        }
+      },
+      "content_hash": "16444bb118ea5267e3d7cc653d10f90869080b966dd4b1b8147942e677e9f1e9",
+      "capture_source": {
+        "source_path": "/data/ananya.iyer/spark_sql/basic.py"
+      }
+    },
+    "aarav.mehra:README.md": {
+      "artifact_id": "aarav.mehra:README.md",
+      "workspace_id": "aarav.mehra",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 366,
+      "last_modified_at": "2026-06-24T17:43:19.569134",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "d73dd1cf05f1270ba3ff63c30161066e9190617e8501238e7d19e096353441e7",
+      "capture_source": {
+        "source_path": "/data/aarav.mehra/README.md"
+      }
+    },
+    "aarav.mehra:spark/wordcount.py": {
+      "artifact_id": "aarav.mehra:spark/wordcount.py",
+      "workspace_id": "aarav.mehra",
+      "relative_path": "spark/wordcount.py",
+      "file_name": "wordcount.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1418,
+      "last_modified_at": "2026-06-24T17:43:19.563664",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "operator",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "246e774adcc1d27bc116bb7338eb532d0be7a459960a033cb8807ab6cc9745ce",
+      "capture_source": {
+        "source_path": "/data/aarav.mehra/spark/wordcount.py"
+      }
+    },
+    "aditya.kulkarni:README.md": {
+      "artifact_id": "aditya.kulkarni:README.md",
+      "workspace_id": "aditya.kulkarni",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 393,
+      "last_modified_at": "2026-06-24T17:43:25.029709",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "e6a22b76528a74fba7d73fb40cdeb1632639bcb9eb69a1671c5689a432d54800",
+      "capture_source": {
+        "source_path": "/data/aditya.kulkarni/README.md"
+      }
+    },
+    "aditya.kulkarni:sklearn/scaling_importance.py": {
+      "artifact_id": "aditya.kulkarni:sklearn/scaling_importance.py",
+      "workspace_id": "aditya.kulkarni",
+      "relative_path": "sklearn/scaling_importance.py",
+      "file_name": "scaling_importance.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 10283,
+      "last_modified_at": "2026-06-24T17:43:25.024587",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "matplotlib.colors",
+            "sklearn.datasets",
+            "sklearn.decomposition",
+            "sklearn.inspection",
+            "sklearn.linear_model",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "sklearn.neighbors",
+            "sklearn.pipeline",
+            "sklearn.preprocessing",
+            "the"
+          ]
+        }
+      },
+      "content_hash": "102afe52c87fce0eb89996adab21a25b3363aa985ce24332e24cbc6c548bffcf",
+      "capture_source": {
+        "source_path": "/data/aditya.kulkarni/sklearn/scaling_importance.py"
+      }
+    },
+    "zoya.khan:README.md": {
+      "artifact_id": "zoya.khan:README.md",
+      "workspace_id": "zoya.khan",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 373,
+      "last_modified_at": "2026-06-24T17:43:23.301095",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "75d6e4ebfff8e1f5504cf0b369c3329636467e8d951776658be72eb12d170a21",
+      "capture_source": {
+        "source_path": "/data/zoya.khan/README.md"
+      }
+    },
+    "zoya.khan:sklearn/kmeans_digits.py": {
+      "artifact_id": "zoya.khan:sklearn/kmeans_digits.py",
+      "workspace_id": "zoya.khan",
+      "relative_path": "sklearn/kmeans_digits.py",
+      "file_name": "kmeans_digits.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 6891,
+      "last_modified_at": "2026-06-24T17:43:23.296476",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "0",
+            "a",
+            "sklearn",
+            "sklearn.cluster",
+            "sklearn.datasets",
+            "sklearn.decomposition",
+            "sklearn.pipeline",
+            "sklearn.preprocessing",
+            "the",
+            "time"
+          ]
+        }
+      },
+      "content_hash": "6c789b1788e3609724b3cc3fd9bf62ae44378361161fdcac565896871e30c0bf",
+      "capture_source": {
+        "source_path": "/data/zoya.khan/sklearn/kmeans_digits.py"
+      }
+    },
+    "kavya.nair:README.md": {
+      "artifact_id": "kavya.nair:README.md",
+      "workspace_id": "kavya.nair",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 398,
+      "last_modified_at": "2026-06-24T17:43:19.967437",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "a5c370a2b0156d8231c92da8fa62c789255d79c98cd56e91af3ed81437bbb047",
+      "capture_source": {
+        "source_path": "/data/kavya.nair/README.md"
+      }
+    },
+    "kavya.nair:spark_ml/logistic_regression_with_elastic_net.py": {
+      "artifact_id": "kavya.nair:spark_ml/logistic_regression_with_elastic_net.py",
+      "workspace_id": "kavya.nair",
+      "relative_path": "spark_ml/logistic_regression_with_elastic_net.py",
+      "file_name": "logistic_regression_with_elastic_net.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1990,
+      "last_modified_at": "2026-06-24T17:43:19.963595",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.ml.classification",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "c03e84556aacc81514cac400fd9916d62a5c53f6ab65a53bf9701e66fe550463",
+      "capture_source": {
+        "source_path": "/data/kavya.nair/spark_ml/logistic_regression_with_elastic_net.py"
+      }
+    },
+    "priya.patel:README.md": {
+      "artifact_id": "priya.patel:README.md",
+      "workspace_id": "priya.patel",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 378,
+      "last_modified_at": "2026-06-24T17:43:20.537566",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "6ee5f36f5ce8e381aa4ace694709d81569b6e662ca3e8be37dfb6968a49f1a39",
+      "capture_source": {
+        "source_path": "/data/priya.patel/README.md"
+      }
+    },
+    "priya.patel:mllib/k_means_example.py": {
+      "artifact_id": "priya.patel:mllib/k_means_example.py",
+      "workspace_id": "priya.patel",
+      "relative_path": "mllib/k_means_example.py",
+      "file_name": "k_means_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1989,
+      "last_modified_at": "2026-06-24T17:43:20.533643",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "math",
+            "numpy",
+            "pyspark",
+            "pyspark.mllib.clustering"
+          ]
+        }
+      },
+      "content_hash": "a809bb8051722664e59665fd747d4258e100135ebae647106b907a02da06abe5",
+      "capture_source": {
+        "source_path": "/data/priya.patel/mllib/k_means_example.py"
+      }
+    },
+    "siddharth.rao:README.md": {
+      "artifact_id": "siddharth.rao:README.md",
+      "workspace_id": "siddharth.rao",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 348,
+      "last_modified_at": "2026-06-24T17:43:21.806343",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "4e963b4c82e67426859982831c2fde3be1a268228a7995b04106dbc2f16c015d",
+      "capture_source": {
+        "source_path": "/data/siddharth.rao/README.md"
+      }
+    },
+    "siddharth.rao:mlflow/hyperparam_train.py": {
+      "artifact_id": "siddharth.rao:mlflow/hyperparam_train.py",
+      "workspace_id": "siddharth.rao",
+      "relative_path": "mlflow/hyperparam_train.py",
+      "file_name": "hyperparam_train.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 6808,
+      "last_modified_at": "2026-06-24T17:43:21.799982",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "mlflow.models",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "tensorflow",
+            "tensorflow.keras.callbacks",
+            "tensorflow.keras.layers",
+            "tensorflow.keras.models",
+            "tensorflow.keras.optimizers",
+            "train",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "ad392385b6f248c4a6c1cc73273b7edcb6b887ebe8cbc47140185568109483d3",
+      "capture_source": {
+        "source_path": "/data/siddharth.rao/mlflow/hyperparam_train.py"
+      }
+    },
+    "diya.shah:README.md": {
+      "artifact_id": "diya.shah:README.md",
+      "workspace_id": "diya.shah",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 369,
+      "last_modified_at": "2026-06-24T17:43:19.813725",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "b8fd6a1c0a40716e404b83899d05567fb130a468e3b46f09fd24ca43dbe93f4f",
+      "capture_source": {
+        "source_path": "/data/diya.shah/README.md"
+      }
+    },
+    "diya.shah:spark_ml/kmeans_example.py": {
+      "artifact_id": "diya.shah:spark_ml/kmeans_example.py",
+      "workspace_id": "diya.shah",
+      "relative_path": "spark_ml/kmeans_example.py",
+      "file_name": "kmeans_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1956,
+      "last_modified_at": "2026-06-24T17:43:19.809554",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.ml.clustering",
+            "pyspark.ml.evaluation",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "12cb40af472191802d04b2ddb922042c7e7f623d592ec514683a899105b1a9a4",
+      "capture_source": {
+        "source_path": "/data/diya.shah/spark_ml/kmeans_example.py"
+      }
+    },
+    "meera.krishnan:README.md": {
+      "artifact_id": "meera.krishnan:README.md",
+      "workspace_id": "meera.krishnan",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 371,
+      "last_modified_at": "2026-06-24T17:43:20.045042",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "59d444a1f4fc22720cc8b2bf00f3df5c375e29918f784e459d375fcf82567fff",
+      "capture_source": {
+        "source_path": "/data/meera.krishnan/README.md"
+      }
+    },
+    "meera.krishnan:spark_ml/pipeline_example.py": {
+      "artifact_id": "meera.krishnan:spark_ml/pipeline_example.py",
+      "workspace_id": "meera.krishnan",
+      "relative_path": "spark_ml/pipeline_example.py",
+      "file_name": "pipeline_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2574,
+      "last_modified_at": "2026-06-24T17:43:20.041643",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "a",
+            "pyspark.ml",
+            "pyspark.ml.classification",
+            "pyspark.ml.feature",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "909b262f44ed7a5887739633e39bc7c8d5b2835ab5433d7af4e88c984097833b",
+      "capture_source": {
+        "source_path": "/data/meera.krishnan/spark_ml/pipeline_example.py"
+      }
+    },
+    "pooja.joshi:README.md": {
+      "artifact_id": "pooja.joshi:README.md",
+      "workspace_id": "pooja.joshi",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 394,
+      "last_modified_at": "2026-06-24T17:43:24.615486",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "26c10b737d2789445aa7651964f71581c475a92557d2b4ab81657da5194def40",
+      "capture_source": {
+        "source_path": "/data/pooja.joshi/README.md"
+      }
+    },
+    "pooja.joshi:sklearn/feature_selection_pipeline.py": {
+      "artifact_id": "pooja.joshi:sklearn/feature_selection_pipeline.py",
+      "workspace_id": "pooja.joshi",
+      "relative_path": "sklearn/feature_selection_pipeline.py",
+      "file_name": "feature_selection_pipeline.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2837,
+      "last_modified_at": "2026-06-24T17:43:24.609645",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "sklearn.datasets",
+            "sklearn.feature_selection",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "sklearn.pipeline",
+            "sklearn.svm",
+            "the",
+            "two"
+          ]
+        }
+      },
+      "content_hash": "eee1541664d04407283fa5a614a3bea8639ccb9b2f17b80f210dd8287c5f982b",
+      "capture_source": {
+        "source_path": "/data/pooja.joshi/sklearn/feature_selection_pipeline.py"
+      }
+    },
+    "rahul.nair:README.md": {
+      "artifact_id": "rahul.nair:README.md",
+      "workspace_id": "rahul.nair",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 386,
+      "last_modified_at": "2026-06-24T17:43:20.908825",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "78106f133129b24656688d6825d0f09e0208e9df10c7999ad5b82c105f225ace",
+      "capture_source": {
+        "source_path": "/data/rahul.nair/README.md"
+      }
+    },
+    "rahul.nair:mllib/recommendation_example.py": {
+      "artifact_id": "rahul.nair:mllib/recommendation_example.py",
+      "workspace_id": "rahul.nair",
+      "relative_path": "mllib/recommendation_example.py",
+      "file_name": "recommendation_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2015,
+      "last_modified_at": "2026-06-24T17:43:20.905272",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark",
+            "pyspark.mllib.recommendation"
+          ]
+        }
+      },
+      "content_hash": "4e68117e91acd9ce81ef5cec0e9c5d70d5f64c9fe970ccda9bbb47d1100c69ee",
+      "capture_source": {
+        "source_path": "/data/rahul.nair/mllib/recommendation_example.py"
+      }
+    },
+    "neha.gupta:README.md": {
+      "artifact_id": "neha.gupta:README.md",
+      "workspace_id": "neha.gupta",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 366,
+      "last_modified_at": "2026-06-24T17:43:20.119254",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "d6d8bdc7200e8d8e7047059ede92674425322ad70d05b5fddfd00b8344514a4e",
+      "capture_source": {
+        "source_path": "/data/neha.gupta/README.md"
+      }
+    },
+    "neha.gupta:spark_ml/als_example.py": {
+      "artifact_id": "neha.gupta:spark_ml/als_example.py",
+      "workspace_id": "neha.gupta",
+      "relative_path": "spark_ml/als_example.py",
+      "file_name": "als_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2936,
+      "last_modified_at": "2026-06-24T17:43:20.115706",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.ml.evaluation",
+            "pyspark.ml.recommendation",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "5482f6ec9766d30693c54a8edd2e549751f54377b591c3e371b84084832a91e3",
+      "capture_source": {
+        "source_path": "/data/neha.gupta/spark_ml/als_example.py"
+      }
+    },
+    "nisha.banerjee:README.md": {
+      "artifact_id": "nisha.banerjee:README.md",
+      "workspace_id": "nisha.banerjee",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 387,
+      "last_modified_at": "2026-06-24T17:43:23.813473",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "a213d3896f87e88de5d0651db643cb2bed361819a94a402198627e3b6b384cb6",
+      "capture_source": {
+        "source_path": "/data/nisha.banerjee/README.md"
+      }
+    },
+    "nisha.banerjee:sklearn/grid_search_digits.py": {
+      "artifact_id": "nisha.banerjee:sklearn/grid_search_digits.py",
+      "workspace_id": "nisha.banerjee",
+      "relative_path": "sklearn/grid_search_digits.py",
+      "file_name": "grid_search_digits.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 7402,
+      "last_modified_at": "2026-06-24T17:43:23.808939",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "a",
+            "sklearn",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "sklearn.svm",
+            "the",
+            "vectors"
+          ]
+        }
+      },
+      "content_hash": "7ffa543b6f588ea064db8ae6fa12ddf429dca04563169c69b836e71d234ad666",
+      "capture_source": {
+        "source_path": "/data/nisha.banerjee/sklearn/grid_search_digits.py"
+      }
+    },
+    "ravi.verma:05-working-with-dataframe.ipynb": {
+      "artifact_id": "ravi.verma:05-working-with-dataframe.ipynb",
+      "workspace_id": "ravi.verma",
+      "relative_path": "05-working-with-dataframe.ipynb",
+      "file_name": "05-working-with-dataframe.ipynb",
+      "file_type": "notebook",
+      "mime_type": null,
+      "size_bytes": 24694,
+      "last_modified_at": "2026-04-29T09:50:04.834348",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "fire_service_calls_tbl",
+            "fire_service_calls_view",
+            "pyspark.sql.functions"
+          ]
+        }
+      },
+      "content_hash": "0a21f39f446cad3499d0f6c389f1be7e4521db1cefa8a31c9592dbde873113f9",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/05-working-with-dataframe.ipynb"
+      }
+    },
+    "ravi.verma:01-getting-started.ipynb": {
+      "artifact_id": "ravi.verma:01-getting-started.ipynb",
+      "workspace_id": "ravi.verma",
+      "relative_path": "01-getting-started.ipynb",
+      "file_name": "01-getting-started.ipynb",
+      "file_type": "notebook",
+      "mime_type": null,
+      "size_bytes": 3874,
+      "last_modified_at": "2026-04-29T09:50:04.925237",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql.functions"
+          ]
+        }
+      },
+      "content_hash": "78d52a3e74469d630627b122de6cfcdebeed114e765420d8aa36a733cc4ee96f",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/01-getting-started.ipynb"
+      }
+    },
+    "ravi.verma:HelloSpark.py": {
+      "artifact_id": "ravi.verma:HelloSpark.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "HelloSpark.py",
+      "file_name": "HelloSpark.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 319,
+      "last_modified_at": "2026-04-29T09:50:05.267713",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "f799e3c89cf5f37819a0e314b7d84b85d710e2d90bcba74b0b2f1c58b2a30943",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/HelloSpark.py"
+      }
+    },
+    "ravi.verma:04-spark-sql-demo.sql": {
+      "artifact_id": "ravi.verma:04-spark-sql-demo.sql",
+      "workspace_id": "ravi.verma",
+      "relative_path": "04-spark-sql-demo.sql",
+      "file_name": "04-spark-sql-demo.sql",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 3058,
+      "last_modified_at": "2026-04-29T09:50:05.661561",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": [
+            "demo_db.fire_service_calls_tbl"
+          ]
+        }
+      },
+      "content_hash": "f3ffb7dfbd9d450443c533a680e6115d4e6ea358422de3e37778ee9886d23dcc",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/04-spark-sql-demo.sql"
+      }
+    },
+    "ravi.verma:03-spark-table-demo.sql": {
+      "artifact_id": "ravi.verma:03-spark-table-demo.sql",
+      "workspace_id": "ravi.verma",
+      "relative_path": "03-spark-table-demo.sql",
+      "file_name": "03-spark-table-demo.sql",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1554,
+      "last_modified_at": "2026-04-29T09:50:05.762045",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": [
+            "demo_db.fire_service_calls_tbl",
+            "global_temp.fire_service_calls_view"
+          ]
+        }
+      },
+      "content_hash": "667f00337a925f9bc6f9403f949bf31ecc403ded8e76e6503b1178aca98fee03",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/03-spark-table-demo.sql"
+      }
+    },
+    "ravi.verma:02-spark-dataframe-demo.ipynb": {
+      "artifact_id": "ravi.verma:02-spark-dataframe-demo.ipynb",
+      "workspace_id": "ravi.verma",
+      "relative_path": "02-spark-dataframe-demo.ipynb",
+      "file_name": "02-spark-dataframe-demo.ipynb",
+      "file_type": "notebook",
+      "mime_type": null,
+      "size_bytes": 5312,
+      "last_modified_at": "2026-04-29T09:50:05.764336",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "global_temp.fire_service_calls_view"
+          ]
+        }
+      },
+      "content_hash": "6629369ebe9aa82305a9fbfa89a93b4b6d1ac405322f8315a98eac33068e6b88",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/02-spark-dataframe-demo.ipynb"
+      }
+    },
+    "ravi.verma:12-MiscDemo/MiscDemo.py": {
+      "artifact_id": "ravi.verma:12-MiscDemo/MiscDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "12-MiscDemo/MiscDemo.py",
+      "file_name": "MiscDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1479,
+      "last_modified_at": "2026-04-29T09:50:04.829087",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql",
+            "pyspark.sql.functions",
+            "pyspark.sql.types"
+          ]
+        }
+      },
+      "content_hash": "8d05535b96ff767c90a5ae4c0b7f7f219ccfc8758dc94962d213b7ca37584696",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/12-MiscDemo/MiscDemo.py"
+      }
+    },
+    "ravi.verma:18-OuterJoinDemo/OuterJoinDemo.py": {
+      "artifact_id": "ravi.verma:18-OuterJoinDemo/OuterJoinDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "18-OuterJoinDemo/OuterJoinDemo.py",
+      "file_name": "OuterJoinDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1894,
+      "last_modified_at": "2026-04-29T09:50:04.837152",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "Demo",
+            "lib.logger",
+            "pyspark.sql",
+            "pyspark.sql.functions"
+          ]
+        }
+      },
+      "content_hash": "f756e79c31db285e57b050183cbb433b99f728205fd2b35d0b4e723005aff3a6",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/18-OuterJoinDemo/OuterJoinDemo.py"
+      }
+    },
+    "ravi.verma:06-SparkSQLTableDemo/SparkSQLTableDemo.py": {
+      "artifact_id": "ravi.verma:06-SparkSQLTableDemo/SparkSQLTableDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "06-SparkSQLTableDemo/SparkSQLTableDemo.py",
+      "file_name": "SparkSQLTableDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 648,
+      "last_modified_at": "2026-04-29T09:50:04.852960",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "9bd4ba9a2972fc4635a3a9cc4319bcbde0e688d6b9b16882675220a25e89e0d6",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/06-SparkSQLTableDemo/SparkSQLTableDemo.py"
+      }
+    },
+    "ravi.verma:16-RankingDemo/RankingDemo.py": {
+      "artifact_id": "ravi.verma:16-RankingDemo/RankingDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "16-RankingDemo/RankingDemo.py",
+      "file_name": "RankingDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 750,
+      "last_modified_at": "2026-04-29T09:50:04.861642",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "8ad018486d968029c0470ca037ae32136bc3482166f5e9070ad4e775ebdfb7c2",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/16-RankingDemo/RankingDemo.py"
+      }
+    },
+    "ravi.verma:14-GroupingDemo/GroupingDemo.py": {
+      "artifact_id": "ravi.verma:14-GroupingDemo/GroupingDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "14-GroupingDemo/GroupingDemo.py",
+      "file_name": "GroupingDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1194,
+      "last_modified_at": "2026-04-29T09:50:04.869399",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "4d079dabe763df32665ca342ccc1ef94fba3396fd5a26ad667fb65f7dbb403fc",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/14-GroupingDemo/GroupingDemo.py"
+      }
+    },
+    "ravi.verma:15-WindowingDemo/WindowingDemo.py": {
+      "artifact_id": "ravi.verma:15-WindowingDemo/WindowingDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "15-WindowingDemo/WindowingDemo.py",
+      "file_name": "WindowingDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 634,
+      "last_modified_at": "2026-04-29T09:50:04.926819",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "459127e03b238e833606bb26869c9a10a7b0c1c4518362fd052e000632503196",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/15-WindowingDemo/WindowingDemo.py"
+      }
+    },
+    "ravi.verma:01-HelloSpark/test_utile.py": {
+      "artifact_id": "ravi.verma:01-HelloSpark/test_utile.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "01-HelloSpark/test_utile.py",
+      "file_name": "test_utile.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1211,
+      "last_modified_at": "2026-04-29T09:50:04.934013",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.utils",
+            "pyspark.sql",
+            "unittest"
+          ]
+        }
+      },
+      "content_hash": "7915e4b2f0e80e65c616a423467e981f21654c93e8f0caf3c4de7c85df322c6e",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/01-HelloSpark/test_utile.py"
+      }
+    },
+    "ravi.verma:01-HelloSpark/HelloSpark.py": {
+      "artifact_id": "ravi.verma:01-HelloSpark/HelloSpark.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "01-HelloSpark/HelloSpark.py",
+      "file_name": "HelloSpark.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 699,
+      "last_modified_at": "2026-04-29T09:50:04.935795",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "lib.utils",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "6c748f9e33127ffc5e8bc2291f892b38544e9488657f55816c2cfb94fa9c0b3b",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/01-HelloSpark/HelloSpark.py"
+      }
+    },
+    "ravi.verma:03-HelloSparkSQL/HelloSparkSQL.py": {
+      "artifact_id": "ravi.verma:03-HelloSparkSQL/HelloSparkSQL.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "03-HelloSparkSQL/HelloSparkSQL.py",
+      "file_name": "HelloSparkSQL.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 682,
+      "last_modified_at": "2026-04-29T09:50:04.945441",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql",
+            "survey_tbl"
+          ]
+        }
+      },
+      "content_hash": "28ed57d4c879bdf4a83394a34a363a5694b0621517a2a2aadb91850a61f0911e",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/03-HelloSparkSQL/HelloSparkSQL.py"
+      }
+    },
+    "ravi.verma:19-ShuffleJoinDemo/SuffleJoinDemo.py": {
+      "artifact_id": "ravi.verma:19-ShuffleJoinDemo/SuffleJoinDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "19-ShuffleJoinDemo/SuffleJoinDemo.py",
+      "file_name": "SuffleJoinDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 605,
+      "last_modified_at": "2026-04-29T09:50:04.953911",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "Demo",
+            "lib.logger",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "6d0d1ee7a33df60dfe70f876e7aa46f8457fa5ffc2faa921c897e6ec952cc4f8",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/19-ShuffleJoinDemo/SuffleJoinDemo.py"
+      }
+    },
+    "ravi.verma:04-SparkSchemaDemo/SparkSchemaDemo.py": {
+      "artifact_id": "ravi.verma:04-SparkSchemaDemo/SparkSchemaDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "04-SparkSchemaDemo/SparkSchemaDemo.py",
+      "file_name": "SparkSchemaDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2279,
+      "last_modified_at": "2026-04-29T09:50:05.270304",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql",
+            "pyspark.sql.types"
+          ]
+        }
+      },
+      "content_hash": "e76631d51d4dbf9f1d20bd963c6c16a51c160a34532d24e93627f215224bc77b",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/04-SparkSchemaDemo/SparkSchemaDemo.py"
+      }
+    },
+    "ravi.verma:05-DataSinkDemo/DataSinkDemo.py": {
+      "artifact_id": "ravi.verma:05-DataSinkDemo/DataSinkDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "05-DataSinkDemo/DataSinkDemo.py",
+      "file_name": "DataSinkDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1165,
+      "last_modified_at": "2026-04-29T09:50:05.693178",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql",
+            "pyspark.sql.functions"
+          ]
+        }
+      },
+      "content_hash": "6f1b89adebb28fa885ed4475410e1321c3919c7d5b58507d17262ca11a5a56a6",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/05-DataSinkDemo/DataSinkDemo.py"
+      }
+    },
+    "ravi.verma:17-SparkJoinDemo/SparkJoinDemo.py": {
+      "artifact_id": "ravi.verma:17-SparkJoinDemo/SparkJoinDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "17-SparkJoinDemo/SparkJoinDemo.py",
+      "file_name": "SparkJoinDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1679,
+      "last_modified_at": "2026-04-29T09:50:05.706644",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "Demo",
+            "lib.logger",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "9e17f15df2f73a0e798e0fb53292b4d93e8577b18ebdd7bdc0fcbf52904c6490",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/17-SparkJoinDemo/SparkJoinDemo.py"
+      }
+    },
+    "ravi.verma:SBDL/test_nutter_sbdl.py": {
+      "artifact_id": "ravi.verma:SBDL/test_nutter_sbdl.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/test_nutter_sbdl.py",
+      "file_name": "test_nutter_sbdl.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 627,
+      "last_modified_at": "2026-04-29T09:50:05.730280",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib",
+            "pyspark.sql",
+            "runtime.nutterfixture"
+          ]
+        }
+      },
+      "content_hash": "17e099c3cf3cb46949c04d114638f02147c5e5e31cdcd7f29286d1e0c8599d16",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/test_nutter_sbdl.py"
+      }
+    },
+    "ravi.verma:SBDL/main.py": {
+      "artifact_id": "ravi.verma:SBDL/main.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/main.py",
+      "file_name": "main.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2809,
+      "last_modified_at": "2026-04-29T09:50:05.748580",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "kafka",
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "Account",
+            "Party",
+            "lib",
+            "lib.logger",
+            "pyspark.sql.functions",
+            "there"
+          ]
+        }
+      },
+      "content_hash": "0a907675549f2ab3261e959c7c988c74f89280e1563f03fbe7d7650c22dc39fc",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/main.py"
+      }
+    },
+    "ravi.verma:SBDL/test_pytest_sbdl.py": {
+      "artifact_id": "ravi.verma:SBDL/test_pytest_sbdl.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/test_pytest_sbdl.py",
+      "file_name": "test_pytest_sbdl.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 15234,
+      "last_modified_at": "2026-04-29T09:50:05.758623",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "kafka",
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "chispa",
+            "datetime",
+            "lib",
+            "lib.ConfigLoader",
+            "lib.DataLoader",
+            "lib.Utils",
+            "pyspark.sql.types"
+          ]
+        }
+      },
+      "content_hash": "5fe4117fada877dddb3c4950cfb91f26850309dd3466d536719871e79bb06c6b",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/test_pytest_sbdl.py"
+      }
+    },
+    "ravi.verma:11-UDFDemo/UDFDemo.py": {
+      "artifact_id": "ravi.verma:11-UDFDemo/UDFDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "11-UDFDemo/UDFDemo.py",
+      "file_name": "UDFDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1352,
+      "last_modified_at": "2026-04-29T09:50:05.768251",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql",
+            "pyspark.sql.functions",
+            "pyspark.sql.types"
+          ]
+        }
+      },
+      "content_hash": "586678e5bf3aeec67d7d612c28a9445f375dddda26c2039d3c9c6b94658cdd8f",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/11-UDFDemo/UDFDemo.py"
+      }
+    },
+    "ravi.verma:SBDL - Starter/sbdl_main.py": {
+      "artifact_id": "ravi.verma:SBDL - Starter/sbdl_main.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL - Starter/sbdl_main.py",
+      "file_name": "sbdl_main.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 417,
+      "last_modified_at": "2026-04-29T09:50:05.840686",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib",
+            "lib.logger"
+          ]
+        }
+      },
+      "content_hash": "d0b2af2ef898008b02a0f376a37a3818654577375c0db7da7c0939bf4c5e5aec",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL - Starter/sbdl_main.py"
+      }
+    },
+    "ravi.verma:SBDL - Starter/test_pytest_sbdl.py": {
+      "artifact_id": "ravi.verma:SBDL - Starter/test_pytest_sbdl.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL - Starter/test_pytest_sbdl.py",
+      "file_name": "test_pytest_sbdl.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 234,
+      "last_modified_at": "2026-04-29T09:50:05.852960",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.Utils"
+          ]
+        }
+      },
+      "content_hash": "d8cdb8455ac59a110cea0a66ea69a3d93bd895c8aeba228d4f82b7fa892669ea",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL - Starter/test_pytest_sbdl.py"
+      }
+    },
+    "ravi.verma:09-LogFileDemo/LogFileDemo.py": {
+      "artifact_id": "ravi.verma:09-LogFileDemo/LogFileDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "09-LogFileDemo/LogFileDemo.py",
+      "file_name": "LogFileDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 989,
+      "last_modified_at": "2026-04-29T09:50:05.858266",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql",
+            "pyspark.sql.functions"
+          ]
+        }
+      },
+      "content_hash": "443c43a9a37f2a4c8f0709fddbc3fef42410f66c4f103311a30180699769435c",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/09-LogFileDemo/LogFileDemo.py"
+      }
+    },
+    "ravi.verma:12-MiscDemoNotebook/MiscDemo.ipynb": {
+      "artifact_id": "ravi.verma:12-MiscDemoNotebook/MiscDemo.ipynb",
+      "workspace_id": "ravi.verma",
+      "relative_path": "12-MiscDemoNotebook/MiscDemo.ipynb",
+      "file_name": "MiscDemo.ipynb",
+      "file_type": "notebook",
+      "mime_type": null,
+      "size_bytes": 9098,
+      "last_modified_at": "2026-04-29T09:50:05.882293",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql",
+            "pyspark.sql.functions",
+            "pyspark.sql.types"
+          ]
+        }
+      },
+      "content_hash": "a6f12de979b6a659f379217acef99bc9cebf3c9f8d2883e89eb437fdd58b5c5c",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/12-MiscDemoNotebook/MiscDemo.ipynb"
+      }
+    },
+    "ravi.verma:notebook/pyspark-test.ipynb": {
+      "artifact_id": "ravi.verma:notebook/pyspark-test.ipynb",
+      "workspace_id": "ravi.verma",
+      "relative_path": "notebook/pyspark-test.ipynb",
+      "file_name": "pyspark-test.ipynb",
+      "file_type": "notebook",
+      "mime_type": null,
+      "size_bytes": 1919,
+      "last_modified_at": "2026-04-29T09:50:05.885085",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "461b145b510755b543c3ec206a9b127462083e8ddac742d2829d7292801f4249",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/notebook/pyspark-test.ipynb"
+      }
+    },
+    "ravi.verma:02-HelloRDD/HelloRDD.py": {
+      "artifact_id": "ravi.verma:02-HelloRDD/HelloRDD.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "02-HelloRDD/HelloRDD.py",
+      "file_name": "HelloRDD.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1114,
+      "last_modified_at": "2026-04-29T09:50:05.893968",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "collections",
+            "lib.logger",
+            "pyspark",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "47dba4d5e77b4a68833a27bf4d492413619167f0ee486a1fbec6b2478295477a",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/02-HelloRDD/HelloRDD.py"
+      }
+    },
+    "ravi.verma:13-AggDemo/AggDemo.py": {
+      "artifact_id": "ravi.verma:13-AggDemo/AggDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "13-AggDemo/AggDemo.py",
+      "file_name": "AggDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1589,
+      "last_modified_at": "2026-04-29T09:50:05.907537",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql",
+            "sales"
+          ]
+        }
+      },
+      "content_hash": "91281f78170f250a24e15ad7aa5e742b24134c8432fafbfd662ddf296fd3242e",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/13-AggDemo/AggDemo.py"
+      }
+    },
+    "ravi.verma:20-BucketJoinDemo/BucketJoinDemo.py": {
+      "artifact_id": "ravi.verma:20-BucketJoinDemo/BucketJoinDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "20-BucketJoinDemo/BucketJoinDemo.py",
+      "file_name": "BucketJoinDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1076,
+      "last_modified_at": "2026-04-29T09:50:06.153189",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "Demo",
+            "lib.logger",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "b88713204760c66d4482dd5a9011a37727c6551530abfc80793ebdc7b2547445",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/20-BucketJoinDemo/BucketJoinDemo.py"
+      }
+    },
+    "ravi.verma:08-RowDemo/RowDemo.py": {
+      "artifact_id": "ravi.verma:08-RowDemo/RowDemo.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "08-RowDemo/RowDemo.py",
+      "file_name": "RowDemo.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 873,
+      "last_modified_at": "2026-04-29T09:50:06.951930",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.logger",
+            "pyspark.sql",
+            "pyspark.sql.functions",
+            "pyspark.sql.types"
+          ]
+        }
+      },
+      "content_hash": "0598b2bc56a18fddcdc8e87439bd07bca7a21f43e4eba404809f591a0bd4b699",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/08-RowDemo/RowDemo.py"
+      }
+    },
+    "ravi.verma:08-RowDemo/RowDemo_Test.py": {
+      "artifact_id": "ravi.verma:08-RowDemo/RowDemo_Test.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "08-RowDemo/RowDemo_Test.py",
+      "file_name": "RowDemo_Test.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1132,
+      "last_modified_at": "2026-04-29T09:50:06.958526",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "RowDemo",
+            "datetime",
+            "pyspark.sql",
+            "pyspark.sql.types",
+            "unittest"
+          ]
+        }
+      },
+      "content_hash": "e1e2e26e8a93e1c4ab1a7d82437695ef9bce7df976a4a6440f2685adff8a54d0",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/08-RowDemo/RowDemo_Test.py"
+      }
+    },
+    "ravi.verma:07-Notebook/MyPythonNotebook.ipynb": {
+      "artifact_id": "ravi.verma:07-Notebook/MyPythonNotebook.ipynb",
+      "workspace_id": "ravi.verma",
+      "relative_path": "07-Notebook/MyPythonNotebook.ipynb",
+      "file_name": "MyPythonNotebook.ipynb",
+      "file_type": "notebook",
+      "mime_type": null,
+      "size_bytes": 2723,
+      "last_modified_at": "2026-04-29T09:50:06.963300",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql",
+            "pyspark.sql.functions",
+            "pyspark.sql.types"
+          ]
+        }
+      },
+      "content_hash": "cf4613b714a35d7a79b9933b26087f1e3fbf6ba412002803790e2d59601cefcc",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/07-Notebook/MyPythonNotebook.ipynb"
+      }
+    },
+    "ravi.verma:10-ExploringColumns/ColumnsNotebook.ipynb": {
+      "artifact_id": "ravi.verma:10-ExploringColumns/ColumnsNotebook.ipynb",
+      "workspace_id": "ravi.verma",
+      "relative_path": "10-ExploringColumns/ColumnsNotebook.ipynb",
+      "file_name": "ColumnsNotebook.ipynb",
+      "file_type": "notebook",
+      "mime_type": null,
+      "size_bytes": 161717,
+      "last_modified_at": "2026-04-29T09:50:06.969070",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql.functions"
+          ]
+        }
+      },
+      "content_hash": "8cb58a71aed1e28bf4e6d918622632564981574d27cfb272523e7db42c782d0d",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/10-ExploringColumns/ColumnsNotebook.ipynb"
+      }
+    },
+    "ravi.verma:12-MiscDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:12-MiscDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "12-MiscDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.826660",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/12-MiscDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:12-MiscDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:12-MiscDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "12-MiscDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:04.827681",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/12-MiscDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:18-OuterJoinDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:18-OuterJoinDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "18-OuterJoinDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.839707",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/18-OuterJoinDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:18-OuterJoinDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:18-OuterJoinDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "18-OuterJoinDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:04.840925",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/18-OuterJoinDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:06-SparkSQLTableDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:06-SparkSQLTableDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "06-SparkSQLTableDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.854823",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/06-SparkSQLTableDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:06-SparkSQLTableDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:06-SparkSQLTableDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "06-SparkSQLTableDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:04.856955",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/06-SparkSQLTableDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:16-RankingDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:16-RankingDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "16-RankingDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.863525",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/16-RankingDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:16-RankingDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:16-RankingDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "16-RankingDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:04.864994",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/16-RankingDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:14-GroupingDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:14-GroupingDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "14-GroupingDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.867765",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/14-GroupingDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:14-GroupingDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:14-GroupingDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "14-GroupingDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:04.868580",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/14-GroupingDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:15-WindowingDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:15-WindowingDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "15-WindowingDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.928192",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/15-WindowingDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:15-WindowingDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:15-WindowingDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "15-WindowingDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:04.929839",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/15-WindowingDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:01-HelloSpark/lib/__init__.py": {
+      "artifact_id": "ravi.verma:01-HelloSpark/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "01-HelloSpark/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.936767",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/01-HelloSpark/lib/__init__.py"
+      }
+    },
+    "ravi.verma:01-HelloSpark/lib/logger.py": {
+      "artifact_id": "ravi.verma:01-HelloSpark/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "01-HelloSpark/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 582,
+      "last_modified_at": "2026-04-29T09:50:04.938405",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "6575345d60afe25aa9c5fdba5dccb17847fd2863ddd1080a61b16d571690b9a9",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/01-HelloSpark/lib/logger.py"
+      }
+    },
+    "ravi.verma:01-HelloSpark/lib/utils.py": {
+      "artifact_id": "ravi.verma:01-HelloSpark/lib/utils.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "01-HelloSpark/lib/utils.py",
+      "file_name": "utils.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 638,
+      "last_modified_at": "2026-04-29T09:50:04.940206",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark"
+          ]
+        }
+      },
+      "content_hash": "6f7253b067803c7895344d75984d6421c17de54aca5ec164680954404d070779",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/01-HelloSpark/lib/utils.py"
+      }
+    },
+    "ravi.verma:03-HelloSparkSQL/lib/__init__.py": {
+      "artifact_id": "ravi.verma:03-HelloSparkSQL/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "03-HelloSparkSQL/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.946465",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/03-HelloSparkSQL/lib/__init__.py"
+      }
+    },
+    "ravi.verma:03-HelloSparkSQL/lib/logger.py": {
+      "artifact_id": "ravi.verma:03-HelloSparkSQL/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "03-HelloSparkSQL/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:04.947522",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/03-HelloSparkSQL/lib/logger.py"
+      }
+    },
+    "ravi.verma:19-ShuffleJoinDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:19-ShuffleJoinDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "19-ShuffleJoinDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:04.951459",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/19-ShuffleJoinDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:19-ShuffleJoinDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:19-ShuffleJoinDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "19-ShuffleJoinDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:04.952732",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/19-ShuffleJoinDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:04-SparkSchemaDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:04-SparkSchemaDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "04-SparkSchemaDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.273168",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/04-SparkSchemaDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:04-SparkSchemaDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:04-SparkSchemaDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "04-SparkSchemaDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:05.275064",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/04-SparkSchemaDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:05-DataSinkDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:05-DataSinkDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "05-DataSinkDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.696491",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/05-DataSinkDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:05-DataSinkDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:05-DataSinkDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "05-DataSinkDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:05.698961",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/05-DataSinkDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:17-SparkJoinDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:17-SparkJoinDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "17-SparkJoinDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.708107",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/17-SparkJoinDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:17-SparkJoinDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:17-SparkJoinDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "17-SparkJoinDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:05.709473",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/17-SparkJoinDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:SBDL/lib/Transformations.py": {
+      "artifact_id": "ravi.verma:SBDL/lib/Transformations.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/lib/Transformations.py",
+      "file_name": "Transformations.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 4428,
+      "last_modified_at": "2026-04-29T09:50:05.741195",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql.functions"
+          ]
+        }
+      },
+      "content_hash": "b512f5d79e25b36258f2e5f7dbc67a3680eb0792f08b66f6d5e64562af973c72",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/lib/Transformations.py"
+      }
+    },
+    "ravi.verma:SBDL/lib/__init__.py": {
+      "artifact_id": "ravi.verma:SBDL/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.742228",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/lib/__init__.py"
+      }
+    },
+    "ravi.verma:SBDL/lib/DataGen.py": {
+      "artifact_id": "ravi.verma:SBDL/lib/DataGen.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/lib/DataGen.py",
+      "file_name": "DataGen.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 3006,
+      "last_modified_at": "2026-04-29T09:50:05.743388",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "faker",
+            "random"
+          ]
+        }
+      },
+      "content_hash": "aa9992692d6cc24a7d02c1ff44f0e34ea660e619496db1fb16e8053154a2e723",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/lib/DataGen.py"
+      }
+    },
+    "ravi.verma:SBDL/lib/logger.py": {
+      "artifact_id": "ravi.verma:SBDL/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 415,
+      "last_modified_at": "2026-04-29T09:50:05.744174",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "afca79bb002c71046c45d8b913641ce5e3b49cccc538f72fece51f9436442dab",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/lib/logger.py"
+      }
+    },
+    "ravi.verma:SBDL/lib/Utils.py": {
+      "artifact_id": "ravi.verma:SBDL/lib/Utils.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/lib/Utils.py",
+      "file_name": "Utils.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 721,
+      "last_modified_at": "2026-04-29T09:50:05.744880",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib.ConfigLoader",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "aa398711f7018c4fdb43d6e719f4f49b4b936fe3cd5e5d225513686215153c53",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/lib/Utils.py"
+      }
+    },
+    "ravi.verma:SBDL/lib/ConfigLoader.py": {
+      "artifact_id": "ravi.verma:SBDL/lib/ConfigLoader.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/lib/ConfigLoader.py",
+      "file_name": "ConfigLoader.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 608,
+      "last_modified_at": "2026-04-29T09:50:05.745873",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark"
+          ]
+        }
+      },
+      "content_hash": "b34d20def597ca72d052c9af286c61f028f0afc613c5e1929f91f47f9b4d707a",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/lib/ConfigLoader.py"
+      }
+    },
+    "ravi.verma:SBDL/lib/DataLoader.py": {
+      "artifact_id": "ravi.verma:SBDL/lib/DataLoader.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL/lib/DataLoader.py",
+      "file_name": "DataLoader.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2124,
+      "last_modified_at": "2026-04-29T09:50:05.747191",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "lib"
+          ]
+        }
+      },
+      "content_hash": "a32be95d7c5b99d5fc40dcc0e6e19ab27825b4e42b88f928373da13970198445",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL/lib/DataLoader.py"
+      }
+    },
+    "ravi.verma:11-UDFDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:11-UDFDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "11-UDFDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.770317",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/11-UDFDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:11-UDFDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:11-UDFDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "11-UDFDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:05.774740",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/11-UDFDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:SBDL - Starter/lib/__init__.py": {
+      "artifact_id": "ravi.verma:SBDL - Starter/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL - Starter/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.842581",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL - Starter/lib/__init__.py"
+      }
+    },
+    "ravi.verma:SBDL - Starter/lib/logger.py": {
+      "artifact_id": "ravi.verma:SBDL - Starter/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL - Starter/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 415,
+      "last_modified_at": "2026-04-29T09:50:05.844598",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "afca79bb002c71046c45d8b913641ce5e3b49cccc538f72fece51f9436442dab",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL - Starter/lib/logger.py"
+      }
+    },
+    "ravi.verma:SBDL - Starter/lib/Utils.py": {
+      "artifact_id": "ravi.verma:SBDL - Starter/lib/Utils.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "SBDL - Starter/lib/Utils.py",
+      "file_name": "Utils.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 458,
+      "last_modified_at": "2026-04-29T09:50:05.846721",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "0911184a93f16f7be93f1c4b8ab37efb843358e185509236688ea59279fa1159",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/SBDL - Starter/lib/Utils.py"
+      }
+    },
+    "ravi.verma:09-LogFileDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:09-LogFileDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "09-LogFileDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.861470",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/09-LogFileDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:09-LogFileDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:09-LogFileDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "09-LogFileDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:05.865474",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/09-LogFileDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:09-LogFileDemo/data/apache_logs.txt": {
+      "artifact_id": "ravi.verma:09-LogFileDemo/data/apache_logs.txt",
+      "workspace_id": "ravi.verma",
+      "relative_path": "09-LogFileDemo/data/apache_logs.txt",
+      "file_name": "apache_logs.txt",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 2370046,
+      "last_modified_at": "2026-04-29T09:50:05.875132",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable"
+      },
+      "content_hash": "f5a48bd2ebe893ebe524d34bb79f19f81e7789042b1dd95e9a46df52a54b7457",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/09-LogFileDemo/data/apache_logs.txt"
+      }
+    },
+    "ravi.verma:02-HelloRDD/lib/__init__.py": {
+      "artifact_id": "ravi.verma:02-HelloRDD/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "02-HelloRDD/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.896551",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/02-HelloRDD/lib/__init__.py"
+      }
+    },
+    "ravi.verma:02-HelloRDD/lib/logger.py": {
+      "artifact_id": "ravi.verma:02-HelloRDD/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "02-HelloRDD/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:05.898496",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/02-HelloRDD/lib/logger.py"
+      }
+    },
+    "ravi.verma:13-AggDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:13-AggDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "13-AggDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:05.908787",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/13-AggDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:13-AggDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:13-AggDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "13-AggDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:05.910094",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/13-AggDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:20-BucketJoinDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:20-BucketJoinDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "20-BucketJoinDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:06.154841",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/20-BucketJoinDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:20-BucketJoinDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:20-BucketJoinDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "20-BucketJoinDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:06.156325",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/20-BucketJoinDemo/lib/logger.py"
+      }
+    },
+    "ravi.verma:08-RowDemo/lib/__init__.py": {
+      "artifact_id": "ravi.verma:08-RowDemo/lib/__init__.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "08-RowDemo/lib/__init__.py",
+      "file_name": "__init__.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 0,
+      "last_modified_at": "2026-04-29T09:50:06.953993",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/08-RowDemo/lib/__init__.py"
+      }
+    },
+    "ravi.verma:08-RowDemo/lib/logger.py": {
+      "artifact_id": "ravi.verma:08-RowDemo/lib/logger.py",
+      "workspace_id": "ravi.verma",
+      "relative_path": "08-RowDemo/lib/logger.py",
+      "file_name": "logger.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 576,
+      "last_modified_at": "2026-04-29T09:50:06.955954",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "spark"
+          ],
+          "databases": [],
+          "tables": []
+        }
+      },
+      "content_hash": "b5bc5560f277add32973b6b729a4e8b660ba9f0023827466db562f1997f6a955",
+      "capture_source": {
+        "source_path": "/data/ravi.verma/08-RowDemo/lib/logger.py"
+      }
+    },
+    "vikram.singh:README.md": {
+      "artifact_id": "vikram.singh:README.md",
+      "workspace_id": "vikram.singh",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 383,
+      "last_modified_at": "2026-06-24T17:43:22.790984",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "dbca4aefde61df3a3647490439dec46183d11240ed721b9915cc326a79fcd06f",
+      "capture_source": {
+        "source_path": "/data/vikram.singh/README.md"
+      }
+    },
+    "vikram.singh:sklearn/classifier_comparison.py": {
+      "artifact_id": "vikram.singh:sklearn/classifier_comparison.py",
+      "workspace_id": "vikram.singh",
+      "relative_path": "sklearn/classifier_comparison.py",
+      "file_name": "classifier_comparison.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 4944,
+      "last_modified_at": "2026-06-24T17:43:22.786892",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "matplotlib.colors",
+            "sklearn.datasets",
+            "sklearn.discriminant_analysis",
+            "sklearn.ensemble",
+            "sklearn.gaussian_process",
+            "sklearn.gaussian_process.kernels",
+            "sklearn.inspection",
+            "sklearn.model_selection",
+            "sklearn.naive_bayes",
+            "sklearn.neighbors",
+            "sklearn.neural_network",
+            "sklearn.pipeline",
+            "sklearn.preprocessing",
+            "sklearn.svm",
+            "sklearn.tree",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "4164a5b1cecaf3d9f83c043dcbf518d6ae24b6b18fe7c53cd9f1661466563c7b",
+      "capture_source": {
+        "source_path": "/data/vikram.singh/sklearn/classifier_comparison.py"
+      }
+    },
+    "tanvi.desai:README.md": {
+      "artifact_id": "tanvi.desai:README.md",
+      "workspace_id": "tanvi.desai",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 365,
+      "last_modified_at": "2026-06-24T17:43:22.277801",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "6a30c27886464588061bbd550ed967dfcd1e6875fb8c83939bfbb5227cec5145",
+      "capture_source": {
+        "source_path": "/data/tanvi.desai/README.md"
+      }
+    },
+    "tanvi.desai:mlflow/mnist_autolog_example.py": {
+      "artifact_id": "tanvi.desai:mlflow/mnist_autolog_example.py",
+      "workspace_id": "tanvi.desai",
+      "relative_path": "mlflow/mnist_autolog_example.py",
+      "file_name": "mnist_autolog_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 7388,
+      "last_modified_at": "2026-06-24T17:43:22.273822",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": [
+            "lightning.pytorch.callbacks",
+            "lightning.pytorch.cli",
+            "torch.nn",
+            "torch.utils.data",
+            "torchvision",
+            "train"
+          ]
+        }
+      },
+      "content_hash": "ec3a7599b7cdbce6c7eb1f70069b433e3370e76ece56aea5c14ef65b6b02a63c",
+      "capture_source": {
+        "source_path": "/data/tanvi.desai/mlflow/mnist_autolog_example.py"
+      }
+    },
+    "arjun.menon:README.md": {
+      "artifact_id": "arjun.menon:README.md",
+      "workspace_id": "arjun.menon",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 361,
+      "last_modified_at": "2026-06-24T17:43:19.730935",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "27cb1475bfd4ce8ee78641d6482f23c93d94be277ab9f6bf5f85f48ef214f004",
+      "capture_source": {
+        "source_path": "/data/arjun.menon/README.md"
+      }
+    },
+    "arjun.menon:spark_sql/datasource.py": {
+      "artifact_id": "arjun.menon:spark_sql/datasource.py",
+      "workspace_id": "arjun.menon",
+      "relative_path": "spark_sql/datasource.py",
+      "file_name": "datasource.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 17836,
+      "last_modified_at": "2026-06-24T17:43:19.726274",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "a",
+            "parquet",
+            "parquetFile",
+            "people",
+            "pyspark.sql",
+            "the"
+          ]
+        }
+      },
+      "content_hash": "69e76df45a1102897a0c38f6471186b69f05f4225b3e00466d048713446ea0d4",
+      "capture_source": {
+        "source_path": "/data/arjun.menon/spark_sql/datasource.py"
+      }
+    },
+    "rohit.sharma:README.md": {
+      "artifact_id": "rohit.sharma:README.md",
+      "workspace_id": "rohit.sharma",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 373,
+      "last_modified_at": "2026-06-24T17:43:21.284618",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "ca9d5ebd2f3038d5acef9a18699cbbe9b023b1dc8891c472d1e38d9c01aa9884",
+      "capture_source": {
+        "source_path": "/data/rohit.sharma/README.md"
+      }
+    },
+    "rohit.sharma:streaming/network_wordcount.py": {
+      "artifact_id": "rohit.sharma:streaming/network_wordcount.py",
+      "workspace_id": "rohit.sharma",
+      "relative_path": "streaming/network_wordcount.py",
+      "file_name": "network_wordcount.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1883,
+      "last_modified_at": "2026-06-24T17:43:21.280221",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark",
+            "pyspark.streaming",
+            "the"
+          ]
+        }
+      },
+      "content_hash": "264e2d5c20d2875582d0a26dd3336746500e9df2034c6149357d08c3fcb29c5a",
+      "capture_source": {
+        "source_path": "/data/rohit.sharma/streaming/network_wordcount.py"
+      }
+    },
+    "saanvi.reddy:README.md": {
+      "artifact_id": "saanvi.reddy:README.md",
+      "workspace_id": "saanvi.reddy",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 358,
+      "last_modified_at": "2026-06-24T17:43:21.380145",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "a80a5d7be1c6887b465bceadbd699126682f56de2b1cc69604c95ae7b15db8a8",
+      "capture_source": {
+        "source_path": "/data/saanvi.reddy/README.md"
+      }
+    },
+    "saanvi.reddy:mlflow/sklearn_elasticnet_wine_train.py": {
+      "artifact_id": "saanvi.reddy:mlflow/sklearn_elasticnet_wine_train.py",
+      "workspace_id": "saanvi.reddy",
+      "relative_path": "mlflow/sklearn_elasticnet_wine_train.py",
+      "file_name": "sklearn_elasticnet_wine_train.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 3286,
+      "last_modified_at": "2026-06-24T17:43:21.371375",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "http",
+            "mlflow.models",
+            "physicochemical",
+            "sklearn.linear_model",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "the",
+            "training",
+            "urllib.parse"
+          ]
+        }
+      },
+      "content_hash": "5c241ae72f9b705f57065932b3397f10faac530ac202377d1d9870fcc5721f26",
+      "capture_source": {
+        "source_path": "/data/saanvi.reddy/mlflow/sklearn_elasticnet_wine_train.py"
+      }
+    }
+  },
+  "workspaces": {
+    "karan.malhotra": {
+      "workspace_id": "karan.malhotra",
+      "owner": "karan.malhotra",
+      "root_path": "/data/karan.malhotra",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:54.910304",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "ishaan.kapoor": {
+      "workspace_id": "ishaan.kapoor",
+      "owner": "ishaan.kapoor",
+      "root_path": "/data/ishaan.kapoor",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:54.917339",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "ananya.iyer": {
+      "workspace_id": "ananya.iyer",
+      "owner": "ananya.iyer",
+      "root_path": "/data/ananya.iyer",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:54.924486",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "aarav.mehra": {
+      "workspace_id": "aarav.mehra",
+      "owner": "aarav.mehra",
+      "root_path": "/data/aarav.mehra",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:54.931601",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "aditya.kulkarni": {
+      "workspace_id": "aditya.kulkarni",
+      "owner": "aditya.kulkarni",
+      "root_path": "/data/aditya.kulkarni",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:54.991395",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "zoya.khan": {
+      "workspace_id": "zoya.khan",
+      "owner": "zoya.khan",
+      "root_path": "/data/zoya.khan",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.000419",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "kavya.nair": {
+      "workspace_id": "kavya.nair",
+      "owner": "kavya.nair",
+      "root_path": "/data/kavya.nair",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.006415",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "priya.patel": {
+      "workspace_id": "priya.patel",
+      "owner": "priya.patel",
+      "root_path": "/data/priya.patel",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.012290",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "siddharth.rao": {
+      "workspace_id": "siddharth.rao",
+      "owner": "siddharth.rao",
+      "root_path": "/data/siddharth.rao",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.020147",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "diya.shah": {
+      "workspace_id": "diya.shah",
+      "owner": "diya.shah",
+      "root_path": "/data/diya.shah",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.026084",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "meera.krishnan": {
+      "workspace_id": "meera.krishnan",
+      "owner": "meera.krishnan",
+      "root_path": "/data/meera.krishnan",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.032718",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "pooja.joshi": {
+      "workspace_id": "pooja.joshi",
+      "owner": "pooja.joshi",
+      "root_path": "/data/pooja.joshi",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.038325",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "rahul.nair": {
+      "workspace_id": "rahul.nair",
+      "owner": "rahul.nair",
+      "root_path": "/data/rahul.nair",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.044576",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "neha.gupta": {
+      "workspace_id": "neha.gupta",
+      "owner": "neha.gupta",
+      "root_path": "/data/neha.gupta",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.050446",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "nisha.banerjee": {
+      "workspace_id": "nisha.banerjee",
+      "owner": "nisha.banerjee",
+      "root_path": "/data/nisha.banerjee",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:55.057722",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "ravi.verma": {
+      "workspace_id": "ravi.verma",
+      "owner": "ravi.verma",
+      "root_path": "/data/ravi.verma",
+      "file_count": 83,
+      "last_ingested_at": "2026-06-24T17:43:57.410002",
+      "status": "success",
+      "source_coverage": {
+        "processable": 83
+      },
+      "notes": null
+    },
+    "vikram.singh": {
+      "workspace_id": "vikram.singh",
+      "owner": "vikram.singh",
+      "root_path": "/data/vikram.singh",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:57.417034",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "tanvi.desai": {
+      "workspace_id": "tanvi.desai",
+      "owner": "tanvi.desai",
+      "root_path": "/data/tanvi.desai",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:57.424495",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "arjun.menon": {
+      "workspace_id": "arjun.menon",
+      "owner": "arjun.menon",
+      "root_path": "/data/arjun.menon",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:57.435022",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "rohit.sharma": {
+      "workspace_id": "rohit.sharma",
+      "owner": "rohit.sharma",
+      "root_path": "/data/rohit.sharma",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:57.442022",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "saanvi.reddy": {
+      "workspace_id": "saanvi.reddy",
+      "owner": "saanvi.reddy",
+      "root_path": "/data/saanvi.reddy",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:43:57.448538",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    }
+  }
+}
