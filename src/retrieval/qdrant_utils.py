@@ -14,6 +14,8 @@ def make_client(config: RetrievalConfig) -> QdrantClient:
         host=config.qdrant_host,
         port=config.qdrant_port,
         api_key=config.qdrant_api_key,
+        https=False,
+        check_compatibility=False,
     )
 
 

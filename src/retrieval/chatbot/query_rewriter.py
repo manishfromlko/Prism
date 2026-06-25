@@ -3,7 +3,7 @@
 import logging
 from typing import Optional
 
-from ...observability import litellm_metadata
+from ...observability import trace_extra_body
 from ..config import make_openai_client
 from .prompt_loader import load_prompt
 
@@ -27,7 +27,7 @@ class QueryRewriter:
                 ],
                 temperature=0.0,
                 max_tokens=80,
-                extra_body=litellm_metadata(trace_id, "rewrite") if trace_id else None,
+                extra_body=trace_extra_body(trace_id, "rewrite") if trace_id else None,
             )
             rewritten = response.choices[0].message.content.strip()
             logger.debug(f"Query rewritten: '{query}' → '{rewritten}'")

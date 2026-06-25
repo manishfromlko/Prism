@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
+from ..observability import make_llm_client
+
 # Load .env from project root (or any parent directory) automatically.
 # This means callers do not need to set env vars manually in development.
 load_dotenv(override=True)
@@ -46,10 +48,6 @@ class RetrievalConfig(BaseModel):
     agent_max_steps: int = Field(default=4)
     agent_enable_planner_llm: bool = Field(default=False)
 
-    # LiteLLM proxy
-    litellm_base_url: str = Field(default="http://localhost:4000")
-    litellm_api_key: str = Field(default="sk-1234")
-
     @classmethod
     def from_env(cls) -> "RetrievalConfig":
         """Create config from environment variables (after .env is loaded)."""
@@ -74,8 +72,6 @@ class RetrievalConfig(BaseModel):
                 "AGENT_ENABLE_PLANNER_LLM",
                 "false",
             ).lower() in {"1", "true", "yes", "on"},
-            litellm_base_url=os.getenv("LITELLM_BASE_URL", "http://localhost:4000"),
-            litellm_api_key=os.getenv("LITELLM_API_KEY", "sk-1234"),
         )
 
 
@@ -83,8 +79,5 @@ config = RetrievalConfig.from_env()
 
 
 def make_openai_client() -> OpenAI:
-    """Return an OpenAI client, preferring direct OpenAI over LiteLLM."""
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    if openai_api_key:
-        return OpenAI(api_key=openai_api_key)
-    return OpenAI(api_key=config.litellm_api_key, base_url=config.litellm_base_url)
+    """Return a direct OpenAI client with LangSmith tracing when enabled."""
+    return make_llm_client()

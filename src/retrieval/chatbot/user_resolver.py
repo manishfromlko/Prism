@@ -16,7 +16,7 @@ from typing import Dict, List, Optional, Tuple
 
 from rapidfuzz import fuzz
 
-from ...observability import litellm_metadata
+from ...observability import trace_extra_body
 from ..config import make_openai_client
 from ..user_profile_store import UserProfileStore
 from .prompt_loader import load_prompt
@@ -182,7 +182,7 @@ class UserNameResolver:
                 ],
                 temperature=0.0,
                 max_tokens=250,
-                extra_body=litellm_metadata(trace_id, "name_resolve") if trace_id else None,
+                extra_body=trace_extra_body(trace_id, "name_resolve") if trace_id else None,
             )
             answer = response.choices[0].message.content.strip()
         except Exception as e:

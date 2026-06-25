@@ -1,4 +1,4 @@
-"""Generate artifact-level summaries and tags via LiteLLM chat completion."""
+"""Generate artifact-level summaries and tags via direct OpenAI chat completion."""
 
 import json
 import logging

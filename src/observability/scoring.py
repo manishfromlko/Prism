@@ -1,9 +1,7 @@
-"""
-Trace scoring utilities for the RAG pipeline.
+"""Trace scoring utilities for the RAG pipeline.
 
-The LiteLLM proxy automatically logs all LLM API calls to Langfuse (tokens,
-cost, latency, prompt/response).  This module's sole job is posting *scores*
-onto those traces — something the proxy doesn't do on its own.
+LangSmith traces the chat pipeline and nested OpenAI calls. This module posts
+feedback scores onto those LangSmith traces.
 
 Scores posted per request:
   response_length    — normalised answer length (penalises very short/long)
@@ -11,19 +9,19 @@ Scores posted per request:
   intent_confidence  — classifier confidence passed through directly (0–1)
   source_count       — number of retrieved sources, normalised over 5 (0–1)
 
-User-initiated scores (via /observability/feedback):
+User-initiated feedback (via /observability/feedback):
   user_feedback      — thumbs up = 1.0, thumbs down = 0.0
 
 RAGAS-based scoring (faithfulness, context relevance, answer relevance) is
 Layer 2 and is not included here.
 
-All functions are no-ops when LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY are
-unset or contain placeholder values.
+All functions are no-ops when LangSmith tracing is not configured.
 
 Environment variables:
-  LANGFUSE_PUBLIC_KEY  — Langfuse project public key
-  LANGFUSE_SECRET_KEY  — Langfuse project secret key
-  LANGFUSE_HOST        — Langfuse server URL (default http://localhost:3001)
+  LANGSMITH_TRACING  — true/false tracing switch
+  LANGSMITH_API_KEY  — LangSmith API key
+  LANGSMITH_ENDPOINT — LangSmith API endpoint
+  LANGSMITH_PROJECT  — project name
 """
 
 import logging
@@ -37,30 +35,32 @@ _MAX_ANSWER_CHARS = 2000
 _SOURCE_NORM = 5  # 5 sources = score 1.0; scales linearly below that
 
 try:
-    from langfuse import Langfuse
-    _LANGFUSE_AVAILABLE = True
+    from langsmith import Client
+    _LANGSMITH_AVAILABLE = True
 except ImportError:
-    _LANGFUSE_AVAILABLE = False
+    Client = None
+    _LANGSMITH_AVAILABLE = False
 
-_langfuse_instance = None
+_langsmith_instance = None
 
 
-def _get_langfuse():
-    global _langfuse_instance
-    if _langfuse_instance is not None:
-        return _langfuse_instance
-    if not _LANGFUSE_AVAILABLE:
+def _langsmith_enabled() -> bool:
+    enabled = os.getenv("LANGSMITH_TRACING", os.getenv("LANGCHAIN_TRACING_V2", "false"))
+    api_key = os.getenv("LANGSMITH_API_KEY", os.getenv("LANGCHAIN_API_KEY", ""))
+    return enabled.lower() in {"1", "true", "yes", "on"} and bool(api_key)
+
+
+def _get_langsmith():
+    global _langsmith_instance
+    if _langsmith_instance is not None:
+        return _langsmith_instance
+    if not _LANGSMITH_AVAILABLE or not _langsmith_enabled() or Client is None:
         return None
-    pk = os.getenv("LANGFUSE_PUBLIC_KEY", "")
-    sk = os.getenv("LANGFUSE_SECRET_KEY", "")
-    if not pk or pk.startswith("your-"):
-        return None
-    _langfuse_instance = Langfuse(
-        public_key=pk,
-        secret_key=sk,
-        host=os.getenv("LANGFUSE_HOST", "http://localhost:3001"),
+    _langsmith_instance = Client(
+        api_url=os.getenv("LANGSMITH_ENDPOINT", os.getenv("LANGCHAIN_ENDPOINT")),
+        api_key=os.getenv("LANGSMITH_API_KEY", os.getenv("LANGCHAIN_API_KEY")),
     )
-    return _langfuse_instance
+    return _langsmith_instance
 
 
 def score_trace(
@@ -69,14 +69,15 @@ def score_trace(
     value: float,
     comment: Optional[str] = None,
 ) -> None:
-    """Post a named numeric score to a Langfuse trace. value must be in [0, 1]."""
-    lf = _get_langfuse()
-    if not lf or not trace_id:
+    """Post a named numeric feedback score to a LangSmith trace."""
+    client = _get_langsmith()
+    if not client or not trace_id:
         return
     try:
-        lf.create_score(
+        client.create_feedback(
             trace_id=trace_id,
-            name=name,
+            key=name,
+            score=round(float(value), 4),
             value=round(float(value), 4),
             comment=comment,
         )
@@ -88,7 +89,7 @@ def score_trace(
 def score_user_feedback(trace_id: str, thumbs_up: bool) -> None:
     """
     Record binary user feedback (thumbs up = 1.0, thumbs down = 0.0).
-    Appears in Langfuse as score name 'user_feedback'.
+    Appears in LangSmith as feedback key 'user_feedback'.
     """
     score_trace(
         trace_id=trace_id,
@@ -96,9 +97,6 @@ def score_user_feedback(trace_id: str, thumbs_up: bool) -> None:
         value=1.0 if thumbs_up else 0.0,
         comment="thumbs_up" if thumbs_up else "thumbs_down",
     )
-    lf = _get_langfuse()
-    if lf:
-        lf.flush()
 
 
 def score_response_quality(
@@ -118,7 +116,7 @@ def score_response_quality(
       source_count      — retrieved sources / _SOURCE_NORM, capped at 1.0
 
     Args:
-        trace_id:    Langfuse trace ID to attach scores to.
+        trace_id:    LangSmith trace ID to attach scores to.
         answer:      Final answer text returned to the user.
         intent:      Resolved intent string (DOC_QA, ARTIFACT_SEARCH, etc.).
         confidence:  Classifier confidence in [0, 1].
@@ -157,6 +155,3 @@ def score_response_quality(
     score_trace(trace_id, "has_content",        has_content,             f"intent={intent}")
     score_trace(trace_id, "intent_confidence",  min(1.0, float(confidence)), f"intent={intent}")
     score_trace(trace_id, "source_count",       src_score,               f"sources={source_count}")
-    lf = _get_langfuse()
-    if lf:
-        lf.flush()
