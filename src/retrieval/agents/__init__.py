@@ -2,6 +2,7 @@
 
 from .orchestrator import OrchestratorAgent
 from .people import PeopleProfileAgent
+from .tools import RetrievalToolbelt
 from .types import AgentContext, AgentStep, AgentToolResult
 
 __all__ = [
@@ -10,4 +11,5 @@ __all__ = [
     "AgentToolResult",
     "OrchestratorAgent",
     "PeopleProfileAgent",
+    "RetrievalToolbelt",
 ]

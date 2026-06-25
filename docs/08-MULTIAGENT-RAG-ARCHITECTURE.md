@@ -106,6 +106,8 @@ back to the legacy engine until the tool layer is introduced.
 Wrap existing document, artifact, and user retrievers in typed tools. Tools
 return structured evidence instead of raw retriever payloads.
 
+Status: implemented as `RetrievalToolbelt`; planner integration is pending.
+
 ### Feature 5: Planner and Multi-Step Answers
 
 Add an orchestrator planner that can call multiple agents for hybrid requests,
