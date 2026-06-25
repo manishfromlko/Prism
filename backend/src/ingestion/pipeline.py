@@ -115,9 +115,6 @@ class IngestionPipeline:
                 capture_source={"source_path": str(path.resolve())},
             )
 
-            if file_type == FileType.UNSUPPORTED:
-                continue
-
             if classification["decision"] == "skipped":
                 artifact.ingestion_status = IngestionStatus.SKIPPED
                 audit = IngestionAudit(
@@ -136,6 +133,9 @@ class IngestionPipeline:
                 )
                 self.storage.write_audit(audit)
                 self.storage.write_artifact(artifact)
+                continue
+
+            if file_type == FileType.UNSUPPORTED:
                 continue
 
             if file_type == FileType.NOTEBOOK:
