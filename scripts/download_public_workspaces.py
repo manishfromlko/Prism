@@ -10,6 +10,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATASET = ROOT / "data" / "workspaces"
+DEFAULT_WORKSPACES = {
+    "aarav.mehra",
+    "aarav.mehraa",
+    "ananya2.iyer",
+    "anaya.iyer",
+    "diya.shah",
+}
 
 SOURCES = [
     {
@@ -288,7 +295,7 @@ def write_readme(workspace: Path, item: dict[str, str]) -> None:
 
 def main() -> None:
     manifest = []
-    for item in SOURCES:
+    for item in (source for source in SOURCES if source["workspace"] in DEFAULT_WORKSPACES):
         workspace = DATASET / item["workspace"]
         destination = workspace / item["path"]
         curl_download(item["url"], destination)

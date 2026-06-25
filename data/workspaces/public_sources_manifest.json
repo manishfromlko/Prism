@@ -2,191 +2,23 @@
   {
     "workspace": "aarav.mehra",
     "focus": "Spark ETL and word-count exploration",
-    "local_path": "dataset/aarav.mehra/spark/wordcount.py",
+    "local_path": "data/workspaces/aarav.mehra/spark/wordcount.py",
     "source_project": "Apache Spark",
     "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/wordcount.py",
     "license": "Apache-2.0"
   },
   {
-    "workspace": "ananya.iyer",
-    "focus": "Spark SQL data discovery",
-    "local_path": "dataset/ananya.iyer/spark_sql/basic.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/sql/basic.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "arjun.menon",
-    "focus": "Spark datasource profiling",
-    "local_path": "dataset/arjun.menon/spark_sql/datasource.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/sql/datasource.py",
-    "license": "Apache-2.0"
-  },
-  {
     "workspace": "diya.shah",
     "focus": "Customer clustering with Spark ML",
-    "local_path": "dataset/diya.shah/spark_ml/kmeans_example.py",
+    "local_path": "data/workspaces/diya.shah/spark_ml/kmeans_example.py",
     "source_project": "Apache Spark",
     "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/ml/kmeans_example.py",
     "license": "Apache-2.0"
   },
   {
-    "workspace": "ishaan.kapoor",
-    "focus": "Classification model comparison in Spark",
-    "local_path": "dataset/ishaan.kapoor/spark_ml/random_forest_classifier_example.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/ml/random_forest_classifier_example.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "kavya.nair",
-    "focus": "Logistic regression experiment tracking",
-    "local_path": "dataset/kavya.nair/spark_ml/logistic_regression_with_elastic_net.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/ml/logistic_regression_with_elastic_net.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "meera.krishnan",
-    "focus": "Feature pipeline prototyping",
-    "local_path": "dataset/meera.krishnan/spark_ml/pipeline_example.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/ml/pipeline_example.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "neha.gupta",
-    "focus": "Recommendation modeling with ALS",
-    "local_path": "dataset/neha.gupta/spark_ml/als_example.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/ml/als_example.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "priya.patel",
-    "focus": "Distributed k-means with Spark MLlib",
-    "local_path": "dataset/priya.patel/mllib/k_means_example.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/k_means_example.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "rahul.nair",
-    "focus": "Collaborative filtering in Spark MLlib",
-    "local_path": "dataset/rahul.nair/mllib/recommendation_example.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/recommendation_example.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "rohit.sharma",
-    "focus": "Streaming text analytics",
-    "local_path": "dataset/rohit.sharma/streaming/network_wordcount.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/streaming/network_wordcount.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "saanvi.reddy",
-    "focus": "MLflow regression experiment",
-    "local_path": "dataset/saanvi.reddy/mlflow/sklearn_elasticnet_wine_train.py",
-    "source_project": "MLflow",
-    "source_url": "https://raw.githubusercontent.com/mlflow/mlflow/master/examples/sklearn_elasticnet_wine/train.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "siddharth.rao",
-    "focus": "Hyperparameter search workflow",
-    "local_path": "dataset/siddharth.rao/mlflow/hyperparam_train.py",
-    "source_project": "MLflow",
-    "source_url": "https://raw.githubusercontent.com/mlflow/mlflow/master/examples/hyperparam/train.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "tanvi.desai",
-    "focus": "PyTorch autologging experiment",
-    "local_path": "dataset/tanvi.desai/mlflow/mnist_autolog_example.py",
-    "source_project": "MLflow",
-    "source_url": "https://raw.githubusercontent.com/mlflow/mlflow/master/examples/pytorch/MNIST/mnist_autolog_example.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "vikram.singh",
-    "focus": "Classifier benchmarking",
-    "local_path": "dataset/vikram.singh/sklearn/classifier_comparison.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/classification/plot_classifier_comparison.py",
-    "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "zoya.khan",
-    "focus": "Clustering digits for discovery",
-    "local_path": "dataset/zoya.khan/sklearn/kmeans_digits.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/cluster/plot_kmeans_digits.py",
-    "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "nisha.banerjee",
-    "focus": "Grid search model selection",
-    "local_path": "dataset/nisha.banerjee/sklearn/grid_search_digits.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/model_selection/plot_grid_search_digits.py",
-    "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "karan.malhotra",
-    "focus": "Feature importance analysis",
-    "local_path": "dataset/karan.malhotra/sklearn/forest_importances.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/ensemble/plot_forest_importances.py",
-    "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "pooja.joshi",
-    "focus": "Feature selection pipelines",
-    "local_path": "dataset/pooja.joshi/sklearn/feature_selection_pipeline.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/feature_selection/plot_feature_selection_pipeline.py",
-    "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "aditya.kulkarni",
-    "focus": "Preprocessing and scaling analysis",
-    "local_path": "dataset/aditya.kulkarni/sklearn/scaling_importance.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/preprocessing/plot_scaling_importance.py",
-    "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "priya2.patel",
-    "focus": "Distributed linear regression with Spark MLlib",
-    "local_path": "dataset/priya2.patel/mllib/linear_regression_with_sgd_example.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/linear_regression_with_sgd_example.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "priyam.patel",
-    "focus": "Decision-tree classification in Spark MLlib",
-    "local_path": "dataset/priyam.patel/mllib/decision_tree_classification_example.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/decision_tree_classification_example.py",
-    "license": "Apache-2.0"
-  },
-  {
-    "workspace": "priyanka.patel",
-    "focus": "Frequent-pattern mining for data discovery",
-    "local_path": "dataset/priyanka.patel/mllib/fpgrowth_example.py",
-    "source_project": "Apache Spark",
-    "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/fpgrowth_example.py",
-    "license": "Apache-2.0"
-  },
-  {
     "workspace": "ananya2.iyer",
     "focus": "Principal component analysis with distributed matrices",
-    "local_path": "dataset/ananya2.iyer/mllib/pca_rowmatrix_example.py",
+    "local_path": "data/workspaces/ananya2.iyer/mllib/pca_rowmatrix_example.py",
     "source_project": "Apache Spark",
     "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/pca_rowmatrix_example.py",
     "license": "Apache-2.0"
@@ -194,49 +26,17 @@
   {
     "workspace": "anaya.iyer",
     "focus": "Text feature extraction using TF-IDF",
-    "local_path": "dataset/anaya.iyer/mllib/tf_idf_example.py",
+    "local_path": "data/workspaces/anaya.iyer/mllib/tf_idf_example.py",
     "source_project": "Apache Spark",
     "source_url": "https://raw.githubusercontent.com/apache/spark/master/examples/src/main/python/mllib/tf_idf_example.py",
     "license": "Apache-2.0"
   },
   {
-    "workspace": "arjun2.menon",
-    "focus": "Lasso model selection for regression",
-    "local_path": "dataset/arjun2.menon/sklearn/lasso_model_selection.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/linear_model/plot_lasso_model_selection.py",
-    "license": "BSD-3-Clause"
-  },
-  {
     "workspace": "aarav.mehraa",
     "focus": "Principal component visualization for discovery",
-    "local_path": "dataset/aarav.mehraa/sklearn/pca_iris.py",
+    "local_path": "data/workspaces/aarav.mehraa/sklearn/pca_iris.py",
     "source_project": "scikit-learn",
     "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/decomposition/plot_pca_iris.py",
     "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "kavya.nairr",
-    "focus": "Density-based clustering and anomaly discovery",
-    "local_path": "dataset/kavya.nairr/sklearn/dbscan.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/cluster/plot_dbscan.py",
-    "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "rahul.nayar",
-    "focus": "Gradient boosting regression and feature importance",
-    "local_path": "dataset/rahul.nayar/sklearn/gradient_boosting_regression.py",
-    "source_project": "scikit-learn",
-    "source_url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/examples/ensemble/plot_gradient_boosting_regression.py",
-    "license": "BSD-3-Clause"
-  },
-  {
-    "workspace": "rohit.sharmma",
-    "focus": "MLflow logistic regression experiment logging",
-    "local_path": "dataset/rohit.sharmma/mlflow/sklearn_logistic_regression_train.py",
-    "source_project": "MLflow",
-    "source_url": "https://raw.githubusercontent.com/mlflow/mlflow/master/examples/sklearn_logistic_regression/train.py",
-    "license": "Apache-2.0"
   }
 ]
