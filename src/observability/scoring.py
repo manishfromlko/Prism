@@ -28,6 +28,8 @@ import logging
 import os
 from typing import Optional
 
+from .mlflow_tracing import log_mlflow_score
+
 logger = logging.getLogger(__name__)
 
 _MIN_ANSWER_CHARS = 50
@@ -69,7 +71,9 @@ def score_trace(
     value: float,
     comment: Optional[str] = None,
 ) -> None:
-    """Post a named numeric feedback score to a LangSmith trace."""
+    """Post a named numeric feedback score to configured tracing backends."""
+    log_mlflow_score(trace_id, name, round(float(value), 4), comment)
+
     client = _get_langsmith()
     if not client or not trace_id:
         return

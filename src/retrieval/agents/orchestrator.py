@@ -6,6 +6,7 @@ import logging
 import uuid
 from typing import Dict, Optional
 
+from ...observability import mlflow_chat_trace, record_mlflow_chat_output
 from ..chatbot.engine import ChatEngine
 from .people import PeopleProfileAgent
 from .types import AgentContext
@@ -39,6 +40,17 @@ class OrchestratorAgent:
         )
 
     def run(
+        self,
+        query: str,
+        history: Optional[list[dict]] = None,
+        session_id: Optional[str] = None,
+    ) -> Dict:
+        with mlflow_chat_trace(query=query, history=history, session_id=session_id) as mlflow_span:
+            result = self._run_once(query=query, history=history, session_id=session_id)
+            record_mlflow_chat_output(mlflow_span, result)
+            return result
+
+    def _run_once(
         self,
         query: str,
         history: Optional[list[dict]] = None,
