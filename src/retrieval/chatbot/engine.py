@@ -40,6 +40,7 @@ from ..user_profile_store import UserProfileStore
 from .classifier import IntentClassifier
 from .doc_store import DocumentChunkStore
 from .formatter import format_response
+from .memory import resolve_user_from_context
 from .prompts import (
     build_artifact_search_messages,
     build_doc_qa_messages,
@@ -121,6 +122,26 @@ class ChatEngine:
         # 4. USER_SEARCH: name resolution first, vector retrieval only as fallback
         if intent == "USER_SEARCH":
             all_ids = self.user_store.get_all_user_ids()
+            contextual_uid = resolve_user_from_context(query, history, all_ids)
+            if contextual_uid:
+                profile = self.user_store.get_profile(contextual_uid)
+                if profile:
+                    answer = f"**{contextual_uid}**\n\n{profile['user_profile']}"
+                    result = format_response(
+                        answer=answer,
+                        intent="USER_SEARCH",
+                        confidence=1.0,
+                        raw_users=[profile],
+                        exact_match=True,
+                    )
+                    result["trace_id"] = trace_id
+                    evaluate_in_background(
+                        trace_id, query, answer,
+                        intent="USER_SEARCH",
+                        exact_match=True,
+                    )
+                    return result
+
             name_candidates = retrieve_candidates(query, all_ids)
 
             if name_candidates:
