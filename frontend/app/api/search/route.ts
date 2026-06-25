@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     const raw = await res.json()
 
-    // Transform Python response → webapp SearchResult shape
+    // Transform Python response into the frontend SearchResult shape.
     const data = (raw.results ?? []).map((r: any) => {
       const meta = r.metadata ?? {}
       const filePath: string = meta.path ?? ''

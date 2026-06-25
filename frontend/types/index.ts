@@ -1,5 +1,4 @@
-// Core data models for the webapp frontend
-// Based on specs/003-webapp-frontend/data-model.md
+// Core data models for the frontend.
 
 // Workspace types
 export interface Workspace {

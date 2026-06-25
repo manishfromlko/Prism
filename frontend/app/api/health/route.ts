@@ -14,7 +14,7 @@ export async function GET() {
     const raw = await res.json()
     const now = new Date().toISOString()
 
-    // Transform Python health shape → webapp HealthStatus shape
+    // Transform Python health shape into the frontend HealthStatus shape.
     const services = [
       {
         name: 'vector_store',
