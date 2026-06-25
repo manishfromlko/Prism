@@ -2,12 +2,14 @@ import importlib.util
 import os
 import sys
 import types as pytypes
+from contextlib import contextmanager
 from pathlib import Path
 
 
 os.environ["MLFLOW_TRACING"] = "false"
 
 AGENTS_ROOT = Path(__file__).resolve().parents[3] / "src" / "retrieval" / "agents"
+SRC_ROOT = Path(__file__).resolve().parents[3] / "src"
 
 
 def load_module(name: str, path: Path, package: str | None = None):
@@ -21,10 +23,29 @@ def load_module(name: str, path: Path, package: str | None = None):
     return module
 
 
-sys.modules.setdefault("src", pytypes.ModuleType("src"))
-sys.modules.setdefault("src.retrieval", pytypes.ModuleType("src.retrieval"))
-sys.modules.setdefault("src.retrieval.agents", pytypes.ModuleType("src.retrieval.agents"))
-sys.modules.setdefault("src.retrieval.chatbot", pytypes.ModuleType("src.retrieval.chatbot"))
+src_module = sys.modules.setdefault("src", pytypes.ModuleType("src"))
+src_module.__path__ = [str(SRC_ROOT)]
+retrieval_module = sys.modules.setdefault("src.retrieval", pytypes.ModuleType("src.retrieval"))
+retrieval_module.__path__ = [str(SRC_ROOT / "retrieval")]
+agents_module = sys.modules.setdefault("src.retrieval.agents", pytypes.ModuleType("src.retrieval.agents"))
+agents_module.__path__ = [str(SRC_ROOT / "retrieval" / "agents")]
+chatbot_module = sys.modules.setdefault("src.retrieval.chatbot", pytypes.ModuleType("src.retrieval.chatbot"))
+chatbot_module.__path__ = [str(SRC_ROOT / "retrieval" / "chatbot")]
+
+observability_module = pytypes.ModuleType("src.observability")
+
+
+@contextmanager
+def noop_trace(*args, **kwargs):
+    yield None
+
+
+observability_module.is_langsmith_enabled = lambda: False
+observability_module.make_llm_client = lambda *args, **kwargs: None
+observability_module.mlflow_chat_trace = noop_trace
+observability_module.record_mlflow_chat_output = lambda *args, **kwargs: None
+observability_module.trace_extra_body = lambda *args, **kwargs: {}
+sys.modules["src.observability"] = observability_module
 
 engine_module = pytypes.ModuleType("src.retrieval.chatbot.engine")
 engine_module.ChatEngine = object

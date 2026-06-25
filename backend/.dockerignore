@@ -5,8 +5,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 tests/
-uv.lock
-pyproject.toml
+requirements.txt
 *.log
 .env
 .env.*

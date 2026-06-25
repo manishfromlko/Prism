@@ -3,23 +3,27 @@ name = "project-1"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "fastapi>=0.100.0",
     "langchain>=0.1.0",
     "langchain-core>=0.1.0",
     "langchain-openai>=0.1.0",
     "langsmith>=0.4.0",
-    "mlflow>=3.14.0",
+    "mlflow-skinny>=3.14.0",
     "openai>=1.0.0",
     "psutil>=7.2.2",
     "pydantic>=2.0.0",
     "python-docx>=1.2.0",
     "python-dotenv>=1.0.0",
     "qdrant-client>=1.9.0",
-    "ragas>=0.2.0",
     "rapidfuzz>=3.14.5",
     "uvicorn>=0.23.0",
+]
+
+[project.optional-dependencies]
+eval = [
+    "ragas>=0.2.0",
 ]
 
 [dependency-groups]

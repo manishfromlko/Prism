@@ -6,12 +6,14 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 ENV VIRTUAL_ENV=/opt/venv
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-COPY requirements.txt ./
+COPY pyproject.toml uv.lock ./
 RUN python -m venv /opt/venv \
   && pip install --upgrade pip \
-  && pip install -r requirements.txt
+  && pip install uv \
+  && uv sync --frozen --no-dev --no-install-project
 
 FROM python:3.12-slim AS runner
 
