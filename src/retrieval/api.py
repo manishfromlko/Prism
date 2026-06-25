@@ -20,6 +20,7 @@ from .profile_indexer import run_profile_indexing
 from .profile_from_summaries_indexer import run_profile_indexing_from_summaries
 from .artifact_summary_store import ArtifactSummaryStore
 from .artifact_summary_indexer import run_artifact_summary_indexing
+from .agents import OrchestratorAgent
 from .chatbot import ChatEngine, DocumentChunkStore, ingest_platform_docs
 
 logger = logging.getLogger(__name__)
@@ -91,6 +92,7 @@ user_profile_store: Optional[UserProfileStore] = None
 artifact_summary_store: Optional[ArtifactSummaryStore] = None
 doc_chunk_store: Optional[DocumentChunkStore] = None
 chat_engine: Optional[ChatEngine] = None
+orchestrator_agent: Optional[OrchestratorAgent] = None
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -119,7 +121,7 @@ app = create_app()
 
 @app.on_event("startup")
 async def startup_event():
-    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store, doc_chunk_store, chat_engine
+    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store, doc_chunk_store, chat_engine, orchestrator_agent
     try:
         config = RetrievalConfig.from_env()
         vector_store = VectorStore(config)
@@ -160,11 +162,17 @@ async def startup_event():
                     embedding_service=embedding_service,
                     llm_model=config.profile_llm_model,
                 )
+                orchestrator_agent = OrchestratorAgent(
+                    chat_engine=chat_engine,
+                    max_steps=config.agent_max_steps,
+                    planner_enabled=config.agent_enable_planner_llm,
+                )
                 logger.info("Chat engine initialized")
         except Exception as e:
             logger.warning(f"Chat engine not ready: {e}")
             doc_chunk_store = None
             chat_engine = None
+            orchestrator_agent = None
 
         # Pre-warm the catalog cache
         try:
@@ -688,9 +696,26 @@ async def chat(request: ChatRequest):
         import asyncio
         history_dicts = [{"role": m.role, "content": m.content} for m in request.history]
         loop = asyncio.get_event_loop()
+        use_orchestrator = (
+            config is not None
+            and config.chat_agent_mode.lower() == "orchestrated"
+            and orchestrator_agent is not None
+        )
         result = await loop.run_in_executor(
             None,
-            lambda: chat_engine.chat(request.query, history_dicts, session_id=request.session_id),
+            lambda: (
+                orchestrator_agent.run(
+                    request.query,
+                    history_dicts,
+                    session_id=request.session_id,
+                )
+                if use_orchestrator
+                else chat_engine.chat(
+                    request.query,
+                    history_dicts,
+                    session_id=request.session_id,
+                )
+            ),
         )
         return ChatResponse(
             answer=result["answer"],

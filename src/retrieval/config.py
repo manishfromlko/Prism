@@ -41,6 +41,11 @@ class RetrievalConfig(BaseModel):
     # LLM for user profile generation (chat completion, not embeddings)
     profile_llm_model: str = Field(default="gpt-4o-mini")
 
+    # Chat runtime
+    chat_agent_mode: str = Field(default="legacy")
+    agent_max_steps: int = Field(default=4)
+    agent_enable_planner_llm: bool = Field(default=False)
+
     # LiteLLM proxy
     litellm_base_url: str = Field(default="http://localhost:4000")
     litellm_api_key: str = Field(default="sk-1234")
@@ -63,6 +68,12 @@ class RetrievalConfig(BaseModel):
                 "dataset/.ingestion/ingestion_catalog.json",
             ),
             profile_llm_model=os.getenv("PROFILE_LLM_MODEL", "gpt-4o-mini"),
+            chat_agent_mode=os.getenv("CHAT_AGENT_MODE", "legacy"),
+            agent_max_steps=int(os.getenv("AGENT_MAX_STEPS", "4")),
+            agent_enable_planner_llm=os.getenv(
+                "AGENT_ENABLE_PLANNER_LLM",
+                "false",
+            ).lower() in {"1", "true", "yes", "on"},
             litellm_base_url=os.getenv("LITELLM_BASE_URL", "http://localhost:4000"),
             litellm_api_key=os.getenv("LITELLM_API_KEY", "sk-1234"),
         )

@@ -89,6 +89,9 @@ Introduce agent dataclasses and a minimal orchestrator behind the existing
 `/chat` endpoint. The first version delegates to the current `ChatEngine` so the
 external behavior remains stable.
 
+Status: implemented behind `CHAT_AGENT_MODE=orchestrated`; default remains
+`legacy`.
+
 ### Feature 3: People/Profile Agent
 
 Move the current user-name resolution and profile lookup flow into a dedicated
@@ -127,4 +130,3 @@ The rollout should use environment variables:
 | `CHAT_AGENT_MODE` | `legacy` | `legacy` uses current `ChatEngine`; `orchestrated` uses the multi-agent path. |
 | `AGENT_MAX_STEPS` | `4` | Maximum orchestrator tool/agent steps per chat turn. |
 | `AGENT_ENABLE_PLANNER_LLM` | `false` | Enables LLM-based planning after deterministic agents are stable. |
-
