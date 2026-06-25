@@ -42,7 +42,7 @@ services:
 
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: kubeflow-backend
     ports:
@@ -58,26 +58,25 @@ services:
       - MLFLOW_EXPERIMENT_NAME=${MLFLOW_EXPERIMENT_NAME:-rag-chatbot-legacy}
       - EMBEDDING_MODEL=text-embedding-3-small
       - EMBEDDING_DIMENSION=1536
-      - INGESTION_CATALOG_PATH=/data/.ingestion/ingestion_catalog.json
+      - INGESTION_CATALOG_PATH=/app/data/workspaces/.ingestion/ingestion_catalog.json
+      - PLATFORM_DOCS_DIR=/app/data/platform_documents
     depends_on:
       qdrant:
         condition: service_healthy
       mlflow:
         condition: service_started
     volumes:
-      - ./src:/app/src:ro
-      - ./requirements.txt:/app/requirements.txt:ro
-      - ./dataset:/data
-      - ./platform_documents:/app/platform_documents:ro
-      - ./prompts:/app/prompts:ro
+      - ./backend/src:/app/src:ro
+      - ./backend/prompts:/app/prompts:ro
+      - ./data:/app/data
 
-  webapp:
+  frontend:
     build:
-      context: ./webapp
+      context: ./frontend
       dockerfile: Dockerfile
       args:
         PYTHON_API_URL: http://backend:8000
-    container_name: kubeflow-webapp
+    container_name: kubeflow-frontend
     ports:
       - "3000:3000"
     environment:

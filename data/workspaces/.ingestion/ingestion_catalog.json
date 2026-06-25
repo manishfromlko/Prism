@@ -1,0 +1,2021 @@
+{
+  "artifacts": {
+    "anaya.iyer:README.md": {
+      "artifact_id": "anaya.iyer:README.md",
+      "workspace_id": "anaya.iyer",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 376,
+      "last_modified_at": "2026-06-24T17:59:33.098018",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "31fc9cba2d78dac5d22b05be8dc56830257452faa937726b52c4c4c25b0a2907",
+      "capture_source": {
+        "source_path": "data/workspaces/anaya.iyer/README.md"
+      }
+    },
+    "anaya.iyer:mllib/tf_idf_example.py": {
+      "artifact_id": "anaya.iyer:mllib/tf_idf_example.py",
+      "workspace_id": "anaya.iyer",
+      "relative_path": "mllib/tf_idf_example.py",
+      "file_name": "tf_idf_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2027,
+      "last_modified_at": "2026-06-24T17:59:33.094677",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark",
+            "pyspark.mllib.feature"
+          ]
+        }
+      },
+      "content_hash": "fcbd8987563557553f038e34213505a2fe8da9a9a54cc4a9684baa8a901ec08a",
+      "capture_source": {
+        "source_path": "data/workspaces/anaya.iyer/mllib/tf_idf_example.py"
+      }
+    },
+    "karan.malhotra:README.md": {
+      "artifact_id": "karan.malhotra:README.md",
+      "workspace_id": "karan.malhotra",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 380,
+      "last_modified_at": "2026-06-24T17:59:31.734406",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "e68d3df84644572b952fc7687765580531c9c8a77f001504d2d4c1a611c09c7a",
+      "capture_source": {
+        "source_path": "data/workspaces/karan.malhotra/README.md"
+      }
+    },
+    "karan.malhotra:sklearn/forest_importances.py": {
+      "artifact_id": "karan.malhotra:sklearn/forest_importances.py",
+      "workspace_id": "karan.malhotra",
+      "relative_path": "sklearn/forest_importances.py",
+      "file_name": "forest_importances.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 4260,
+      "last_modified_at": "2026-06-24T17:59:31.730214",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "sklearn.datasets",
+            "sklearn.ensemble",
+            "sklearn.inspection",
+            "sklearn.model_selection",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "6143e0e588f5e57d1809220592d8f81e6365b34fda34bbab7490ed7055cf73d6",
+      "capture_source": {
+        "source_path": "data/workspaces/karan.malhotra/sklearn/forest_importances.py"
+      }
+    },
+    "ishaan.kapoor:README.md": {
+      "artifact_id": "ishaan.kapoor:README.md",
+      "workspace_id": "ishaan.kapoor",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 398,
+      "last_modified_at": "2026-06-24T17:59:25.692181",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "d6a6d2c93239b51d41a8a49019380b5f6cf723c5db8ed934709551baf427098c",
+      "capture_source": {
+        "source_path": "data/workspaces/ishaan.kapoor/README.md"
+      }
+    },
+    "ishaan.kapoor:spark_ml/random_forest_classifier_example.py": {
+      "artifact_id": "ishaan.kapoor:spark_ml/random_forest_classifier_example.py",
+      "workspace_id": "ishaan.kapoor",
+      "relative_path": "spark_ml/random_forest_classifier_example.py",
+      "file_name": "random_forest_classifier_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 3195,
+      "last_modified_at": "2026-06-24T17:59:25.687249",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.ml",
+            "pyspark.ml.classification",
+            "pyspark.ml.evaluation",
+            "pyspark.ml.feature",
+            "pyspark.sql",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "36744f60160875d62452bdd47824947e3472093ea9126dc5a9d1a1d056923767",
+      "capture_source": {
+        "source_path": "data/workspaces/ishaan.kapoor/spark_ml/random_forest_classifier_example.py"
+      }
+    },
+    "priyanka.patel:README.md": {
+      "artifact_id": "priyanka.patel:README.md",
+      "workspace_id": "priyanka.patel",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 388,
+      "last_modified_at": "2026-06-24T17:59:32.938828",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "50c3cf5fa7437b833b50ef683e2f75824a94fc2cb205d552e971a64f784597f0",
+      "capture_source": {
+        "source_path": "data/workspaces/priyanka.patel/README.md"
+      }
+    },
+    "priyanka.patel:mllib/fpgrowth_example.py": {
+      "artifact_id": "priyanka.patel:mllib/fpgrowth_example.py",
+      "workspace_id": "priyanka.patel",
+      "relative_path": "mllib/fpgrowth_example.py",
+      "file_name": "fpgrowth_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1280,
+      "last_modified_at": "2026-06-24T17:59:32.935291",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark",
+            "pyspark.mllib.fpm"
+          ]
+        }
+      },
+      "content_hash": "aaedf5c55ed5c6dd637fb4e11ae7b9ab254c083c31e519012958c667bb756abe",
+      "capture_source": {
+        "source_path": "data/workspaces/priyanka.patel/mllib/fpgrowth_example.py"
+      }
+    },
+    "ananya.iyer:README.md": {
+      "artifact_id": "ananya.iyer:README.md",
+      "workspace_id": "ananya.iyer",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 354,
+      "last_modified_at": "2026-06-24T17:59:23.276407",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "2c730a821736a51cd0c7c28c81b02ec514d1d7173a54336d21711b11517ce238",
+      "capture_source": {
+        "source_path": "data/workspaces/ananya.iyer/README.md"
+      }
+    },
+    "ananya.iyer:spark_sql/basic.py": {
+      "artifact_id": "ananya.iyer:spark_sql/basic.py",
+      "workspace_id": "ananya.iyer",
+      "relative_path": "spark_sql/basic.py",
+      "file_name": "basic.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 6331,
+      "last_modified_at": "2026-06-24T17:59:23.270663",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "global_temp.people",
+            "people",
+            "pyspark.sql",
+            "pyspark.sql.types",
+            "the"
+          ]
+        }
+      },
+      "content_hash": "16444bb118ea5267e3d7cc653d10f90869080b966dd4b1b8147942e677e9f1e9",
+      "capture_source": {
+        "source_path": "data/workspaces/ananya.iyer/spark_sql/basic.py"
+      }
+    },
+    "aarav.mehra:README.md": {
+      "artifact_id": "aarav.mehra:README.md",
+      "workspace_id": "aarav.mehra",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 366,
+      "last_modified_at": "2026-06-24T17:59:22.850165",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "d73dd1cf05f1270ba3ff63c30161066e9190617e8501238e7d19e096353441e7",
+      "capture_source": {
+        "source_path": "data/workspaces/aarav.mehra/README.md"
+      }
+    },
+    "aarav.mehra:spark/wordcount.py": {
+      "artifact_id": "aarav.mehra:spark/wordcount.py",
+      "workspace_id": "aarav.mehra",
+      "relative_path": "spark/wordcount.py",
+      "file_name": "wordcount.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1418,
+      "last_modified_at": "2026-06-24T17:59:22.844579",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "operator",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "246e774adcc1d27bc116bb7338eb532d0be7a459960a033cb8807ab6cc9745ce",
+      "capture_source": {
+        "source_path": "data/workspaces/aarav.mehra/spark/wordcount.py"
+      }
+    },
+    "priyam.patel:README.md": {
+      "artifact_id": "priyam.patel:README.md",
+      "workspace_id": "priyam.patel",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 407,
+      "last_modified_at": "2026-06-24T17:59:32.860447",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "30cf3a240a615d1f97fc5c6d5fd07c032e2edb5bce81780c4f80a5d388b4480e",
+      "capture_source": {
+        "source_path": "data/workspaces/priyam.patel/README.md"
+      }
+    },
+    "priyam.patel:mllib/decision_tree_classification_example.py": {
+      "artifact_id": "priyam.patel:mllib/decision_tree_classification_example.py",
+      "workspace_id": "priyam.patel",
+      "relative_path": "mllib/decision_tree_classification_example.py",
+      "file_name": "decision_tree_classification_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2333,
+      "last_modified_at": "2026-06-24T17:59:32.856835",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark"
+          ],
+          "databases": [],
+          "tables": [
+            "an",
+            "pyspark",
+            "pyspark.mllib.tree",
+            "pyspark.mllib.util",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "a9b1efe26098aec34b968c699a390a99de81b6a95e8ad5e2d4b1b12319b2f6e2",
+      "capture_source": {
+        "source_path": "data/workspaces/priyam.patel/mllib/decision_tree_classification_example.py"
+      }
+    },
+    "aditya.kulkarni:README.md": {
+      "artifact_id": "aditya.kulkarni:README.md",
+      "workspace_id": "aditya.kulkarni",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 393,
+      "last_modified_at": "2026-06-24T17:59:32.693023",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "e6a22b76528a74fba7d73fb40cdeb1632639bcb9eb69a1671c5689a432d54800",
+      "capture_source": {
+        "source_path": "data/workspaces/aditya.kulkarni/README.md"
+      }
+    },
+    "aditya.kulkarni:sklearn/scaling_importance.py": {
+      "artifact_id": "aditya.kulkarni:sklearn/scaling_importance.py",
+      "workspace_id": "aditya.kulkarni",
+      "relative_path": "sklearn/scaling_importance.py",
+      "file_name": "scaling_importance.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 10283,
+      "last_modified_at": "2026-06-24T17:59:32.669755",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "matplotlib.colors",
+            "sklearn.datasets",
+            "sklearn.decomposition",
+            "sklearn.inspection",
+            "sklearn.linear_model",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "sklearn.neighbors",
+            "sklearn.pipeline",
+            "sklearn.preprocessing",
+            "the"
+          ]
+        }
+      },
+      "content_hash": "102afe52c87fce0eb89996adab21a25b3363aa985ce24332e24cbc6c548bffcf",
+      "capture_source": {
+        "source_path": "data/workspaces/aditya.kulkarni/sklearn/scaling_importance.py"
+      }
+    },
+    "priya2.patel:README.md": {
+      "artifact_id": "priya2.patel:README.md",
+      "workspace_id": "priya2.patel",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 408,
+      "last_modified_at": "2026-06-24T17:59:32.780829",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "58994018b3c1db661aac282594648b59fd82e1431b8a388fb5ab2f67157b05fe",
+      "capture_source": {
+        "source_path": "data/workspaces/priya2.patel/README.md"
+      }
+    },
+    "priya2.patel:mllib/linear_regression_with_sgd_example.py": {
+      "artifact_id": "priya2.patel:mllib/linear_regression_with_sgd_example.py",
+      "workspace_id": "priya2.patel",
+      "relative_path": "mllib/linear_regression_with_sgd_example.py",
+      "file_name": "linear_regression_with_sgd_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2013,
+      "last_modified_at": "2026-06-24T17:59:32.776992",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark",
+            "pyspark.mllib.regression"
+          ]
+        }
+      },
+      "content_hash": "bd1fa00f1655df8786face52e3cad72b9934c851f1138979eb492e5ab8736213",
+      "capture_source": {
+        "source_path": "data/workspaces/priya2.patel/mllib/linear_regression_with_sgd_example.py"
+      }
+    },
+    "zoya.khan:README.md": {
+      "artifact_id": "zoya.khan:README.md",
+      "workspace_id": "zoya.khan",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 373,
+      "last_modified_at": "2026-06-24T17:59:30.806469",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "75d6e4ebfff8e1f5504cf0b369c3329636467e8d951776658be72eb12d170a21",
+      "capture_source": {
+        "source_path": "data/workspaces/zoya.khan/README.md"
+      }
+    },
+    "zoya.khan:sklearn/kmeans_digits.py": {
+      "artifact_id": "zoya.khan:sklearn/kmeans_digits.py",
+      "workspace_id": "zoya.khan",
+      "relative_path": "sklearn/kmeans_digits.py",
+      "file_name": "kmeans_digits.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 6891,
+      "last_modified_at": "2026-06-24T17:59:30.801997",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "0",
+            "a",
+            "sklearn",
+            "sklearn.cluster",
+            "sklearn.datasets",
+            "sklearn.decomposition",
+            "sklearn.pipeline",
+            "sklearn.preprocessing",
+            "the",
+            "time"
+          ]
+        }
+      },
+      "content_hash": "6c789b1788e3609724b3cc3fd9bf62ae44378361161fdcac565896871e30c0bf",
+      "capture_source": {
+        "source_path": "data/workspaces/zoya.khan/sklearn/kmeans_digits.py"
+      }
+    },
+    "rahul.nayar:README.md": {
+      "artifact_id": "rahul.nayar:README.md",
+      "workspace_id": "rahul.nayar",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 411,
+      "last_modified_at": "2026-06-24T17:59:33.402292",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "696b3863c93e1d1bfea205a177383ef59d3bf4317e1072c1cd0fa0151d7b8b97",
+      "capture_source": {
+        "source_path": "data/workspaces/rahul.nayar/README.md"
+      }
+    },
+    "rahul.nayar:sklearn/gradient_boosting_regression.py": {
+      "artifact_id": "rahul.nayar:sklearn/gradient_boosting_regression.py",
+      "workspace_id": "rahul.nayar",
+      "relative_path": "sklearn/gradient_boosting_regression.py",
+      "file_name": "gradient_boosting_regression.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 5610,
+      "last_modified_at": "2026-06-24T17:59:33.398894",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "an",
+            "sklearn",
+            "sklearn.inspection",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "sklearn.utils.fixes"
+          ]
+        }
+      },
+      "content_hash": "cedc1b3fd49dd17ab9dac825791f82ba409853113442ab9ef886a711c09cb0f9",
+      "capture_source": {
+        "source_path": "data/workspaces/rahul.nayar/sklearn/gradient_boosting_regression.py"
+      }
+    },
+    "kavya.nair:README.md": {
+      "artifact_id": "kavya.nair:README.md",
+      "workspace_id": "kavya.nair",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 398,
+      "last_modified_at": "2026-06-24T17:59:26.201828",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "a5c370a2b0156d8231c92da8fa62c789255d79c98cd56e91af3ed81437bbb047",
+      "capture_source": {
+        "source_path": "data/workspaces/kavya.nair/README.md"
+      }
+    },
+    "kavya.nair:spark_ml/logistic_regression_with_elastic_net.py": {
+      "artifact_id": "kavya.nair:spark_ml/logistic_regression_with_elastic_net.py",
+      "workspace_id": "kavya.nair",
+      "relative_path": "spark_ml/logistic_regression_with_elastic_net.py",
+      "file_name": "logistic_regression_with_elastic_net.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1990,
+      "last_modified_at": "2026-06-24T17:59:26.198490",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.ml.classification",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "c03e84556aacc81514cac400fd9916d62a5c53f6ab65a53bf9701e66fe550463",
+      "capture_source": {
+        "source_path": "data/workspaces/kavya.nair/spark_ml/logistic_regression_with_elastic_net.py"
+      }
+    },
+    "aarav.mehraa:README.md": {
+      "artifact_id": "aarav.mehraa:README.md",
+      "workspace_id": "aarav.mehraa",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 393,
+      "last_modified_at": "2026-06-24T17:59:33.254580",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "fee5cfa8cb6da227e94037fdf01be340f2c6a1e0b36dffb8c161446b07f9f0ea",
+      "capture_source": {
+        "source_path": "data/workspaces/aarav.mehraa/README.md"
+      }
+    },
+    "aarav.mehraa:sklearn/pca_iris.py": {
+      "artifact_id": "aarav.mehraa:sklearn/pca_iris.py",
+      "workspace_id": "aarav.mehraa",
+      "relative_path": "sklearn/pca_iris.py",
+      "file_name": "pca_iris.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 3431,
+      "last_modified_at": "2026-06-24T17:59:33.251297",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "a",
+            "sklearn.datasets",
+            "sklearn.decomposition"
+          ]
+        }
+      },
+      "content_hash": "331b3d876607892dcb18ab083589adbdc35238fccdd3d98cf7878204637843df",
+      "capture_source": {
+        "source_path": "data/workspaces/aarav.mehraa/sklearn/pca_iris.py"
+      }
+    },
+    "arjun2.menon:README.md": {
+      "artifact_id": "arjun2.menon:README.md",
+      "workspace_id": "arjun2.menon",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 394,
+      "last_modified_at": "2026-06-24T17:59:33.174224",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "ec972bd76183a1c67b3cacb5fa47344005d01ccb47dd9d95f38695c63bb28262",
+      "capture_source": {
+        "source_path": "data/workspaces/arjun2.menon/README.md"
+      }
+    },
+    "arjun2.menon:sklearn/lasso_model_selection.py": {
+      "artifact_id": "arjun2.menon:sklearn/lasso_model_selection.py",
+      "workspace_id": "arjun2.menon",
+      "relative_path": "sklearn/lasso_model_selection.py",
+      "file_name": "lasso_model_selection.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 8855,
+      "last_modified_at": "2026-06-24T17:59:33.170561",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "sklearn.datasets",
+            "sklearn.linear_model",
+            "sklearn.pipeline",
+            "sklearn.preprocessing"
+          ]
+        }
+      },
+      "content_hash": "0d5d1093e8a7c23818e20279f964a3d41195153550b84c7b78eb60b36e43070b",
+      "capture_source": {
+        "source_path": "data/workspaces/arjun2.menon/sklearn/lasso_model_selection.py"
+      }
+    },
+    "priya.patel:README.md": {
+      "artifact_id": "priya.patel:README.md",
+      "workspace_id": "priya.patel",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 378,
+      "last_modified_at": "2026-06-24T17:59:27.627045",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "6ee5f36f5ce8e381aa4ace694709d81569b6e662ca3e8be37dfb6968a49f1a39",
+      "capture_source": {
+        "source_path": "data/workspaces/priya.patel/README.md"
+      }
+    },
+    "priya.patel:mllib/k_means_example.py": {
+      "artifact_id": "priya.patel:mllib/k_means_example.py",
+      "workspace_id": "priya.patel",
+      "relative_path": "mllib/k_means_example.py",
+      "file_name": "k_means_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1989,
+      "last_modified_at": "2026-06-24T17:59:27.620853",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "math",
+            "numpy",
+            "pyspark",
+            "pyspark.mllib.clustering"
+          ]
+        }
+      },
+      "content_hash": "a809bb8051722664e59665fd747d4258e100135ebae647106b907a02da06abe5",
+      "capture_source": {
+        "source_path": "data/workspaces/priya.patel/mllib/k_means_example.py"
+      }
+    },
+    "rohit.sharmma:README.md": {
+      "artifact_id": "rohit.sharmma:README.md",
+      "workspace_id": "rohit.sharmma",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 380,
+      "last_modified_at": "2026-06-24T17:59:33.483239",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "8383674144dfd603c8b23a75223354049592d650b00150b963487d63828b6f7f",
+      "capture_source": {
+        "source_path": "data/workspaces/rohit.sharmma/README.md"
+      }
+    },
+    "rohit.sharmma:mlflow/sklearn_logistic_regression_train.py": {
+      "artifact_id": "rohit.sharmma:mlflow/sklearn_logistic_regression_train.py",
+      "workspace_id": "rohit.sharmma",
+      "relative_path": "mlflow/sklearn_logistic_regression_train.py",
+      "file_name": "sklearn_logistic_regression_train.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 642,
+      "last_modified_at": "2026-06-24T17:59:33.479325",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "mlflow.models",
+            "sklearn.linear_model"
+          ]
+        }
+      },
+      "content_hash": "29b3be9feecb1d982566fd219a2d08c12fc0a827c92f73f9000e9f608ac66d74",
+      "capture_source": {
+        "source_path": "data/workspaces/rohit.sharmma/mlflow/sklearn_logistic_regression_train.py"
+      }
+    },
+    "siddharth.rao:README.md": {
+      "artifact_id": "siddharth.rao:README.md",
+      "workspace_id": "siddharth.rao",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 348,
+      "last_modified_at": "2026-06-24T17:59:29.476946",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "4e963b4c82e67426859982831c2fde3be1a268228a7995b04106dbc2f16c015d",
+      "capture_source": {
+        "source_path": "data/workspaces/siddharth.rao/README.md"
+      }
+    },
+    "siddharth.rao:mlflow/hyperparam_train.py": {
+      "artifact_id": "siddharth.rao:mlflow/hyperparam_train.py",
+      "workspace_id": "siddharth.rao",
+      "relative_path": "mlflow/hyperparam_train.py",
+      "file_name": "hyperparam_train.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 6808,
+      "last_modified_at": "2026-06-24T17:59:29.472964",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "mlflow.models",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "tensorflow",
+            "tensorflow.keras.callbacks",
+            "tensorflow.keras.layers",
+            "tensorflow.keras.models",
+            "tensorflow.keras.optimizers",
+            "train",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "ad392385b6f248c4a6c1cc73273b7edcb6b887ebe8cbc47140185568109483d3",
+      "capture_source": {
+        "source_path": "data/workspaces/siddharth.rao/mlflow/hyperparam_train.py"
+      }
+    },
+    "diya.shah:README.md": {
+      "artifact_id": "diya.shah:README.md",
+      "workspace_id": "diya.shah",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 369,
+      "last_modified_at": "2026-06-24T17:59:24.171528",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "b8fd6a1c0a40716e404b83899d05567fb130a468e3b46f09fd24ca43dbe93f4f",
+      "capture_source": {
+        "source_path": "data/workspaces/diya.shah/README.md"
+      }
+    },
+    "diya.shah:spark_ml/kmeans_example.py": {
+      "artifact_id": "diya.shah:spark_ml/kmeans_example.py",
+      "workspace_id": "diya.shah",
+      "relative_path": "spark_ml/kmeans_example.py",
+      "file_name": "kmeans_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1956,
+      "last_modified_at": "2026-06-24T17:59:24.167914",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.ml.clustering",
+            "pyspark.ml.evaluation",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "12cb40af472191802d04b2ddb922042c7e7f623d592ec514683a899105b1a9a4",
+      "capture_source": {
+        "source_path": "data/workspaces/diya.shah/spark_ml/kmeans_example.py"
+      }
+    },
+    "meera.krishnan:README.md": {
+      "artifact_id": "meera.krishnan:README.md",
+      "workspace_id": "meera.krishnan",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 371,
+      "last_modified_at": "2026-06-24T17:59:26.636474",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "59d444a1f4fc22720cc8b2bf00f3df5c375e29918f784e459d375fcf82567fff",
+      "capture_source": {
+        "source_path": "data/workspaces/meera.krishnan/README.md"
+      }
+    },
+    "meera.krishnan:spark_ml/pipeline_example.py": {
+      "artifact_id": "meera.krishnan:spark_ml/pipeline_example.py",
+      "workspace_id": "meera.krishnan",
+      "relative_path": "spark_ml/pipeline_example.py",
+      "file_name": "pipeline_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2574,
+      "last_modified_at": "2026-06-24T17:59:26.632786",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "a",
+            "pyspark.ml",
+            "pyspark.ml.classification",
+            "pyspark.ml.feature",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "909b262f44ed7a5887739633e39bc7c8d5b2835ab5433d7af4e88c984097833b",
+      "capture_source": {
+        "source_path": "data/workspaces/meera.krishnan/spark_ml/pipeline_example.py"
+      }
+    },
+    "pooja.joshi:README.md": {
+      "artifact_id": "pooja.joshi:README.md",
+      "workspace_id": "pooja.joshi",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 394,
+      "last_modified_at": "2026-06-24T17:59:32.244529",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "26c10b737d2789445aa7651964f71581c475a92557d2b4ab81657da5194def40",
+      "capture_source": {
+        "source_path": "data/workspaces/pooja.joshi/README.md"
+      }
+    },
+    "pooja.joshi:sklearn/feature_selection_pipeline.py": {
+      "artifact_id": "pooja.joshi:sklearn/feature_selection_pipeline.py",
+      "workspace_id": "pooja.joshi",
+      "relative_path": "sklearn/feature_selection_pipeline.py",
+      "file_name": "feature_selection_pipeline.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2837,
+      "last_modified_at": "2026-06-24T17:59:32.239969",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "sklearn.datasets",
+            "sklearn.feature_selection",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "sklearn.pipeline",
+            "sklearn.svm",
+            "the",
+            "two"
+          ]
+        }
+      },
+      "content_hash": "eee1541664d04407283fa5a614a3bea8639ccb9b2f17b80f210dd8287c5f982b",
+      "capture_source": {
+        "source_path": "data/workspaces/pooja.joshi/sklearn/feature_selection_pipeline.py"
+      }
+    },
+    "rahul.nair:README.md": {
+      "artifact_id": "rahul.nair:README.md",
+      "workspace_id": "rahul.nair",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 386,
+      "last_modified_at": "2026-06-24T17:59:28.049537",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "78106f133129b24656688d6825d0f09e0208e9df10c7999ad5b82c105f225ace",
+      "capture_source": {
+        "source_path": "data/workspaces/rahul.nair/README.md"
+      }
+    },
+    "rahul.nair:mllib/recommendation_example.py": {
+      "artifact_id": "rahul.nair:mllib/recommendation_example.py",
+      "workspace_id": "rahul.nair",
+      "relative_path": "mllib/recommendation_example.py",
+      "file_name": "recommendation_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2015,
+      "last_modified_at": "2026-06-24T17:59:28.045754",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark",
+            "pyspark.mllib.recommendation"
+          ]
+        }
+      },
+      "content_hash": "4e68117e91acd9ce81ef5cec0e9c5d70d5f64c9fe970ccda9bbb47d1100c69ee",
+      "capture_source": {
+        "source_path": "data/workspaces/rahul.nair/mllib/recommendation_example.py"
+      }
+    },
+    "neha.gupta:README.md": {
+      "artifact_id": "neha.gupta:README.md",
+      "workspace_id": "neha.gupta",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 366,
+      "last_modified_at": "2026-06-24T17:59:27.126137",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "d6d8bdc7200e8d8e7047059ede92674425322ad70d05b5fddfd00b8344514a4e",
+      "capture_source": {
+        "source_path": "data/workspaces/neha.gupta/README.md"
+      }
+    },
+    "neha.gupta:spark_ml/als_example.py": {
+      "artifact_id": "neha.gupta:spark_ml/als_example.py",
+      "workspace_id": "neha.gupta",
+      "relative_path": "spark_ml/als_example.py",
+      "file_name": "als_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 2936,
+      "last_modified_at": "2026-06-24T17:59:27.120880",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark.ml.evaluation",
+            "pyspark.ml.recommendation",
+            "pyspark.sql"
+          ]
+        }
+      },
+      "content_hash": "5482f6ec9766d30693c54a8edd2e549751f54377b591c3e371b84084832a91e3",
+      "capture_source": {
+        "source_path": "data/workspaces/neha.gupta/spark_ml/als_example.py"
+      }
+    },
+    "nisha.banerjee:README.md": {
+      "artifact_id": "nisha.banerjee:README.md",
+      "workspace_id": "nisha.banerjee",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 387,
+      "last_modified_at": "2026-06-24T17:59:31.324199",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "a213d3896f87e88de5d0651db643cb2bed361819a94a402198627e3b6b384cb6",
+      "capture_source": {
+        "source_path": "data/workspaces/nisha.banerjee/README.md"
+      }
+    },
+    "nisha.banerjee:sklearn/grid_search_digits.py": {
+      "artifact_id": "nisha.banerjee:sklearn/grid_search_digits.py",
+      "workspace_id": "nisha.banerjee",
+      "relative_path": "sklearn/grid_search_digits.py",
+      "file_name": "grid_search_digits.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 7402,
+      "last_modified_at": "2026-06-24T17:59:31.318227",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "a",
+            "sklearn",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "sklearn.svm",
+            "the",
+            "vectors"
+          ]
+        }
+      },
+      "content_hash": "7ffa543b6f588ea064db8ae6fa12ddf429dca04563169c69b836e71d234ad666",
+      "capture_source": {
+        "source_path": "data/workspaces/nisha.banerjee/sklearn/grid_search_digits.py"
+      }
+    },
+    "kavya.nairr:README.md": {
+      "artifact_id": "kavya.nairr:README.md",
+      "workspace_id": "kavya.nairr",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 383,
+      "last_modified_at": "2026-06-24T17:59:33.327374",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "ad33a025e34a24b550eea03ad42e39b22f11b7da09538b7ef268cac99a8bf3ed",
+      "capture_source": {
+        "source_path": "data/workspaces/kavya.nairr/README.md"
+      }
+    },
+    "kavya.nairr:sklearn/dbscan.py": {
+      "artifact_id": "kavya.nairr:sklearn/dbscan.py",
+      "workspace_id": "kavya.nairr",
+      "relative_path": "sklearn/dbscan.py",
+      "file_name": "dbscan.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 4082,
+      "last_modified_at": "2026-06-24T17:59:33.323627",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "sklearn",
+            "sklearn.cluster",
+            "sklearn.datasets",
+            "sklearn.preprocessing",
+            "them"
+          ]
+        }
+      },
+      "content_hash": "a1a3f32b6fa917914ae103f9af125ddb4bf9140e6e3ff8189c69d8a2d6f63460",
+      "capture_source": {
+        "source_path": "data/workspaces/kavya.nairr/sklearn/dbscan.py"
+      }
+    },
+    "vikram.singh:README.md": {
+      "artifact_id": "vikram.singh:README.md",
+      "workspace_id": "vikram.singh",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 383,
+      "last_modified_at": "2026-06-24T17:59:30.400749",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "dbca4aefde61df3a3647490439dec46183d11240ed721b9915cc326a79fcd06f",
+      "capture_source": {
+        "source_path": "data/workspaces/vikram.singh/README.md"
+      }
+    },
+    "vikram.singh:sklearn/classifier_comparison.py": {
+      "artifact_id": "vikram.singh:sklearn/classifier_comparison.py",
+      "workspace_id": "vikram.singh",
+      "relative_path": "sklearn/classifier_comparison.py",
+      "file_name": "classifier_comparison.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 4944,
+      "last_modified_at": "2026-06-24T17:59:30.396541",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "matplotlib.colors",
+            "sklearn.datasets",
+            "sklearn.discriminant_analysis",
+            "sklearn.ensemble",
+            "sklearn.gaussian_process",
+            "sklearn.gaussian_process.kernels",
+            "sklearn.inspection",
+            "sklearn.model_selection",
+            "sklearn.naive_bayes",
+            "sklearn.neighbors",
+            "sklearn.neural_network",
+            "sklearn.pipeline",
+            "sklearn.preprocessing",
+            "sklearn.svm",
+            "sklearn.tree",
+            "training"
+          ]
+        }
+      },
+      "content_hash": "4164a5b1cecaf3d9f83c043dcbf518d6ae24b6b18fe7c53cd9f1661466563c7b",
+      "capture_source": {
+        "source_path": "data/workspaces/vikram.singh/sklearn/classifier_comparison.py"
+      }
+    },
+    "ananya2.iyer:README.md": {
+      "artifact_id": "ananya2.iyer:README.md",
+      "workspace_id": "ananya2.iyer",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 403,
+      "last_modified_at": "2026-06-24T17:59:33.020116",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "fc0e43917ff81702cf2d8d725bc1bad21e6116fd01d672b4f494f9b174cfa072",
+      "capture_source": {
+        "source_path": "data/workspaces/ananya2.iyer/README.md"
+      }
+    },
+    "ananya2.iyer:mllib/pca_rowmatrix_example.py": {
+      "artifact_id": "ananya2.iyer:mllib/pca_rowmatrix_example.py",
+      "workspace_id": "ananya2.iyer",
+      "relative_path": "mllib/pca_rowmatrix_example.py",
+      "file_name": "pca_rowmatrix_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1712,
+      "last_modified_at": "2026-06-24T17:59:33.016848",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark",
+            "pyspark.mllib.linalg",
+            "pyspark.mllib.linalg.distributed"
+          ]
+        }
+      },
+      "content_hash": "d76dff916a8e9d8c6edf533bb4dcef19232eba09af54fb299613471c7312c7ec",
+      "capture_source": {
+        "source_path": "data/workspaces/ananya2.iyer/mllib/pca_rowmatrix_example.py"
+      }
+    },
+    "tanvi.desai:README.md": {
+      "artifact_id": "tanvi.desai:README.md",
+      "workspace_id": "tanvi.desai",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 365,
+      "last_modified_at": "2026-06-24T17:59:29.918142",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "6a30c27886464588061bbd550ed967dfcd1e6875fb8c83939bfbb5227cec5145",
+      "capture_source": {
+        "source_path": "data/workspaces/tanvi.desai/README.md"
+      }
+    },
+    "tanvi.desai:mlflow/mnist_autolog_example.py": {
+      "artifact_id": "tanvi.desai:mlflow/mnist_autolog_example.py",
+      "workspace_id": "tanvi.desai",
+      "relative_path": "mlflow/mnist_autolog_example.py",
+      "file_name": "mnist_autolog_example.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 7388,
+      "last_modified_at": "2026-06-24T17:59:29.914586",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [],
+          "databases": [],
+          "tables": [
+            "lightning.pytorch.callbacks",
+            "lightning.pytorch.cli",
+            "torch.nn",
+            "torch.utils.data",
+            "torchvision",
+            "train"
+          ]
+        }
+      },
+      "content_hash": "ec3a7599b7cdbce6c7eb1f70069b433e3370e76ece56aea5c14ef65b6b02a63c",
+      "capture_source": {
+        "source_path": "data/workspaces/tanvi.desai/mlflow/mnist_autolog_example.py"
+      }
+    },
+    "arjun.menon:README.md": {
+      "artifact_id": "arjun.menon:README.md",
+      "workspace_id": "arjun.menon",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 361,
+      "last_modified_at": "2026-06-24T17:59:23.744249",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "27cb1475bfd4ce8ee78641d6482f23c93d94be277ab9f6bf5f85f48ef214f004",
+      "capture_source": {
+        "source_path": "data/workspaces/arjun.menon/README.md"
+      }
+    },
+    "arjun.menon:spark_sql/datasource.py": {
+      "artifact_id": "arjun.menon:spark_sql/datasource.py",
+      "workspace_id": "arjun.menon",
+      "relative_path": "spark_sql/datasource.py",
+      "file_name": "datasource.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 17836,
+      "last_modified_at": "2026-06-24T17:59:23.740283",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "a",
+            "parquet",
+            "parquetFile",
+            "people",
+            "pyspark.sql",
+            "the"
+          ]
+        }
+      },
+      "content_hash": "69e76df45a1102897a0c38f6471186b69f05f4225b3e00466d048713446ea0d4",
+      "capture_source": {
+        "source_path": "data/workspaces/arjun.menon/spark_sql/datasource.py"
+      }
+    },
+    "rohit.sharma:README.md": {
+      "artifact_id": "rohit.sharma:README.md",
+      "workspace_id": "rohit.sharma",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 373,
+      "last_modified_at": "2026-06-24T17:59:28.519506",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "ca9d5ebd2f3038d5acef9a18699cbbe9b023b1dc8891c472d1e38d9c01aa9884",
+      "capture_source": {
+        "source_path": "data/workspaces/rohit.sharma/README.md"
+      }
+    },
+    "rohit.sharma:streaming/network_wordcount.py": {
+      "artifact_id": "rohit.sharma:streaming/network_wordcount.py",
+      "workspace_id": "rohit.sharma",
+      "relative_path": "streaming/network_wordcount.py",
+      "file_name": "network_wordcount.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 1883,
+      "last_modified_at": "2026-06-24T17:59:28.516272",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "pyspark",
+            "spark"
+          ],
+          "databases": [],
+          "tables": [
+            "pyspark",
+            "pyspark.streaming",
+            "the"
+          ]
+        }
+      },
+      "content_hash": "264e2d5c20d2875582d0a26dd3336746500e9df2034c6149357d08c3fcb29c5a",
+      "capture_source": {
+        "source_path": "data/workspaces/rohit.sharma/streaming/network_wordcount.py"
+      }
+    },
+    "saanvi.reddy:README.md": {
+      "artifact_id": "saanvi.reddy:README.md",
+      "workspace_id": "saanvi.reddy",
+      "relative_path": "README.md",
+      "file_name": "README.md",
+      "file_type": "text",
+      "mime_type": null,
+      "size_bytes": 358,
+      "last_modified_at": "2026-06-24T17:59:28.984549",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "binary"
+      },
+      "content_hash": "a80a5d7be1c6887b465bceadbd699126682f56de2b1cc69604c95ae7b15db8a8",
+      "capture_source": {
+        "source_path": "data/workspaces/saanvi.reddy/README.md"
+      }
+    },
+    "saanvi.reddy:mlflow/sklearn_elasticnet_wine_train.py": {
+      "artifact_id": "saanvi.reddy:mlflow/sklearn_elasticnet_wine_train.py",
+      "workspace_id": "saanvi.reddy",
+      "relative_path": "mlflow/sklearn_elasticnet_wine_train.py",
+      "file_name": "sklearn_elasticnet_wine_train.py",
+      "file_type": "script",
+      "mime_type": null,
+      "size_bytes": 3286,
+      "last_modified_at": "2026-06-24T17:59:28.980487",
+      "ingestion_status": "new",
+      "classification": {
+        "decision": "ingested",
+        "matched_pattern": null,
+        "category": "processable",
+        "metadata": {
+          "tools": [
+            "numpy",
+            "pandas",
+            "sklearn"
+          ],
+          "databases": [],
+          "tables": [
+            "http",
+            "mlflow.models",
+            "physicochemical",
+            "sklearn.linear_model",
+            "sklearn.metrics",
+            "sklearn.model_selection",
+            "the",
+            "training",
+            "urllib.parse"
+          ]
+        }
+      },
+      "content_hash": "5c241ae72f9b705f57065932b3397f10faac530ac202377d1d9870fcc5721f26",
+      "capture_source": {
+        "source_path": "data/workspaces/saanvi.reddy/mlflow/sklearn_elasticnet_wine_train.py"
+      }
+    }
+  },
+  "workspaces": {
+    "anaya.iyer": {
+      "workspace_id": "anaya.iyer",
+      "owner": "anaya.iyer",
+      "root_path": "/data/anaya.iyer",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.150995",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "karan.malhotra": {
+      "workspace_id": "karan.malhotra",
+      "owner": "karan.malhotra",
+      "root_path": "/data/karan.malhotra",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.159023",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "ishaan.kapoor": {
+      "workspace_id": "ishaan.kapoor",
+      "owner": "ishaan.kapoor",
+      "root_path": "/data/ishaan.kapoor",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.165460",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "priyanka.patel": {
+      "workspace_id": "priyanka.patel",
+      "owner": "priyanka.patel",
+      "root_path": "/data/priyanka.patel",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.170804",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "ananya.iyer": {
+      "workspace_id": "ananya.iyer",
+      "owner": "ananya.iyer",
+      "root_path": "/data/ananya.iyer",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.177973",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "aarav.mehra": {
+      "workspace_id": "aarav.mehra",
+      "owner": "aarav.mehra",
+      "root_path": "/data/aarav.mehra",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.183442",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "priyam.patel": {
+      "workspace_id": "priyam.patel",
+      "owner": "priyam.patel",
+      "root_path": "/data/priyam.patel",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.190004",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "aditya.kulkarni": {
+      "workspace_id": "aditya.kulkarni",
+      "owner": "aditya.kulkarni",
+      "root_path": "/data/aditya.kulkarni",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.197958",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "priya2.patel": {
+      "workspace_id": "priya2.patel",
+      "owner": "priya2.patel",
+      "root_path": "/data/priya2.patel",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.203629",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "zoya.khan": {
+      "workspace_id": "zoya.khan",
+      "owner": "zoya.khan",
+      "root_path": "/data/zoya.khan",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.212105",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "rahul.nayar": {
+      "workspace_id": "rahul.nayar",
+      "owner": "rahul.nayar",
+      "root_path": "/data/rahul.nayar",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.218985",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "kavya.nair": {
+      "workspace_id": "kavya.nair",
+      "owner": "kavya.nair",
+      "root_path": "/data/kavya.nair",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.225597",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "aarav.mehraa": {
+      "workspace_id": "aarav.mehraa",
+      "owner": "aarav.mehraa",
+      "root_path": "/data/aarav.mehraa",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.232088",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "arjun2.menon": {
+      "workspace_id": "arjun2.menon",
+      "owner": "arjun2.menon",
+      "root_path": "/data/arjun2.menon",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.240060",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "priya.patel": {
+      "workspace_id": "priya.patel",
+      "owner": "priya.patel",
+      "root_path": "/data/priya.patel",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.246176",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "rohit.sharmma": {
+      "workspace_id": "rohit.sharmma",
+      "owner": "rohit.sharmma",
+      "root_path": "/data/rohit.sharmma",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.251255",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "siddharth.rao": {
+      "workspace_id": "siddharth.rao",
+      "owner": "siddharth.rao",
+      "root_path": "/data/siddharth.rao",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.258850",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "diya.shah": {
+      "workspace_id": "diya.shah",
+      "owner": "diya.shah",
+      "root_path": "/data/diya.shah",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.264214",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "meera.krishnan": {
+      "workspace_id": "meera.krishnan",
+      "owner": "meera.krishnan",
+      "root_path": "/data/meera.krishnan",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.269877",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "pooja.joshi": {
+      "workspace_id": "pooja.joshi",
+      "owner": "pooja.joshi",
+      "root_path": "/data/pooja.joshi",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.276898",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "rahul.nair": {
+      "workspace_id": "rahul.nair",
+      "owner": "rahul.nair",
+      "root_path": "/data/rahul.nair",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.282593",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "neha.gupta": {
+      "workspace_id": "neha.gupta",
+      "owner": "neha.gupta",
+      "root_path": "/data/neha.gupta",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.289109",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "nisha.banerjee": {
+      "workspace_id": "nisha.banerjee",
+      "owner": "nisha.banerjee",
+      "root_path": "/data/nisha.banerjee",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.295908",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "kavya.nairr": {
+      "workspace_id": "kavya.nairr",
+      "owner": "kavya.nairr",
+      "root_path": "/data/kavya.nairr",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:40.302211",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "vikram.singh": {
+      "workspace_id": "vikram.singh",
+      "owner": "vikram.singh",
+      "root_path": "/data/vikram.singh",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:42.548468",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "ananya2.iyer": {
+      "workspace_id": "ananya2.iyer",
+      "owner": "ananya2.iyer",
+      "root_path": "/data/ananya2.iyer",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:42.553588",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "tanvi.desai": {
+      "workspace_id": "tanvi.desai",
+      "owner": "tanvi.desai",
+      "root_path": "/data/tanvi.desai",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:42.561099",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "arjun.menon": {
+      "workspace_id": "arjun.menon",
+      "owner": "arjun.menon",
+      "root_path": "/data/arjun.menon",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:42.570595",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "rohit.sharma": {
+      "workspace_id": "rohit.sharma",
+      "owner": "rohit.sharma",
+      "root_path": "/data/rohit.sharma",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:42.576560",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "saanvi.reddy": {
+      "workspace_id": "saanvi.reddy",
+      "owner": "saanvi.reddy",
+      "root_path": "/data/saanvi.reddy",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-24T17:59:42.582335",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    }
+  }
+}

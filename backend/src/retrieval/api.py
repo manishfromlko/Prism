@@ -772,7 +772,7 @@ async def post_feedback(request: FeedbackRequest):
 
 @app.post("/admin/ingest-docs")
 async def ingest_docs(drop_existing: bool = False):
-    """Ingest Word documents from platform_documents/ into the platform_docs Qdrant collection."""
+    """Ingest Word documents from data/platform_documents into the platform_docs Qdrant collection."""
     global doc_chunk_store, chat_engine
     try:
         import asyncio

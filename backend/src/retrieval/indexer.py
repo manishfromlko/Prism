@@ -3,7 +3,7 @@ Indexer: reads the ingestion catalog and populates Qdrant with embeddings.
 
 Run after ingestion to bring the vector store in sync with the catalog:
 
-    python -m src.retrieval.indexer --catalog dataset/.ingestion/ingestion_catalog.json
+    python -m src.retrieval.indexer --catalog ../data/workspaces/.ingestion/ingestion_catalog.json
 
 Modes:
     incremental (default) — only indexes artifact_ids not already in Qdrant
@@ -103,7 +103,10 @@ def main() -> None:
     )
     parser.add_argument(
         "--catalog",
-        default=os.getenv("INGESTION_CATALOG_PATH", "dataset/.ingestion/ingestion_catalog.json"),
+        default=os.getenv(
+            "INGESTION_CATALOG_PATH",
+            "../data/workspaces/.ingestion/ingestion_catalog.json",
+        ),
         help="Path to ingestion_catalog.json",
     )
     parser.add_argument(

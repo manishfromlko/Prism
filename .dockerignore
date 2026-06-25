@@ -15,14 +15,14 @@ ENV/
 
 # Node files
 node_modules/
-webapp/node_modules/
+frontend/node_modules/
 .next/
 out/
 dist/
 build/
 
 # Local project state
-dataset/
+data/workspaces/
 .tmp
 .pytest_cache/
 .vscode/

@@ -49,5 +49,6 @@ coverage/
 .next
 .vercel
 
-# dataset — large workspace files, stored in Unity Catalog Volume in Databricks
-dataset/
+# Runtime data can be large; selected sample workspaces are tracked intentionally.
+data/workspaces/.ingestion/
+data/workspaces/ravi.verma/

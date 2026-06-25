@@ -1,4 +1,4 @@
-"""Ingestion pipeline for Word documents in platform_documents/."""
+"""Ingestion pipeline for Word documents in data/platform_documents/."""
 
 import logging
 import os
@@ -12,7 +12,12 @@ from .doc_store import DocumentChunkStore
 
 logger = logging.getLogger(__name__)
 
-DOCS_DIR = Path(__file__).parents[3] / "platform_documents"
+DOCS_DIR = Path(
+    os.getenv(
+        "PLATFORM_DOCS_DIR",
+        str(Path(__file__).parents[4] / "data" / "platform_documents"),
+    )
+)
 CHUNK_SIZE = 800   # characters
 CHUNK_OVERLAP = 150
 

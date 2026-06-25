@@ -38,7 +38,7 @@ class RetrievalConfig(BaseModel):
     index_type: str = Field(default="HNSW")
 
     # Catalog path — must point to ingestion_catalog.json
-    ingestion_catalog_path: str = Field(default="dataset/.ingestion/ingestion_catalog.json")
+    ingestion_catalog_path: str = Field(default="../data/workspaces/.ingestion/ingestion_catalog.json")
 
     # LLM for user profile generation (chat completion, not embeddings)
     profile_llm_model: str = Field(default="gpt-4o-mini")
@@ -63,7 +63,7 @@ class RetrievalConfig(BaseModel):
             batch_size=int(os.getenv("BATCH_SIZE", "32")),
             ingestion_catalog_path=os.getenv(
                 "INGESTION_CATALOG_PATH",
-                "dataset/.ingestion/ingestion_catalog.json",
+                "../data/workspaces/.ingestion/ingestion_catalog.json",
             ),
             profile_llm_model=os.getenv("PROFILE_LLM_MODEL", "gpt-4o-mini"),
             chat_agent_mode=os.getenv("CHAT_AGENT_MODE", "orchestrated"),

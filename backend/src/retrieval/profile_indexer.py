@@ -4,7 +4,7 @@ stores them in the Qdrant user_profiles collection.
 
 Usage:
     python -m src.retrieval.profile_indexer \
-        --catalog dataset/.ingestion/ingestion_catalog.json
+        --catalog ../data/workspaces/.ingestion/ingestion_catalog.json
 """
 
 import argparse
@@ -46,7 +46,10 @@ def main():
     parser = argparse.ArgumentParser(description="Index user profiles into Qdrant")
     parser.add_argument(
         "--catalog",
-        default=os.getenv("INGESTION_CATALOG_PATH", "dataset/.ingestion/ingestion_catalog.json"),
+        default=os.getenv(
+            "INGESTION_CATALOG_PATH",
+            "../data/workspaces/.ingestion/ingestion_catalog.json",
+        ),
     )
     args = parser.parse_args()
 
