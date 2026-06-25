@@ -11,6 +11,7 @@ This directory is the canonical documentation home for the project. Earlier note
 5. [Data Flows](./05-DATA-FLOWS.md) - ingestion, retrieval, chatbot, admin, and observability flows.
 6. [Data Stores and Schemas](./06-DATABASE-SCHEMA.md) - JSON catalog and Qdrant collections.
 7. [Technology Stack](./07-TECHNOLOGY-STACK.md) - runtime technologies and key dependencies.
+8. [Multi-Agent RAG Architecture](./08-MULTIAGENT-RAG-ARCHITECTURE.md) - target architecture for evolving the chatbot into a multi-agent RAG system.
 
 ## Component Guides
 

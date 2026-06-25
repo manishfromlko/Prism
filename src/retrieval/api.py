@@ -20,7 +20,9 @@ from .profile_indexer import run_profile_indexing
 from .profile_from_summaries_indexer import run_profile_indexing_from_summaries
 from .artifact_summary_store import ArtifactSummaryStore
 from .artifact_summary_indexer import run_artifact_summary_indexing
+from .agents import OrchestratorAgent
 from .chatbot import ChatEngine, DocumentChunkStore, ingest_platform_docs
+from .chatbot.session_memory import ConversationMemoryStore
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +93,8 @@ user_profile_store: Optional[UserProfileStore] = None
 artifact_summary_store: Optional[ArtifactSummaryStore] = None
 doc_chunk_store: Optional[DocumentChunkStore] = None
 chat_engine: Optional[ChatEngine] = None
+orchestrator_agent: Optional[OrchestratorAgent] = None
+conversation_memory = ConversationMemoryStore()
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -119,7 +123,7 @@ app = create_app()
 
 @app.on_event("startup")
 async def startup_event():
-    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store, doc_chunk_store, chat_engine
+    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store, doc_chunk_store, chat_engine, orchestrator_agent
     try:
         config = RetrievalConfig.from_env()
         vector_store = VectorStore(config)
@@ -160,11 +164,17 @@ async def startup_event():
                     embedding_service=embedding_service,
                     llm_model=config.profile_llm_model,
                 )
+                orchestrator_agent = OrchestratorAgent(
+                    chat_engine=chat_engine,
+                    max_steps=config.agent_max_steps,
+                    planner_enabled=config.agent_enable_planner_llm,
+                )
                 logger.info("Chat engine initialized")
         except Exception as e:
             logger.warning(f"Chat engine not ready: {e}")
             doc_chunk_store = None
             chat_engine = None
+            orchestrator_agent = None
 
         # Pre-warm the catalog cache
         try:
@@ -649,7 +659,7 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     query: str = Field(..., description="User's question")
     history: List[ChatMessage] = Field(default_factory=list, description="Prior conversation turns")
-    session_id: Optional[str] = Field(None, description="Session ID for Langfuse trace grouping")
+    session_id: Optional[str] = Field(None, description="Session ID for memory and trace grouping")
 
 class ArtifactResult(BaseModel):
     title: str
@@ -673,7 +683,8 @@ class ChatResponse(BaseModel):
     artifacts: List[ArtifactResult] = Field(default_factory=list)
     users: List[UserResult] = Field(default_factory=list)
     sources: List[SourceResult] = Field(default_factory=list)
-    trace_id: Optional[str] = Field(None, description="Langfuse trace ID — use to post scores")
+    trace_id: Optional[str] = Field(None, description="Trace ID — use to post feedback/scores")
+    session_id: Optional[str] = Field(None, description="Conversation session ID used for memory")
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -686,11 +697,35 @@ async def chat(request: ChatRequest):
         )
     try:
         import asyncio
-        history_dicts = [{"role": m.role, "content": m.content} for m in request.history]
+        incoming_history = [{"role": m.role, "content": m.content} for m in request.history]
+        stored_history = conversation_memory.get(request.session_id)
+        history_dicts = ConversationMemoryStore.merge(stored_history, incoming_history)
         loop = asyncio.get_event_loop()
+        use_orchestrator = (
+            config is not None
+            and config.chat_agent_mode.lower() == "orchestrated"
+            and orchestrator_agent is not None
+        )
         result = await loop.run_in_executor(
             None,
-            lambda: chat_engine.chat(request.query, history_dicts, session_id=request.session_id),
+            lambda: (
+                orchestrator_agent.run(
+                    request.query,
+                    history_dicts,
+                    session_id=request.session_id,
+                )
+                if use_orchestrator
+                else chat_engine.chat(
+                    request.query,
+                    history_dicts,
+                    session_id=request.session_id,
+                )
+            ),
+        )
+        conversation_memory.remember_turn(
+            request.session_id,
+            request.query,
+            result.get("answer", ""),
         )
         return ChatResponse(
             answer=result["answer"],
@@ -701,6 +736,7 @@ async def chat(request: ChatRequest):
             users=[UserResult(**u) for u in result.get("users", [])],
             sources=[SourceResult(**s) for s in result.get("sources", [])],
             trace_id=result.get("trace_id"),
+            session_id=request.session_id,
         )
     except Exception as e:
         logger.error(f"Chat endpoint failed: {e}")
@@ -712,18 +748,18 @@ async def chat(request: ChatRequest):
 # ---------------------------------------------------------------------------
 
 class ScoreRequest(BaseModel):
-    trace_id: str = Field(..., description="Langfuse trace ID returned by /chat")
+    trace_id: str = Field(..., description="Trace ID returned by /chat")
     score_name: str = Field(..., description="Score name, e.g. 'user_feedback', 'faithfulness'")
     value: float = Field(..., description="Score value in [0, 1]", ge=0.0, le=1.0)
     comment: Optional[str] = Field(None, description="Optional free-text comment")
 
 class FeedbackRequest(BaseModel):
-    trace_id: str = Field(..., description="Langfuse trace ID returned by /chat")
+    trace_id: str = Field(..., description="Trace ID returned by /chat")
     thumbs_up: bool = Field(..., description="True = positive feedback, False = negative")
 
 @app.post("/observability/score", status_code=204)
 async def post_score(request: ScoreRequest):
-    """Post a named score to a Langfuse trace (e.g. RAGAS metrics, manual eval)."""
+    """Post a named feedback score to configured tracing backends."""
     from ..observability import score_trace
     score_trace(request.trace_id, request.score_name, request.value, request.comment)
 

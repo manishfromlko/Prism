@@ -1,5 +1,9 @@
 # Architecture
 
+This page describes the current fixed-pipeline RAG architecture. The target
+multi-agent evolution is documented separately in
+[Multi-Agent RAG Architecture](./08-MULTIAGENT-RAG-ARCHITECTURE.md).
+
 ## High-Level View
 
 ```mermaid

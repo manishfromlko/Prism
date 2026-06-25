@@ -5,14 +5,12 @@ classify   →  IntentClassifier
 rewrite    →  QueryRewriter
 retrieve   →  DocRetriever | ArtifactRetriever | UserRetriever (or all for HYBRID)
 resolve    →  UserNameResolver  (name disambiguation before any vector search)
-generate   →  LiteLLM proxy → OpenAI
+generate   →  direct OpenAI
 
 Observability (Layer 1):
-  A UUID trace_id is generated at the start of each request and forwarded as
-  LiteLLM metadata to every LLM API call in the pipeline.  The LiteLLM proxy's
-  Langfuse callback groups all generations under the same Langfuse trace, giving
-  full token/cost/latency visibility per user request without any explicit
-  Langfuse SDK calls in this file.
+  A UUID trace_id is generated at the start of each request and returned to the
+  frontend for feedback. LangSmith traces the request-level pipeline and nested
+  OpenAI calls when LANGSMITH_TRACING=true.
 
   trace_id is returned in the response so the frontend can attach user feedback
   scores via POST /observability/feedback.
@@ -28,10 +26,15 @@ import logging
 import uuid
 from typing import Dict, List, Optional
 
+from langsmith import traceable
+from langsmith.run_helpers import get_current_run_tree, set_run_metadata
+
 from ...observability import (
     evaluate_in_background,
-    litellm_metadata,
+    mlflow_chat_trace,
+    record_mlflow_chat_output,
     score_response_quality,
+    trace_extra_body,
 )
 from ..artifact_summary_store import ArtifactSummaryStore
 from ..config import RetrievalConfig, make_openai_client
@@ -61,6 +64,27 @@ _OUT_OF_SCOPE_REPLY = (
     "• **People search** — finding colleagues by expertise or what they're working on\n\n"
     "Try asking something like: *\"How do I submit a Spark job?\"* or *\"Who works on NLP?\"*"
 )
+
+
+def _chat_trace_inputs(inputs: Dict) -> Dict:
+    history = inputs.get("history") or []
+    return {
+        "query": inputs.get("query"),
+        "session_id": inputs.get("session_id"),
+        "history_turns": len(history),
+    }
+
+
+def _chat_trace_outputs(outputs: Dict) -> Dict:
+    return {
+        "trace_id": outputs.get("trace_id"),
+        "intent": outputs.get("intent"),
+        "confidence": outputs.get("confidence"),
+        "exact_match": outputs.get("exact_match", False),
+        "artifact_count": len(outputs.get("artifacts", [])),
+        "user_count": len(outputs.get("users", [])),
+        "source_count": len(outputs.get("sources", [])),
+    }
 
 
 class ChatEngine:
@@ -94,11 +118,31 @@ class ChatEngine:
         """
         Full pipeline: classify → rewrite → retrieve → generate → format.
 
-        Returns the output schema dict.  trace_id groups all LLM calls in this
-        request under a single Langfuse trace (via LiteLLM metadata forwarding).
+        Returns the output schema dict. LangSmith traces this method and nested
+        OpenAI calls when tracing is enabled.
         """
+        with mlflow_chat_trace(query=query, history=history, session_id=session_id) as mlflow_span:
+            result = self._chat_traced(query=query, history=history, session_id=session_id)
+            record_mlflow_chat_output(mlflow_span, result)
+            return result
+
+    @traceable(
+        name="chat_pipeline",
+        run_type="chain",
+        process_inputs=_chat_trace_inputs,
+        process_outputs=_chat_trace_outputs,
+    )
+    def _chat_traced(
+        self,
+        query: str,
+        history: Optional[List[Dict]] = None,
+        session_id: Optional[str] = None,
+    ) -> Dict:
         history = history or []
-        trace_id = str(uuid.uuid4())
+        current_run = get_current_run_tree()
+        trace_id = str(current_run.id) if current_run else str(uuid.uuid4())
+        if current_run:
+            set_run_metadata(app_trace_id=trace_id, session_id=session_id)
 
         # 1. Classify
         classification = self.classifier.classify(query, trace_id=trace_id)
@@ -207,14 +251,14 @@ class ChatEngine:
 
         source_count = len(doc_hits) + len(artifact_hits) + len(user_hits)
 
-        # 7. Generate — full trace context enriches the root Langfuse trace
+        # 7. Generate — OpenAI call is traced by LangSmith's wrapped client
         try:
             response = self.client.chat.completions.create(
                 model=self.llm_model,
                 messages=messages,
                 temperature=0.2,
                 max_tokens=600,
-                extra_body=litellm_metadata(
+                extra_body=trace_extra_body(
                     trace_id,
                     "generate",
                     session_id=session_id,

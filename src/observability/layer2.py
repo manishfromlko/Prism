@@ -12,7 +12,7 @@ Scores posted per request (RAGAS 0.4.3):
 For USER_SEARCH exact-match (profile lookup, no LLM generation):
   profile_relevance   — LLM judge: does the profile answer the query (0–1)
 
-All functions are no-ops if LITELLM_BASE_URL is unset or ragas is missing.
+All functions are no-ops if OPENAI_API_KEY is unset or ragas is missing.
 """
 
 import asyncio
@@ -21,7 +21,7 @@ import os
 import threading
 from typing import Dict, List, Optional
 
-from .scoring import _get_langfuse, score_trace
+from .scoring import score_trace
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +42,10 @@ except ImportError:
 
 def _make_sync_client():
     from openai import OpenAI
-    base_url = os.getenv("LITELLM_BASE_URL", "")
-    api_key = os.getenv("LITELLM_API_KEY", "sk-1234")
-    if not base_url:
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
         return None
-    return OpenAI(api_key=api_key, base_url=base_url)
+    return OpenAI(api_key=api_key)
 
 
 _EVAL_MODEL = "gpt-4o"  # stronger than the generation model for reliable metric scores
@@ -54,13 +53,12 @@ _EVAL_MODEL = "gpt-4o"  # stronger than the generation model for reliable metric
 
 def _make_ragas_components():
     from openai import AsyncOpenAI
-    base_url = os.getenv("LITELLM_BASE_URL", "")
-    api_key = os.getenv("LITELLM_API_KEY", "sk-1234")
-    if not base_url:
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
         return None, None
     # Both LLM and embeddings wrappers need an AsyncOpenAI client so that
     # RAGAS can call agenerate() / aembed_text() inside ascore()
-    async_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+    async_client = AsyncOpenAI(api_key=api_key)
     llm = llm_factory(_EVAL_MODEL, client=async_client)
     emb = OpenAIEmbeddings(client=async_client, model="text-embedding-3-small")
     return llm, emb
@@ -172,10 +170,6 @@ def _background_eval(
                 asyncio.run(_run_ragas_eval(trace_id, query, answer, contexts, llm, emb))
         else:
             logger.debug("[layer2] ragas not installed, skipping")
-
-        lf = _get_langfuse()
-        if lf:
-            lf.flush()
     except Exception as e:
         logger.warning(f"[layer2] Background eval crashed trace={trace_id}: {e}")
 
