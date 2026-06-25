@@ -97,6 +97,10 @@ Status: implemented behind `CHAT_AGENT_MODE=orchestrated`; default remains
 Move the current user-name resolution and profile lookup flow into a dedicated
 People/Profile Agent. Preserve exact follow-up disambiguation behavior.
 
+Status: implemented for deterministic name resolution, follow-up selection, and
+direct profile lookup in orchestrated mode. Semantic people search still falls
+back to the legacy engine until the tool layer is introduced.
+
 ### Feature 4: Retrieval Tool Layer
 
 Wrap existing document, artifact, and user retrievers in typed tools. Tools

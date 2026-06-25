@@ -1,6 +1,7 @@
 """Multi-agent runtime primitives for the chatbot."""
 
 from .orchestrator import OrchestratorAgent
+from .people import PeopleProfileAgent
 from .types import AgentContext, AgentStep, AgentToolResult
 
 __all__ = [
@@ -8,4 +9,5 @@ __all__ = [
     "AgentStep",
     "AgentToolResult",
     "OrchestratorAgent",
+    "PeopleProfileAgent",
 ]

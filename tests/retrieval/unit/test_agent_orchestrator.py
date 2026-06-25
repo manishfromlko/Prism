@@ -27,6 +27,26 @@ engine_module = pytypes.ModuleType("src.retrieval.chatbot.engine")
 engine_module.ChatEngine = object
 sys.modules["src.retrieval.chatbot.engine"] = engine_module
 
+
+class FakePeopleProfileAgent:
+    def __init__(self, user_store, user_resolver):
+        self.user_store = user_store
+        self.user_resolver = user_resolver
+
+    def run(self, context):
+        context.add_step("people_profile", "return_profile", user_id="priya2.patel")
+        return {
+            "answer": "**priya2.patel**\n\nProfile",
+            "intent": "USER_SEARCH",
+            "confidence": 1.0,
+            "exact_match": True,
+        }
+
+
+people_module = pytypes.ModuleType("src.retrieval.agents.people")
+people_module.PeopleProfileAgent = FakePeopleProfileAgent
+sys.modules["src.retrieval.agents.people"] = people_module
+
 types = load_module(
     "src.retrieval.agents.types",
     AGENTS_ROOT / "types.py",
@@ -40,6 +60,14 @@ orchestrator_module = load_module(
 
 
 class StubChatEngine:
+    user_store = object()
+    user_resolver = object()
+
+    class classifier:
+        @staticmethod
+        def classify(query, trace_id=None):
+            return {"intent": "USER_SEARCH", "confidence": 0.92}
+
     def chat(self, query, history, session_id=None):
         return {
             "answer": f"answer for {query}",
@@ -59,7 +87,7 @@ def test_agent_context_records_steps():
     assert context.steps[0].details["mode"] == "test"
 
 
-def test_orchestrator_delegates_to_legacy_engine():
+def test_orchestrator_routes_user_search_to_people_agent():
     orchestrator = orchestrator_module.OrchestratorAgent(
         chat_engine=StubChatEngine(),
         max_steps=3,
@@ -68,9 +96,10 @@ def test_orchestrator_delegates_to_legacy_engine():
 
     result = orchestrator.run("who is priya?", [{"role": "user", "content": "hi"}])
 
-    assert result["answer"] == "answer for who is priya?"
+    assert result["answer"].startswith("**priya2.patel**")
     assert result["agent_mode"] == "orchestrated"
     assert [step["action"] for step in result["agent_steps"]] == [
         "start",
-        "delegate_to_legacy_chat_engine",
+        "classify_intent",
+        "return_profile",
     ]
