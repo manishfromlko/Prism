@@ -31,6 +31,8 @@ from langsmith.run_helpers import get_current_run_tree, set_run_metadata
 
 from ...observability import (
     evaluate_in_background,
+    mlflow_chat_trace,
+    record_mlflow_chat_output,
     score_response_quality,
     trace_extra_body,
 )
@@ -119,7 +121,10 @@ class ChatEngine:
         Returns the output schema dict. LangSmith traces this method and nested
         OpenAI calls when tracing is enabled.
         """
-        return self._chat_traced(query=query, history=history, session_id=session_id)
+        with mlflow_chat_trace(query=query, history=history, session_id=session_id) as mlflow_span:
+            result = self._chat_traced(query=query, history=history, session_id=session_id)
+            record_mlflow_chat_output(mlflow_span, result)
+            return result
 
     @traceable(
         name="chat_pipeline",

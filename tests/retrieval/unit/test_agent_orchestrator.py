@@ -1,8 +1,11 @@
 import importlib.util
+import os
 import sys
 import types as pytypes
 from pathlib import Path
 
+
+os.environ["MLFLOW_TRACING"] = "false"
 
 AGENTS_ROOT = Path(__file__).resolve().parents[3] / "src" / "retrieval" / "agents"
 
