@@ -3,7 +3,7 @@ python-docx>=1.1.0
 langchain>=0.1.0
 langchain-core>=0.1.0
 langsmith>=0.4.0
-mlflow>=3.14.0
+mlflow-skinny>=3.14.0
 qdrant-client>=1.9.0
 
 # OpenAI embeddings (text-embedding-3-small)
@@ -19,10 +19,3 @@ uvicorn>=0.23.0
 pydantic>=2.0.0
 psutil>=5.9.0
 rapidfuzz>=3.14.0
-
-# Testing
-pytest>=7.0.0
-
-# Optional: for development
-black>=23.0.0
-flake8>=6.0.0
