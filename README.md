@@ -6,7 +6,7 @@ Minimal local stack for a multi-agent RAG chatbot over workspace artifacts, user
 
 - `frontend/` - Next.js UI and proxy API routes.
 - `backend/` - FastAPI API, ingestion, retrieval, agents, memory, and tracing.
-- `data/workspaces/` - Lightweight sample user workspaces and ingestion catalog.
+- `data/workspaces/` - Five tracked seed workspaces plus any ignored local workspaces you add for ingestion.
 - `data/platform_documents/` - Word documents indexed into the `platform_docs` collection.
 - `docker-compose.yml` - Qdrant, backend, frontend, and MLflow.
 
@@ -43,4 +43,3 @@ docker compose exec backend python -m src.retrieval.chatbot.doc_ingestion
 - [Ingestion](docs/INGESTION.md)
 - [Observability](docs/OBSERVABILITY.md)
 - [API](docs/API.md)
-

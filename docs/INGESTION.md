@@ -28,5 +28,18 @@ docker compose exec backend python -m src.retrieval.chatbot.doc_ingestion
 - Catalog: `data/workspaces/.ingestion/ingestion_catalog.json`
 - Platform docs: `data/platform_documents/*.docx`
 
-The large local legacy `ravi.verma` workspace is intentionally ignored in this branch. The tracked sample workspaces are small enough for Git and cover similar user-name disambiguation cases.
+Git tracks only five small seed workspaces so the repository stays light. Local runtime is broader: ingestion scans every workspace directory that exists under `data/workspaces/`, including ignored local-only folders copied in for testing.
 
+If you add more local workspaces, run the incremental or full pipeline again so the local catalog and Qdrant collections reflect those folders. Those extra workspace folders stay ignored by Git unless you explicitly change `.gitignore`.
+
+To recreate only the five Git-tracked seed workspaces:
+
+```bash
+python scripts/download_public_workspaces.py
+```
+
+To download every known public workspace locally without adding them to Git:
+
+```bash
+python scripts/download_public_workspaces.py --all
+```

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import subprocess
 from pathlib import Path
@@ -293,9 +294,26 @@ def write_readme(workspace: Path, item: dict[str, str]) -> None:
     )
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Download public example workspaces into data/workspaces."
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Download every known public workspace locally. By default only the five Git-tracked seed workspaces are downloaded.",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
+    selected_sources = SOURCES if args.all else [
+        source for source in SOURCES if source["workspace"] in DEFAULT_WORKSPACES
+    ]
+
     manifest = []
-    for item in (source for source in SOURCES if source["workspace"] in DEFAULT_WORKSPACES):
+    for item in selected_sources:
         workspace = DATASET / item["workspace"]
         destination = workspace / item["path"]
         curl_download(item["url"], destination)
