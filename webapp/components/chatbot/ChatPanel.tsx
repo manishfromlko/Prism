@@ -23,6 +23,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessageData[]>([WELCOME])
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const sessionIdRef = useRef<string>(crypto.randomUUID())
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, history }),
+        body: JSON.stringify({ query, history, session_id: sessionIdRef.current }),
       })
 
       if (!res.ok) {
@@ -80,7 +81,10 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
     }
   }
 
-  const handleClear = () => setMessages([WELCOME])
+  const handleClear = () => {
+    sessionIdRef.current = crypto.randomUUID()
+    setMessages([WELCOME])
+  }
 
   return (
     <div

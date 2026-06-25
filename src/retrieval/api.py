@@ -22,6 +22,7 @@ from .artifact_summary_store import ArtifactSummaryStore
 from .artifact_summary_indexer import run_artifact_summary_indexing
 from .agents import OrchestratorAgent
 from .chatbot import ChatEngine, DocumentChunkStore, ingest_platform_docs
+from .chatbot.session_memory import ConversationMemoryStore
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +94,7 @@ artifact_summary_store: Optional[ArtifactSummaryStore] = None
 doc_chunk_store: Optional[DocumentChunkStore] = None
 chat_engine: Optional[ChatEngine] = None
 orchestrator_agent: Optional[OrchestratorAgent] = None
+conversation_memory = ConversationMemoryStore()
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -682,6 +684,7 @@ class ChatResponse(BaseModel):
     users: List[UserResult] = Field(default_factory=list)
     sources: List[SourceResult] = Field(default_factory=list)
     trace_id: Optional[str] = Field(None, description="LangSmith trace ID — use to post feedback")
+    session_id: Optional[str] = Field(None, description="Conversation session ID used for memory")
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -694,7 +697,9 @@ async def chat(request: ChatRequest):
         )
     try:
         import asyncio
-        history_dicts = [{"role": m.role, "content": m.content} for m in request.history]
+        incoming_history = [{"role": m.role, "content": m.content} for m in request.history]
+        stored_history = conversation_memory.get(request.session_id)
+        history_dicts = ConversationMemoryStore.merge(stored_history, incoming_history)
         loop = asyncio.get_event_loop()
         use_orchestrator = (
             config is not None
@@ -717,6 +722,11 @@ async def chat(request: ChatRequest):
                 )
             ),
         )
+        conversation_memory.remember_turn(
+            request.session_id,
+            request.query,
+            result.get("answer", ""),
+        )
         return ChatResponse(
             answer=result["answer"],
             intent=result["intent"],
@@ -726,6 +736,7 @@ async def chat(request: ChatRequest):
             users=[UserResult(**u) for u in result.get("users", [])],
             sources=[SourceResult(**s) for s in result.get("sources", [])],
             trace_id=result.get("trace_id"),
+            session_id=request.session_id,
         )
     except Exception as e:
         logger.error(f"Chat endpoint failed: {e}")

@@ -38,3 +38,15 @@ def test_resolves_user_selection_from_previous_disambiguation():
     ]
 
     assert memory.resolve_user_from_context("priya2.patel", history, user_ids) == "priya2.patel"
+
+
+def test_resolves_contextual_followup_from_recent_profile():
+    user_ids = ["priya.patel", "priya2.patel", "priyam.patel"]
+    history = [
+        {
+            "role": "assistant",
+            "content": "**priya2.patel**\n\nPriya works on model monitoring and Spark ETL.",
+        }
+    ]
+
+    assert memory.resolve_user_from_context("what projects is she working on?", history, user_ids) == "priya2.patel"

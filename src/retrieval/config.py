@@ -44,7 +44,7 @@ class RetrievalConfig(BaseModel):
     profile_llm_model: str = Field(default="gpt-4o-mini")
 
     # Chat runtime
-    chat_agent_mode: str = Field(default="legacy")
+    chat_agent_mode: str = Field(default="orchestrated")
     agent_max_steps: int = Field(default=4)
     agent_enable_planner_llm: bool = Field(default=False)
 
@@ -66,7 +66,7 @@ class RetrievalConfig(BaseModel):
                 "dataset/.ingestion/ingestion_catalog.json",
             ),
             profile_llm_model=os.getenv("PROFILE_LLM_MODEL", "gpt-4o-mini"),
-            chat_agent_mode=os.getenv("CHAT_AGENT_MODE", "legacy"),
+            chat_agent_mode=os.getenv("CHAT_AGENT_MODE", "orchestrated"),
             agent_max_steps=int(os.getenv("AGENT_MAX_STEPS", "4")),
             agent_enable_planner_llm=os.getenv(
                 "AGENT_ENABLE_PLANNER_LLM",
