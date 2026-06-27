@@ -13,6 +13,7 @@ dependencies = [
     "mlflow-skinny>=3.14.0",
     "openai>=1.0.0",
     "psutil>=7.2.2",
+    "psycopg[binary]>=3.2.0",
     "pydantic>=2.0.0",
     "python-docx>=1.2.0",
     "python-dotenv>=1.0.0",

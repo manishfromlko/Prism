@@ -20,6 +20,7 @@ from .profile_indexer import run_profile_indexing
 from .profile_from_summaries_indexer import run_profile_indexing_from_summaries
 from .artifact_summary_store import ArtifactSummaryStore
 from .artifact_summary_indexer import run_artifact_summary_indexing
+from .metadata_repository import MetadataRepository
 from .agents import OrchestratorAgent
 from .chatbot import ChatEngine, DocumentChunkStore, ingest_platform_docs
 from .chatbot.session_memory import ConversationMemoryStore
@@ -94,6 +95,7 @@ artifact_summary_store: Optional[ArtifactSummaryStore] = None
 doc_chunk_store: Optional[DocumentChunkStore] = None
 chat_engine: Optional[ChatEngine] = None
 orchestrator_agent: Optional[OrchestratorAgent] = None
+metadata_repository: Optional[MetadataRepository] = None
 conversation_memory = ConversationMemoryStore()
 
 # ---------------------------------------------------------------------------
@@ -123,9 +125,10 @@ app = create_app()
 
 @app.on_event("startup")
 async def startup_event():
-    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store, doc_chunk_store, chat_engine, orchestrator_agent
+    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store, doc_chunk_store, chat_engine, orchestrator_agent, metadata_repository
     try:
         config = RetrievalConfig.from_env()
+        metadata_repository = MetadataRepository()
         vector_store = VectorStore(config)
         embedding_service = EmbeddingService(config)
         query_processor = QueryProcessor(config)
@@ -266,12 +269,52 @@ async def get_metrics():
 # Workspace endpoints
 # ---------------------------------------------------------------------------
 
+def _workspace_response(ws_id: str, ws: Dict[str, Any], artifact_count: int) -> Dict[str, Any]:
+    status_map = {'success': 'active', 'failed': 'error', 'running': 'active'}
+    return {
+        'id': ws_id,
+        'name': ws_id,
+        'description': ws.get('notes') or f"Workspace owned by {ws.get('owner', ws_id)}",
+        'artifact_count': artifact_count,
+        'last_updated': ws.get('last_ingested_at', ''),
+        'created_at': ws.get('last_ingested_at', ''),
+        'status': status_map.get(ws.get('status', 'success'), 'active'),
+        'owner': ws.get('owner', ''),
+    }
+
+
+def _paginated_workspaces(data: List[Dict[str, Any]]) -> Dict[str, Any]:
+    return {
+        'data': data,
+        'pagination': {
+            'page': 1,
+            'page_size': len(data),
+            'total_count': len(data),
+            'total_pages': 1,
+            'has_next': False,
+            'has_previous': False,
+        },
+    }
+
+
 @app.get("/workspaces")
 async def list_workspaces():
-    """List all workspaces from the ingestion catalog."""
+    """List all workspaces from metadata storage."""
     if not profiler:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
+        if metadata_repository and metadata_repository.enabled:
+            artifact_counts = metadata_repository.artifact_counts_by_workspace()
+            data = [
+                _workspace_response(
+                    ws["workspace_id"],
+                    ws,
+                    artifact_counts.get(ws["workspace_id"], ws.get("file_count", 0)),
+                )
+                for ws in metadata_repository.list_workspaces()
+            ]
+            return _paginated_workspaces(data)
+
         catalog = profiler.loader.load_catalog()
         workspaces_raw = catalog.get('workspaces', {})
         artifacts = catalog.get('artifacts', {})
@@ -282,41 +325,31 @@ async def list_workspaces():
             ws_id = art.get('workspace_id', '')
             artifact_counts[ws_id] = artifact_counts.get(ws_id, 0) + 1
 
-        status_map = {'success': 'active', 'failed': 'error', 'running': 'active'}
         data = []
         for ws_id, ws in workspaces_raw.items():
-            data.append({
-                'id': ws_id,
-                'name': ws_id,
-                'description': ws.get('notes') or f"Workspace owned by {ws.get('owner', ws_id)}",
-                'artifact_count': artifact_counts.get(ws_id, ws.get('file_count', 0)),
-                'last_updated': ws.get('last_ingested_at', ''),
-                'created_at': ws.get('last_ingested_at', ''),
-                'status': status_map.get(ws.get('status', 'success'), 'active'),
-                'owner': ws.get('owner', ''),
-            })
+            data.append(_workspace_response(ws_id, ws, artifact_counts.get(ws_id, ws.get('file_count', 0))))
 
-        return {
-            'data': data,
-            'pagination': {
-                'page': 1,
-                'page_size': len(data),
-                'total_count': len(data),
-                'total_pages': 1,
-                'has_next': False,
-                'has_previous': False,
-            },
-        }
+        return _paginated_workspaces(data)
     except Exception as e:
         logger.error(f"Failed to list workspaces: {e}")
         raise HTTPException(status_code=500, detail="Failed to list workspaces")
 
 @app.get("/workspaces/{workspace_id}")
 async def get_workspace_by_id(workspace_id: str):
-    """Get a single workspace from the ingestion catalog."""
+    """Get a single workspace from metadata storage."""
     if not profiler:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
+        if metadata_repository and metadata_repository.enabled:
+            ws = metadata_repository.get_workspace(workspace_id)
+            if not ws:
+                raise HTTPException(status_code=404, detail=f"Workspace '{workspace_id}' not found")
+            artifact_count = metadata_repository.artifact_counts_by_workspace().get(
+                workspace_id,
+                ws.get("file_count", 0),
+            )
+            return {'data': _workspace_response(workspace_id, ws, artifact_count)}
+
         catalog = profiler.loader.load_catalog()
         workspaces_raw = catalog.get('workspaces', {})
         ws = workspaces_raw.get(workspace_id)
@@ -326,18 +359,8 @@ async def get_workspace_by_id(workspace_id: str):
         artifacts = catalog.get('artifacts', {})
         artifact_count = sum(1 for a in artifacts.values() if a.get('workspace_id') == workspace_id)
 
-        status_map = {'success': 'active', 'failed': 'error', 'running': 'active'}
         return {
-            'data': {
-                'id': workspace_id,
-                'name': workspace_id,
-                'description': ws.get('notes') or f"Workspace owned by {ws.get('owner', workspace_id)}",
-                'artifact_count': artifact_count,
-                'last_updated': ws.get('last_ingested_at', ''),
-                'created_at': ws.get('last_ingested_at', ''),
-                'status': status_map.get(ws.get('status', 'success'), 'active'),
-                'owner': ws.get('owner', ''),
-            }
+            'data': _workspace_response(workspace_id, ws, artifact_count)
         }
     except HTTPException:
         raise

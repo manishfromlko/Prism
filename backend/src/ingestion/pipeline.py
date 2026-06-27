@@ -45,11 +45,9 @@ class IngestionPipeline:
         self.ingestion_run.workspace_scope = [p.name for p in safe_list_dir(self.root) if p.is_dir()]
         self.ingestion_run.status = "running"
         if self.mode == "full":
-            # Reset catalog so stale entries from previous runs don't persist
-            self.storage._catalog = {}
+            self.storage.reset()
         for workspace_dir in self._list_workspaces():
-            workspace = self._ingest_workspace(workspace_dir)
-            self.storage.write_workspace(workspace)
+            self._ingest_workspace(workspace_dir)
         self.ingestion_run.completed_at = datetime.datetime.utcnow()
         self.ingestion_run.status = "success"
         if not self.dry_run:
@@ -65,11 +63,13 @@ class IngestionPipeline:
             owner=workspace_id,
             root_path=str(workspace_dir.resolve()),
         )
+        self.storage.write_workspace(workspace)
         artifacts = self._scan_files(workspace_dir, workspace_id)
         workspace.file_count = len(artifacts)
         workspace.source_coverage = self._summarize_coverage(artifacts)
         workspace.last_ingested_at = datetime.datetime.utcnow()
         workspace.status = "success"
+        self.storage.write_workspace(workspace)
         return workspace
 
     def _scan_files(self, workspace_dir: Path, workspace_id: str) -> Iterable[FileArtifact]:
@@ -91,9 +91,7 @@ class IngestionPipeline:
                 status = IngestionStatus.UPDATED
 
             if self.mode == "incremental" and status == IngestionStatus.UNCHANGED:
-                # For unchanged files in incremental mode, update status in place
-                if artifact_id in self.storage._catalog.get("artifacts", {}):
-                    self.storage._catalog["artifacts"][artifact_id]["ingestion_status"] = "unchanged"
+                self.storage.mark_artifact_unchanged(artifact_id)
                 continue
 
             artifact = FileArtifact(

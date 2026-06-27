@@ -1,4 +1,71 @@
 {
+  "workspaces": {
+    "anaya.iyer": {
+      "workspace_id": "anaya.iyer",
+      "owner": "anaya.iyer",
+      "root_path": "/app/data/workspaces/anaya.iyer",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-27T13:40:50.816820",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "aarav.mehra": {
+      "workspace_id": "aarav.mehra",
+      "owner": "aarav.mehra",
+      "root_path": "/app/data/workspaces/aarav.mehra",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-27T13:40:50.896913",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "aarav.mehraa": {
+      "workspace_id": "aarav.mehraa",
+      "owner": "aarav.mehraa",
+      "root_path": "/app/data/workspaces/aarav.mehraa",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-27T13:40:50.976370",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "diya.shah": {
+      "workspace_id": "diya.shah",
+      "owner": "diya.shah",
+      "root_path": "/app/data/workspaces/diya.shah",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-27T13:40:51.055142",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    },
+    "ananya2.iyer": {
+      "workspace_id": "ananya2.iyer",
+      "owner": "ananya2.iyer",
+      "root_path": "/app/data/workspaces/ananya2.iyer",
+      "file_count": 2,
+      "last_ingested_at": "2026-06-27T13:40:51.133797",
+      "status": "success",
+      "source_coverage": {
+        "binary": 1,
+        "processable": 1
+      },
+      "notes": null
+    }
+  },
   "artifacts": {
     "anaya.iyer:README.md": {
       "artifact_id": "anaya.iyer:README.md",
@@ -17,7 +84,7 @@
       },
       "content_hash": "31fc9cba2d78dac5d22b05be8dc56830257452faa937726b52c4c4c25b0a2907",
       "capture_source": {
-        "source_path": "data/workspaces/anaya.iyer/README.md"
+        "source_path": "/app/data/workspaces/anaya.iyer/README.md"
       }
     },
     "anaya.iyer:mllib/tf_idf_example.py": {
@@ -48,7 +115,7 @@
       },
       "content_hash": "fcbd8987563557553f038e34213505a2fe8da9a9a54cc4a9684baa8a901ec08a",
       "capture_source": {
-        "source_path": "data/workspaces/anaya.iyer/mllib/tf_idf_example.py"
+        "source_path": "/app/data/workspaces/anaya.iyer/mllib/tf_idf_example.py"
       }
     },
     "aarav.mehra:README.md": {
@@ -68,7 +135,7 @@
       },
       "content_hash": "d73dd1cf05f1270ba3ff63c30161066e9190617e8501238e7d19e096353441e7",
       "capture_source": {
-        "source_path": "data/workspaces/aarav.mehra/README.md"
+        "source_path": "/app/data/workspaces/aarav.mehra/README.md"
       }
     },
     "aarav.mehra:spark/wordcount.py": {
@@ -99,7 +166,7 @@
       },
       "content_hash": "246e774adcc1d27bc116bb7338eb532d0be7a459960a033cb8807ab6cc9745ce",
       "capture_source": {
-        "source_path": "data/workspaces/aarav.mehra/spark/wordcount.py"
+        "source_path": "/app/data/workspaces/aarav.mehra/spark/wordcount.py"
       }
     },
     "aarav.mehraa:README.md": {
@@ -119,7 +186,7 @@
       },
       "content_hash": "fee5cfa8cb6da227e94037fdf01be340f2c6a1e0b36dffb8c161446b07f9f0ea",
       "capture_source": {
-        "source_path": "data/workspaces/aarav.mehraa/README.md"
+        "source_path": "/app/data/workspaces/aarav.mehraa/README.md"
       }
     },
     "aarav.mehraa:sklearn/pca_iris.py": {
@@ -150,7 +217,7 @@
       },
       "content_hash": "331b3d876607892dcb18ab083589adbdc35238fccdd3d98cf7878204637843df",
       "capture_source": {
-        "source_path": "data/workspaces/aarav.mehraa/sklearn/pca_iris.py"
+        "source_path": "/app/data/workspaces/aarav.mehraa/sklearn/pca_iris.py"
       }
     },
     "diya.shah:README.md": {
@@ -170,7 +237,7 @@
       },
       "content_hash": "b8fd6a1c0a40716e404b83899d05567fb130a468e3b46f09fd24ca43dbe93f4f",
       "capture_source": {
-        "source_path": "data/workspaces/diya.shah/README.md"
+        "source_path": "/app/data/workspaces/diya.shah/README.md"
       }
     },
     "diya.shah:spark_ml/kmeans_example.py": {
@@ -203,7 +270,7 @@
       },
       "content_hash": "12cb40af472191802d04b2ddb922042c7e7f623d592ec514683a899105b1a9a4",
       "capture_source": {
-        "source_path": "data/workspaces/diya.shah/spark_ml/kmeans_example.py"
+        "source_path": "/app/data/workspaces/diya.shah/spark_ml/kmeans_example.py"
       }
     },
     "ananya2.iyer:README.md": {
@@ -223,7 +290,7 @@
       },
       "content_hash": "fc0e43917ff81702cf2d8d725bc1bad21e6116fd01d672b4f494f9b174cfa072",
       "capture_source": {
-        "source_path": "data/workspaces/ananya2.iyer/README.md"
+        "source_path": "/app/data/workspaces/ananya2.iyer/README.md"
       }
     },
     "ananya2.iyer:mllib/pca_rowmatrix_example.py": {
@@ -254,75 +321,8 @@
       },
       "content_hash": "d76dff916a8e9d8c6edf533bb4dcef19232eba09af54fb299613471c7312c7ec",
       "capture_source": {
-        "source_path": "data/workspaces/ananya2.iyer/mllib/pca_rowmatrix_example.py"
+        "source_path": "/app/data/workspaces/ananya2.iyer/mllib/pca_rowmatrix_example.py"
       }
-    }
-  },
-  "workspaces": {
-    "anaya.iyer": {
-      "workspace_id": "anaya.iyer",
-      "owner": "anaya.iyer",
-      "root_path": "/data/anaya.iyer",
-      "file_count": 2,
-      "last_ingested_at": "2026-06-24T17:59:40.150995",
-      "status": "success",
-      "source_coverage": {
-        "binary": 1,
-        "processable": 1
-      },
-      "notes": null
-    },
-    "aarav.mehra": {
-      "workspace_id": "aarav.mehra",
-      "owner": "aarav.mehra",
-      "root_path": "/data/aarav.mehra",
-      "file_count": 2,
-      "last_ingested_at": "2026-06-24T17:59:40.183442",
-      "status": "success",
-      "source_coverage": {
-        "binary": 1,
-        "processable": 1
-      },
-      "notes": null
-    },
-    "aarav.mehraa": {
-      "workspace_id": "aarav.mehraa",
-      "owner": "aarav.mehraa",
-      "root_path": "/data/aarav.mehraa",
-      "file_count": 2,
-      "last_ingested_at": "2026-06-24T17:59:40.232088",
-      "status": "success",
-      "source_coverage": {
-        "binary": 1,
-        "processable": 1
-      },
-      "notes": null
-    },
-    "diya.shah": {
-      "workspace_id": "diya.shah",
-      "owner": "diya.shah",
-      "root_path": "/data/diya.shah",
-      "file_count": 2,
-      "last_ingested_at": "2026-06-24T17:59:40.264214",
-      "status": "success",
-      "source_coverage": {
-        "binary": 1,
-        "processable": 1
-      },
-      "notes": null
-    },
-    "ananya2.iyer": {
-      "workspace_id": "ananya2.iyer",
-      "owner": "ananya2.iyer",
-      "root_path": "/data/ananya2.iyer",
-      "file_count": 2,
-      "last_ingested_at": "2026-06-24T17:59:42.553588",
-      "status": "success",
-      "source_coverage": {
-        "binary": 1,
-        "processable": 1
-      },
-      "notes": null
     }
   }
 }

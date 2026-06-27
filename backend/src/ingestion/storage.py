@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from .metadata_store import PostgresMetadataStore
 from .models import FileArtifact, IngestionAudit, IngestionRun, Workspace
 
 
@@ -15,6 +16,9 @@ class Storage:
         self.audit_path = self.base_path / "ingestion_audit.json"
         self._catalog: Dict[str, Any] = {}
         self._audit: List[Dict[str, Any]] = []
+        self.metadata_store = PostgresMetadataStore.from_env()
+        if self.metadata_store:
+            self.metadata_store.initialize()
         self._load()
 
     def _load(self) -> None:
@@ -38,6 +42,12 @@ class Storage:
         with self.audit_path.open("w", encoding="utf-8") as handle:
             json.dump(self._audit, handle, indent=2)
 
+    def reset(self) -> None:
+        self._catalog = {}
+        self._audit = []
+        if self.metadata_store:
+            self.metadata_store.reset()
+
     def write_workspace(self, workspace: Workspace) -> None:
         self._catalog.setdefault("workspaces", {})[workspace.workspace_id] = {
             "workspace_id": workspace.workspace_id,
@@ -51,6 +61,8 @@ class Storage:
             "source_coverage": workspace.source_coverage,
             "notes": workspace.notes,
         }
+        if self.metadata_store:
+            self.metadata_store.upsert_workspace(workspace)
 
     def write_artifact(self, artifact: FileArtifact) -> None:
         self._catalog.setdefault("artifacts", {})[artifact.artifact_id] = {
@@ -69,6 +81,8 @@ class Storage:
             "content_hash": artifact.content_hash,
             "capture_source": artifact.capture_source,
         }
+        if self.metadata_store:
+            self.metadata_store.upsert_artifact(artifact)
 
     def write_audit(self, audit: IngestionAudit) -> None:
         self._audit.append({
@@ -81,22 +95,36 @@ class Storage:
             "matched_pattern": audit.matched_pattern,
             "metadata_snapshot": audit.metadata_snapshot,
         })
+        if self.metadata_store:
+            self.metadata_store.insert_audit(audit)
 
     def get_workspace(self, workspace_id: str) -> Optional[Dict[str, Any]]:
+        if self.metadata_store:
+            return self.metadata_store.get_workspace(workspace_id)
         return self._catalog.get("workspaces", {}).get(workspace_id)
 
     def get_artifact(self, artifact_id: str) -> Optional[Dict[str, Any]]:
+        if self.metadata_store:
+            return self.metadata_store.get_artifact(artifact_id)
         return self._catalog.get("artifacts", {}).get(artifact_id)
 
     def get_artifact_hash(self, artifact_id: str) -> Optional[str]:
+        if self.metadata_store:
+            return self.metadata_store.get_artifact_hash(artifact_id)
         artifact = self._catalog.get("artifacts", {}).get(artifact_id)
         return artifact.get("content_hash") if artifact else None
 
     def get_workspace_last_ingested(self, workspace_id: str) -> Optional[datetime]:
-        workspace = self._catalog.get("workspaces", {}).get(workspace_id)
+        workspace = self.get_workspace(workspace_id)
         if workspace and workspace.get("last_ingested_at"):
             return datetime.fromisoformat(workspace["last_ingested_at"])
         return None
+
+    def mark_artifact_unchanged(self, artifact_id: str) -> None:
+        if artifact_id in self._catalog.get("artifacts", {}):
+            self._catalog["artifacts"][artifact_id]["ingestion_status"] = "unchanged"
+        if self.metadata_store:
+            self.metadata_store.upsert_artifact_status(artifact_id, "unchanged")
 
     def summary(self) -> Dict[str, Any]:
         audit_summary = {}
