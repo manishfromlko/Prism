@@ -87,7 +87,14 @@ class UserProfileStore:
         if not self.collection:
             return []
         try:
-            return scroll_payloads(self._ensure_client(), COLLECTION_NAME, limit=1000)
+            profiles = scroll_payloads(self._ensure_client(), COLLECTION_NAME, limit=1000)
+            return sorted(
+                profiles,
+                key=lambda profile: (
+                    str(profile.get("user_id") or "").casefold(),
+                    str(profile.get("id") or ""),
+                ),
+            )
         except Exception as e:
             logger.error(f"Failed to query all profiles: {e}")
             return []
