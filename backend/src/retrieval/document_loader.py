@@ -1,88 +1,49 @@
-"""Document loader for ingestion catalog artifacts."""
+"""Document loader for Postgres-backed artifact metadata."""
 
 import json
 import logging
-from pathlib import Path
 from typing import Dict, List, Optional
 
 from langchain_core.documents import Document
 
 from .config import RetrievalConfig
 from .document_guard import DocumentGuard
+from .metadata_repository import MetadataRepository
 
 logger = logging.getLogger(__name__)
 
 
 class DocumentLoader:
-    """Loader for documents from the ingestion catalog."""
+    """Loader for documents from the Postgres metadata store."""
 
-    def __init__(self, catalog_path: str, config: Optional[RetrievalConfig] = None):
-        """Initialize the document loader.
-
-        Args:
-            catalog_path: Path to the ingestion catalog JSON file
-            config: Retrieval configuration (optional)
-        """
-        self.catalog_path = Path(catalog_path)
-        self.config = config or RetrievalConfig()
-        self._catalog: Optional[Dict] = None
-        self._catalog_mtime_ns: Optional[int] = None
-
-    def load_catalog(self, force: bool = False) -> Dict:
-        """Load the ingestion catalog from JSON file.
-
-        The catalog is cached, but automatically refreshed when the backing
-        file changes. This keeps long-running API containers in sync after an
-        ingestion job rewrites the catalog.
-
-        Args:
-            force: Re-read from disk even if already cached
-        """
-        if not self.catalog_path.exists():
-            raise FileNotFoundError(f"Catalog file not found: {self.catalog_path}")
-
-        current_mtime_ns = self.catalog_path.stat().st_mtime_ns
-        if (
-            self._catalog is not None
-            and self._catalog_mtime_ns == current_mtime_ns
-            and not force
-        ):
-            return self._catalog
-
-        try:
-            with open(self.catalog_path, 'r', encoding='utf-8') as f:
-                self._catalog = json.load(f)
-            self._catalog_mtime_ns = current_mtime_ns
-            logger.info(f"Loaded catalog with {len(self._catalog.get('artifacts', {}))} artifacts")
-            return self._catalog
-        except Exception as e:
-            logger.error(f"Failed to load catalog: {e}")
-            raise
-
-    def get_artifacts(self) -> List[Dict]:
-        """Get all artifacts from the catalog.
-
-        Returns:
-            List of artifact dictionaries
-        """
-        if not self._catalog:
-            self.load_catalog()
-
-        return list(self._catalog.get('artifacts', {}).values())
-
-    # Only index these file types — CSVs, binaries, archives, etc. are not useful
-    # for user profiling and can contain enormous amounts of noisy numerical data.
     ALLOWED_FILE_TYPES = {"notebook", "script", "text"}
 
+    def __init__(
+        self,
+        config: Optional[RetrievalConfig] = None,
+        metadata_repository: Optional[MetadataRepository] = None,
+    ):
+        self.config = config or RetrievalConfig.from_env()
+        self.metadata_repository = metadata_repository or MetadataRepository()
+        self._workspaces_by_id: Dict[str, Dict] = {}
+        self._artifact_counts_by_workspace: Dict[str, int] = {}
+
+    def get_artifacts(self, workspace_id: Optional[str] = None) -> List[Dict]:
+        """Get artifacts from Postgres."""
+        if not self.metadata_repository.enabled:
+            raise RuntimeError("METADATA_DATABASE_URL is required for artifact loading")
+
+        artifacts = self.metadata_repository.list_artifacts(workspace_id)
+        if not self._workspaces_by_id:
+            self._workspaces_by_id = {
+                workspace["workspace_id"]: workspace
+                for workspace in self.metadata_repository.list_workspaces()
+            }
+        if not self._artifact_counts_by_workspace:
+            self._artifact_counts_by_workspace = self.metadata_repository.artifact_counts_by_workspace()
+        return artifacts
+
     def load_documents(self, apply_guardrails: bool = True) -> List[Document]:
-        """Load all artifacts as Langchain documents.
-
-        Args:
-            apply_guardrails: Whether to apply document filtering
-
-        Returns:
-            List of Document objects
-        """
         artifacts = self.get_artifacts()
         documents = []
 
@@ -95,12 +56,11 @@ class DocumentLoader:
                 if doc:
                     documents.append(doc)
             except Exception as e:
-                logger.warning(f"Failed to process artifact {artifact.get('id')}: {e}")
+                logger.warning(f"Failed to process artifact {artifact.get('artifact_id')}: {e}")
                 continue
 
         logger.info(f"Loaded {len(documents)} documents from {len(artifacts)} artifacts")
 
-        # Apply guardrails if requested
         if apply_guardrails:
             original_count = len(documents)
             documents = DocumentGuard.filter_documents(documents)
@@ -109,122 +69,67 @@ class DocumentLoader:
         return documents
 
     def _artifact_to_document(self, artifact: Dict) -> Optional[Document]:
-        """Convert an artifact to a Langchain document.
-
-        Args:
-            artifact: Artifact dictionary from catalog
-
-        Returns:
-            Document object or None if invalid
-        """
-        # Extract content
         content = self._extract_content(artifact)
         if not content:
             return None
 
-        # Build metadata
-        metadata = self._build_metadata(artifact)
-
         return Document(
             page_content=content,
-            metadata=metadata
+            metadata=self._build_metadata(artifact),
         )
 
     def _extract_content(self, artifact: Dict) -> Optional[str]:
-        """Extract text content from artifact.
-
-        Args:
-            artifact: Artifact dictionary
-
-        Returns:
-            Extracted text content
-        """
-        file_type = artifact.get('file_type', artifact.get('type', ''))
-        source_path = artifact.get('capture_source', {}).get('source_path', '')
+        file_type = artifact.get("file_type", artifact.get("type", ""))
+        source_path = artifact.get("capture_source", {}).get("source_path", "")
 
         if not source_path:
-            return artifact.get('content', '')
+            return artifact.get("content", "")
 
         try:
-            content = open(source_path, 'r', encoding='utf-8', errors='ignore').read()
+            with open(source_path, "r", encoding="utf-8", errors="ignore") as handle:
+                content = handle.read()
         except (OSError, IOError):
             return None
 
-        if file_type == 'notebook':
+        if file_type == "notebook":
             return self._extract_notebook_content_from_text(content)
-
         return content
 
     def _extract_notebook_content_from_text(self, raw: str) -> str:
-        """Extract cell text from raw notebook JSON string."""
         try:
             notebook = json.loads(raw)
-            cells = notebook.get('cells', [])
+            cells = notebook.get("cells", [])
             parts = []
             for cell in cells:
-                if cell.get('cell_type') in ['code', 'markdown']:
-                    source = cell.get('source', [])
-                    parts.append(''.join(source) if isinstance(source, list) else str(source))
-            return '\n\n'.join(parts)
+                if cell.get("cell_type") in ["code", "markdown"]:
+                    source = cell.get("source", [])
+                    parts.append("".join(source) if isinstance(source, list) else str(source))
+            return "\n\n".join(parts)
         except (json.JSONDecodeError, Exception):
             return raw
 
-    def _extract_notebook_content(self, artifact: Dict) -> str:
-        """Extract content from Jupyter notebook artifact dict (legacy path)."""
-        content = artifact.get('content', '')
-        if not content:
-            return ''
-        return self._extract_notebook_content_from_text(content)
-
     def _build_metadata(self, artifact: Dict) -> Dict:
-        """Build metadata dictionary for the document.
-
-        Args:
-            artifact: Artifact dictionary
-
-        Returns:
-            Metadata dictionary
-        """
         metadata = {
-            'artifact_id': artifact.get('artifact_id', artifact.get('id', '')),
-            'workspace_id': artifact.get('workspace_id', ''),
-            'type': artifact.get('file_type', artifact.get('type', '')),
-            'path': artifact.get('relative_path', artifact.get('path', '')),
-            'size': artifact.get('size_bytes', artifact.get('size', 0)),
-            'modified_at': artifact.get('last_modified_at', artifact.get('modified_at', '')),
+            "artifact_id": artifact.get("artifact_id", artifact.get("id", "")),
+            "workspace_id": artifact.get("workspace_id", ""),
+            "type": artifact.get("file_type", artifact.get("type", "")),
+            "path": artifact.get("relative_path", artifact.get("path", "")),
+            "size": artifact.get("size_bytes", artifact.get("size", 0)),
+            "modified_at": artifact.get("last_modified_at", artifact.get("modified_at", "")),
         }
 
-        # Add any additional metadata from artifact
-        if 'metadata' in artifact:
-            metadata.update(artifact['metadata'])
+        if "metadata" in artifact:
+            metadata.update(artifact["metadata"])
 
-        # Enrich with workspace context
         metadata.update(self._enrich_workspace_context(artifact))
-
         return metadata
 
     def _enrich_workspace_context(self, artifact: Dict) -> Dict:
-        """Enrich metadata with workspace-level context.
-
-        Args:
-            artifact: Artifact dictionary
-
-        Returns:
-            Additional metadata
-        """
-        workspace_id = artifact.get('workspace_id', '')
-        if not workspace_id or not self._catalog:
-            return {}
-
-        workspaces = self._catalog.get('workspaces', {})
-        workspace = workspaces.get(workspace_id, {})
-
+        workspace_id = artifact.get("workspace_id", "")
+        workspace = self._workspaces_by_id.get(workspace_id, {})
         return {
-            'workspace_name': workspace.get('workspace_id', workspace.get('name', '')),
-            'workspace_owner': workspace.get('owner', ''),
-            'workspace_path': workspace.get('root_path', workspace.get('path', '')),
-            'artifact_count_in_workspace': len([
-                a for a in self._catalog.get('artifacts', {}).values()
-                if a.get('workspace_id') == workspace_id
-            ]),
+            "workspace_name": workspace.get("workspace_id", workspace_id),
+            "workspace_owner": workspace.get("owner", ""),
+            "workspace_path": workspace.get("root_path", ""),
+            "artifact_count_in_workspace": self._artifact_counts_by_workspace.get(workspace_id, 0),
         }

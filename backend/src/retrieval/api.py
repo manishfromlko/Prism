@@ -132,7 +132,7 @@ async def startup_event():
         vector_store = VectorStore(config)
         embedding_service = EmbeddingService(config)
         query_processor = QueryProcessor(config)
-        profiler = WorkspaceProfiler(config, config.ingestion_catalog_path)
+        profiler = WorkspaceProfiler(config)
         vector_store.create_collection()
 
         # Load user_profiles collection (non-fatal if not yet indexed)
@@ -178,16 +178,6 @@ async def startup_event():
             doc_chunk_store = None
             chat_engine = None
             orchestrator_agent = None
-
-        # Pre-warm the catalog cache
-        try:
-            profiler.loader.load_catalog()
-        except FileNotFoundError:
-            logger.warning(
-                f"Catalog not found at '{config.ingestion_catalog_path}'. "
-                "Workspace and profile endpoints will return 503 until the catalog "
-                "is available. Set INGESTION_CATALOG_PATH to fix this."
-            )
 
         logger.info("API services initialized successfully")
     except Exception as e:
@@ -303,32 +293,18 @@ async def list_workspaces():
     if not profiler:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
-        if metadata_repository and metadata_repository.enabled:
-            artifact_counts = metadata_repository.artifact_counts_by_workspace()
-            data = [
-                _workspace_response(
-                    ws["workspace_id"],
-                    ws,
-                    artifact_counts.get(ws["workspace_id"], ws.get("file_count", 0)),
-                )
-                for ws in metadata_repository.list_workspaces()
-            ]
-            return _paginated_workspaces(data)
+        if not metadata_repository or not metadata_repository.enabled:
+            raise HTTPException(status_code=503, detail="Metadata database is not configured")
 
-        catalog = profiler.loader.load_catalog()
-        workspaces_raw = catalog.get('workspaces', {})
-        artifacts = catalog.get('artifacts', {})
-
-        # Count ingested artifacts per workspace
-        artifact_counts: Dict[str, int] = {}
-        for art in artifacts.values():
-            ws_id = art.get('workspace_id', '')
-            artifact_counts[ws_id] = artifact_counts.get(ws_id, 0) + 1
-
-        data = []
-        for ws_id, ws in workspaces_raw.items():
-            data.append(_workspace_response(ws_id, ws, artifact_counts.get(ws_id, ws.get('file_count', 0))))
-
+        artifact_counts = metadata_repository.artifact_counts_by_workspace()
+        data = [
+            _workspace_response(
+                ws["workspace_id"],
+                ws,
+                artifact_counts.get(ws["workspace_id"], ws.get("file_count", 0)),
+            )
+            for ws in metadata_repository.list_workspaces()
+        ]
         return _paginated_workspaces(data)
     except Exception as e:
         logger.error(f"Failed to list workspaces: {e}")
@@ -340,28 +316,18 @@ async def get_workspace_by_id(workspace_id: str):
     if not profiler:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
-        if metadata_repository and metadata_repository.enabled:
-            ws = metadata_repository.get_workspace(workspace_id)
-            if not ws:
-                raise HTTPException(status_code=404, detail=f"Workspace '{workspace_id}' not found")
-            artifact_count = metadata_repository.artifact_counts_by_workspace().get(
-                workspace_id,
-                ws.get("file_count", 0),
-            )
-            return {'data': _workspace_response(workspace_id, ws, artifact_count)}
+        if not metadata_repository or not metadata_repository.enabled:
+            raise HTTPException(status_code=503, detail="Metadata database is not configured")
 
-        catalog = profiler.loader.load_catalog()
-        workspaces_raw = catalog.get('workspaces', {})
-        ws = workspaces_raw.get(workspace_id)
+        ws = metadata_repository.get_workspace(workspace_id)
         if not ws:
             raise HTTPException(status_code=404, detail=f"Workspace '{workspace_id}' not found")
 
-        artifacts = catalog.get('artifacts', {})
-        artifact_count = sum(1 for a in artifacts.values() if a.get('workspace_id') == workspace_id)
-
-        return {
-            'data': _workspace_response(workspace_id, ws, artifact_count)
-        }
+        artifact_count = metadata_repository.artifact_counts_by_workspace().get(
+            workspace_id,
+            ws.get("file_count", 0),
+        )
+        return {'data': _workspace_response(workspace_id, ws, artifact_count)}
     except HTTPException:
         raise
     except Exception as e:
@@ -446,7 +412,7 @@ async def query_documents(request: QueryRequest):
 
 @app.post("/admin/sync", response_model=SyncResponse)
 async def sync_data(request: SyncRequest):
-    """Re-index the ingestion catalog into Qdrant (incremental or full)."""
+    """Re-index Postgres artifact metadata into Qdrant (incremental or full)."""
     if not config:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
@@ -460,12 +426,8 @@ async def sync_data(request: SyncRequest):
         # Run the CPU/IO-bound indexing in a thread so the event loop isn't blocked
         result = await loop.run_in_executor(
             None,
-            lambda: run_indexing(config.ingestion_catalog_path, mode),
+            lambda: run_indexing(mode),
         )
-
-        # Reload the catalog cache after sync
-        if profiler:
-            profiler.loader.load_catalog(force=True)
 
         return SyncResponse(
             sync_id=str(uuid.uuid4()),
@@ -528,7 +490,7 @@ async def get_user_profile(user_id: str):
 
 @app.post("/admin/sync-profiles")
 async def sync_profiles():
-    """Re-generate and re-index all user profiles from the catalog (raw-file approach)."""
+    """Re-generate and re-index all user profiles from Postgres artifact metadata."""
     if not config:
         raise HTTPException(status_code=503, detail="Service not initialized")
     try:
@@ -536,7 +498,7 @@ async def sync_profiles():
         loop = asyncio.get_event_loop()
         result = await loop.run_in_executor(
             None,
-            lambda: run_profile_indexing(config.ingestion_catalog_path),
+            run_profile_indexing,
         )
         global user_profile_store
         user_profile_store = UserProfileStore(config)
@@ -654,7 +616,7 @@ async def sync_artifact_summaries(force_full: bool = False):
         mode = "full" if force_full else "incremental"
         result = await loop.run_in_executor(
             None,
-            lambda: run_artifact_summary_indexing(config.ingestion_catalog_path, mode),
+            lambda: run_artifact_summary_indexing(mode),
         )
         global artifact_summary_store
         artifact_summary_store = ArtifactSummaryStore(config)

@@ -52,9 +52,6 @@ coverage/
 # Runtime workspace data can be large. Git tracks only the five seed workspaces
 # below; local-only workspace directories are still scanned by ingestion.
 data/workspaces/*
-!data/workspaces/.ingestion/
-!data/workspaces/.ingestion/ingestion_audit.json
-!data/workspaces/.ingestion/ingestion_catalog.json
 !data/workspaces/ATTRIBUTIONS.md
 !data/workspaces/public_sources_manifest.json
 !data/workspaces/aarav.mehra/

@@ -26,7 +26,6 @@ docker compose exec backend python -m src.retrieval.chatbot.doc_ingestion
 
 - Workspace source: `data/workspaces/`
 - Metadata source of truth: Postgres `workspaces`, `artifacts`, and `ingestion_audits` tables
-- Compatibility export: `data/workspaces/.ingestion/ingestion_catalog.json`
 - Platform docs: `data/platform_documents/*.docx`
 
 Git tracks only five small seed workspaces so the repository stays light. Local runtime is broader: ingestion scans every workspace directory that exists under `data/workspaces/`, including ignored local-only folders copied in for testing.

@@ -37,9 +37,6 @@ class RetrievalConfig(BaseModel):
     default_top_k: int = Field(default=10)
     index_type: str = Field(default="HNSW")
 
-    # Catalog path — must point to ingestion_catalog.json
-    ingestion_catalog_path: str = Field(default="../data/workspaces/.ingestion/ingestion_catalog.json")
-
     # LLM for user profile generation (chat completion, not embeddings)
     profile_llm_model: str = Field(default="gpt-4o-mini")
 
@@ -61,10 +58,6 @@ class RetrievalConfig(BaseModel):
             chunk_size=int(os.getenv("CHUNK_SIZE", "1000")),
             chunk_overlap=int(os.getenv("CHUNK_OVERLAP", "200")),
             batch_size=int(os.getenv("BATCH_SIZE", "32")),
-            ingestion_catalog_path=os.getenv(
-                "INGESTION_CATALOG_PATH",
-                "../data/workspaces/.ingestion/ingestion_catalog.json",
-            ),
             profile_llm_model=os.getenv("PROFILE_LLM_MODEL", "gpt-4o-mini"),
             chat_agent_mode=os.getenv("CHAT_AGENT_MODE", "orchestrated"),
             agent_max_steps=int(os.getenv("AGENT_MAX_STEPS", "4")),

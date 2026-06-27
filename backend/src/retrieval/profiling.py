@@ -5,7 +5,7 @@ from collections import Counter
 from typing import Dict, List, Any, Optional
 
 from .config import RetrievalConfig
-from .document_loader import DocumentLoader
+from .metadata_repository import MetadataRepository
 
 logger = logging.getLogger(__name__)
 
@@ -13,15 +13,14 @@ logger = logging.getLogger(__name__)
 class WorkspaceProfiler:
     """Generates profiling insights for workspaces."""
 
-    def __init__(self, config: RetrievalConfig, catalog_path: str):
+    def __init__(self, config: RetrievalConfig):
         self.config = config
-        self.loader = DocumentLoader(catalog_path, config)
+        self.metadata_repository = MetadataRepository()
 
     def profile_workspace(self, workspace_id: str) -> Dict[str, Any]:
         """Generate comprehensive profile for a workspace."""
         try:
-            catalog = self.loader.load_catalog()
-            artifacts = self._get_workspace_artifacts(workspace_id, catalog)
+            artifacts = self._get_workspace_artifacts(workspace_id)
             if not artifacts:
                 return self._empty_profile(workspace_id)
 
@@ -40,10 +39,9 @@ class WorkspaceProfiler:
             logger.error(f"Failed to profile workspace {workspace_id}: {e}")
             return self._empty_profile(workspace_id)
 
-    def _get_workspace_artifacts(self, workspace_id: str, catalog: Dict) -> List[Dict]:
-        """Get all artifacts for a workspace from a pre-loaded catalog."""
-        artifacts = catalog.get('artifacts', {})
-        return [a for a in artifacts.values() if a.get('workspace_id') == workspace_id]
+    def _get_workspace_artifacts(self, workspace_id: str) -> List[Dict]:
+        """Get all artifacts for a workspace from Postgres metadata."""
+        return self.metadata_repository.list_artifacts(workspace_id)
 
     def _empty_profile(self, workspace_id: str) -> Dict[str, Any]:
         return {

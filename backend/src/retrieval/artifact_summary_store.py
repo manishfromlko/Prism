@@ -102,7 +102,7 @@ class ArtifactSummaryStore:
         return len(artifact_hashes)
 
     def delete_summaries(self, artifact_ids: List[str]) -> int:
-        """Delete summaries for artifacts that no longer exist in the catalog."""
+        """Delete summaries for artifacts that no longer exist in metadata."""
         if not self.collection or not artifact_ids:
             return 0
 

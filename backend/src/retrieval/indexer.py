@@ -1,9 +1,4 @@
-"""
-Indexer: reads the ingestion catalog and populates Qdrant with embeddings.
-
-Run after ingestion to bring the vector store in sync with the catalog:
-
-    python -m src.retrieval.indexer --catalog ../data/workspaces/.ingestion/ingestion_catalog.json
+"""Indexer: reads Postgres artifact metadata and populates Qdrant with embeddings.
 
 Modes:
     incremental (default) — only indexes artifact_ids not already in Qdrant
@@ -12,8 +7,6 @@ Modes:
 
 import argparse
 import logging
-import os
-import sys
 from typing import Dict, List, Set
 
 from .config import RetrievalConfig
@@ -34,12 +27,8 @@ def _get_indexed_ids(store: VectorStore) -> Set[str]:
         return set()
 
 
-def run_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
-    """
-    Index catalog artifacts into Qdrant.
-
-    Returns a summary dict: {inserted, skipped, errors, total}.
-    """
+def run_indexing(mode: str = "incremental") -> Dict:
+    """Index Postgres artifact metadata into Qdrant."""
     config = RetrievalConfig.from_env()
 
     store = VectorStore(config)
@@ -54,9 +43,9 @@ def run_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
         already_indexed = _get_indexed_ids(store)
         logger.info(f"Already indexed: {len(already_indexed)} artifacts")
 
-    loader = DocumentLoader(catalog_path, config)
+    loader = DocumentLoader(config)
     all_docs = loader.load_documents()
-    logger.info(f"Catalog contains {len(all_docs)} indexable documents")
+    logger.info(f"Metadata store contains {len(all_docs)} indexable documents")
 
     if mode == "incremental":
         new_docs = [d for d in all_docs if d.metadata.get("artifact_id") not in already_indexed]
@@ -99,15 +88,7 @@ def run_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Index ingestion catalog artifacts into Qdrant"
-    )
-    parser.add_argument(
-        "--catalog",
-        default=os.getenv(
-            "INGESTION_CATALOG_PATH",
-            "../data/workspaces/.ingestion/ingestion_catalog.json",
-        ),
-        help="Path to ingestion_catalog.json",
+        description="Index Postgres artifact metadata into Qdrant"
     )
     parser.add_argument(
         "--mode",
@@ -117,11 +98,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if not os.path.exists(args.catalog):
-        print(f"ERROR: catalog not found: {args.catalog}", file=sys.stderr)
-        sys.exit(1)
-
-    result = run_indexing(args.catalog, args.mode)
+    result = run_indexing(args.mode)
     print(
         f"\nDone — inserted: {result['inserted']}, "
         f"skipped: {result['skipped']}, "

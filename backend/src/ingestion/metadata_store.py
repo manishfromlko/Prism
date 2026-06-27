@@ -288,12 +288,6 @@ class PostgresMetadataStore:
             ).fetchall()
         return {row["workspace_id"]: int(row["artifact_count"]) for row in rows}
 
-    def export_catalog(self) -> Dict[str, Any]:
-        return {
-            "workspaces": {row["workspace_id"]: row for row in self.list_workspaces()},
-            "artifacts": {row["artifact_id"]: row for row in self.list_artifacts()},
-        }
-
     def _workspace_row(self, row: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "workspace_id": row["workspace_id"],

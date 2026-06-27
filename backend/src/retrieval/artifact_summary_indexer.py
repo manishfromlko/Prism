@@ -1,24 +1,18 @@
 """
-Artifact summary indexer: generates artifact summaries from ingestion catalog and
+Artifact summary indexer: generates artifact summaries from Postgres metadata and
 stores them in the Qdrant artifact_summaries collection.
-
-Usage:
-    python -m src.retrieval.artifact_summary_indexer \
-        --catalog ../data/workspaces/.ingestion/ingestion_catalog.json \
-        --mode incremental
 """
 
 import argparse
-import json
 import logging
 import os
-import sys
 from typing import Dict, Set
 
 from .artifact_summary_generator import generate_artifact_summaries
 from .artifact_summary_store import ArtifactSummaryStore
 from .config import RetrievalConfig
 from .embeddings import EmbeddingService
+from .metadata_repository import MetadataRepository
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -27,12 +21,11 @@ logger = logging.getLogger(__name__)
 ELIGIBLE_FILE_TYPES = {"notebook", "script", "text"}
 
 
-def _load_eligible_artifacts(catalog_path: str) -> Dict[str, Dict]:
-    with open(catalog_path, "r", encoding="utf-8") as f:
-        catalog = json.load(f)
+def _load_eligible_artifacts() -> Dict[str, Dict]:
+    repository = MetadataRepository()
     return {
         artifact.get("artifact_id", ""): artifact
-        for artifact in catalog.get("artifacts", {}).values()
+        for artifact in repository.list_artifacts()
         if artifact.get("artifact_id")
         and artifact.get("workspace_id")
         and artifact.get("file_type") in ELIGIBLE_FILE_TYPES
@@ -45,9 +38,9 @@ def _select_incremental_artifacts(
     store: ArtifactSummaryStore,
 ) -> tuple[Set[str], Set[str], int, int]:
     """Return artifact IDs to summarize, affected users, skipped count, stale count."""
-    catalog_ids = set(artifacts)
+    current_artifact_ids = set(artifacts)
     existing_ids = set(existing_summaries)
-    stale_ids = sorted(existing_ids - catalog_ids)
+    stale_ids = sorted(existing_ids - current_artifact_ids)
     affected_user_ids: Set[str] = {
         existing_summaries[artifact_id].get("user_id", "")
         for artifact_id in stale_ids
@@ -84,12 +77,12 @@ def _select_incremental_artifacts(
     return to_summarize, affected_user_ids, skipped, len(stale_ids) + backfilled
 
 
-def run_artifact_summary_indexing(catalog_path: str, mode: str = "incremental") -> Dict:
+def run_artifact_summary_indexing(mode: str = "incremental") -> Dict:
     config = RetrievalConfig.from_env()
     store = ArtifactSummaryStore(config)
     store.create_collection(drop_if_exists=(mode == "full"))
 
-    artifacts = _load_eligible_artifacts(catalog_path)
+    artifacts = _load_eligible_artifacts()
     if mode == "incremental":
         existing_summaries = store.get_summary_index(limit=max(10000, len(artifacts) * 2))
         artifact_ids, affected_user_ids, skipped, maintenance_count = _select_incremental_artifacts(
@@ -128,9 +121,9 @@ def run_artifact_summary_indexing(catalog_path: str, mode: str = "incremental") 
     frequency_penalty = float(os.getenv("ARTIFACT_SUMMARY_LLM_FREQUENCY_PENALTY", "0.0"))
     presence_penalty = float(os.getenv("ARTIFACT_SUMMARY_LLM_PRESENCE_PENALTY", "0.0"))
 
-    logger.info("Generating artifact summaries from catalog...")
+    logger.info("Generating artifact summaries from Postgres metadata...")
     summaries = generate_artifact_summaries(
-        catalog_path=catalog_path,
+        artifacts=artifacts.values(),
         model=model,
         temperature=temperature,
         max_tokens=max_tokens,
@@ -172,24 +165,13 @@ def run_artifact_summary_indexing(catalog_path: str, mode: str = "incremental") 
 def main():
     parser = argparse.ArgumentParser(description="Index artifact summaries into Qdrant")
     parser.add_argument(
-        "--catalog",
-        default=os.getenv(
-            "INGESTION_CATALOG_PATH",
-            "../data/workspaces/.ingestion/ingestion_catalog.json",
-        ),
-    )
-    parser.add_argument(
         "--mode",
         choices=["full", "incremental"],
         default="incremental",
     )
     args = parser.parse_args()
 
-    if not os.path.exists(args.catalog):
-        print(f"ERROR: catalog not found: {args.catalog}", file=sys.stderr)
-        sys.exit(1)
-
-    result = run_artifact_summary_indexing(args.catalog, args.mode)
+    result = run_artifact_summary_indexing(args.mode)
     print(
         f"\nDone - inserted: {result['inserted']}, "
         f"skipped: {result.get('skipped', 0)}, "

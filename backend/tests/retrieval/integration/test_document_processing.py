@@ -1,97 +1,102 @@
 """Integration tests for document processing pipeline."""
 
 import json
-import tempfile
-from pathlib import Path
 
-import pytest
-
-from src.retrieval.config import RetrievalConfig
 from src.retrieval.document_loader import DocumentLoader
+from src.retrieval.config import RetrievalConfig
 from src.retrieval.text_processor import TextProcessor
+
+
+class FakeMetadataRepository:
+    enabled = True
+
+    def __init__(self, workspaces, artifacts):
+        self.workspaces = workspaces
+        self.artifacts = artifacts
+
+    def list_workspaces(self):
+        return self.workspaces
+
+    def list_artifacts(self, workspace_id=None):
+        if workspace_id:
+            return [a for a in self.artifacts if a.get("workspace_id") == workspace_id]
+        return self.artifacts
+
+    def artifact_counts_by_workspace(self):
+        counts = {}
+        for artifact in self.artifacts:
+            workspace_id = artifact.get("workspace_id", "")
+            counts[workspace_id] = counts.get(workspace_id, 0) + 1
+        return counts
 
 
 class TestDocumentProcessing:
     """Integration tests for document processing."""
 
-    def test_full_pipeline_with_sample_catalog(self):
+    def test_full_pipeline_with_sample_metadata(self):
         """Test the complete document processing pipeline."""
-        # Create sample catalog data
-        catalog_data = {
-            "workspaces": {
-                "ws1": {
-                    "id": "ws1",
-                    "name": "Test Workspace",
-                    "owner": "testuser",
-                    "path": "/test/ws1"
-                }
-            },
-            "artifacts": {
-                "art1": {
-                    "id": "art1",
-                    "workspace_id": "ws1",
-                    "type": "notebook",
-                    "path": "analysis.ipynb",
-                    "size": 1024,
-                    "modified_at": "2024-01-01T00:00:00Z",
-                    "content": json.dumps({
-                        "metadata": {"kernelspec": {"language": "python"}},
-                        "cells": [
-                            {"cell_type": "code", "source": ["print('hello world')"]},
-                            {"cell_type": "markdown", "source": ["# Analysis\n\nThis is a test."]}
-                        ]
-                    })
-                },
-                "art2": {
-                    "id": "art2",
-                    "workspace_id": "ws1",
-                    "type": "python",
-                    "path": "script.py",
-                    "size": 256,
-                    "modified_at": "2024-01-01T00:00:00Z",
-                    "content": "def hello():\n    print('Hello from script')\n\nhello()"
-                }
+        workspaces = [
+            {
+                "workspace_id": "ws1",
+                "owner": "testuser",
+                "root_path": "/test/ws1",
             }
-        }
+        ]
+        artifacts = [
+            {
+                "artifact_id": "art1",
+                "workspace_id": "ws1",
+                "file_type": "notebook",
+                "relative_path": "analysis.ipynb",
+                "size_bytes": 1024,
+                "last_modified_at": "2024-01-01T00:00:00Z",
+                "content": json.dumps({
+                    "metadata": {"kernelspec": {"language": "python"}},
+                    "cells": [
+                        {"cell_type": "code", "source": ["print('hello world')"]},
+                        {"cell_type": "markdown", "source": ["# Analysis\n\nThis is a test."]},
+                    ],
+                }),
+                "capture_source": {},
+            },
+            {
+                "artifact_id": "art2",
+                "workspace_id": "ws1",
+                "file_type": "script",
+                "relative_path": "script.py",
+                "size_bytes": 256,
+                "last_modified_at": "2024-01-01T00:00:00Z",
+                "content": "def hello():\n    print('Hello from script')\n\nhello()",
+                "capture_source": {},
+            },
+        ]
+        config = RetrievalConfig()
+        loader = DocumentLoader(
+            config=config,
+            metadata_repository=FakeMetadataRepository(workspaces, artifacts),
+        )
+        processor = TextProcessor(config)
 
-        # Create temporary catalog file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            json.dump(catalog_data, f)
-            catalog_path = f.name
+        documents = loader.load_documents(apply_guardrails=False)
 
-        try:
-            # Initialize components
-            config = RetrievalConfig()
-            loader = DocumentLoader(catalog_path, config)
-            processor = TextProcessor(config)
+        assert len(documents) == 2
 
-            # Load documents
-            documents = loader.load_documents(apply_guardrails=False)
+        notebook_doc = next(d for d in documents if d.metadata["artifact_id"] == "art1")
+        assert notebook_doc.metadata["type"] == "notebook"
+        assert "hello world" in notebook_doc.page_content
+        assert "# Analysis" in notebook_doc.page_content
+        assert notebook_doc.metadata["workspace_name"] == "ws1"
 
-            assert len(documents) == 2
+        script_doc = next(d for d in documents if d.metadata["artifact_id"] == "art2")
+        assert script_doc.metadata["type"] == "script"
+        assert "def hello():" in script_doc.page_content
 
-            # Check notebook document
-            notebook_doc = next(d for d in documents if d.metadata['artifact_id'] == 'art1')
-            assert notebook_doc.metadata['type'] == 'notebook'
-            assert 'hello world' in notebook_doc.page_content
-            assert '# Analysis' in notebook_doc.page_content
-            assert notebook_doc.metadata['workspace_name'] == 'Test Workspace'
+        chunked = processor.split_documents([
+            {"content": notebook_doc.page_content, "metadata": notebook_doc.metadata},
+            {"content": script_doc.page_content, "metadata": script_doc.metadata},
+        ])
 
-            # Check script document
-            script_doc = next(d for d in documents if d.metadata['artifact_id'] == 'art2')
-            assert script_doc.metadata['type'] == 'python'
-            assert 'def hello():' in script_doc.page_content
-
-            # Test text processing
-            chunked = processor.split_documents([
-                {'content': notebook_doc.page_content, 'metadata': notebook_doc.metadata},
-                {'content': script_doc.page_content, 'metadata': script_doc.metadata}
-            ])
-
-            assert len(chunked) >= 2  # At least one chunk per document
-
-        finally:
-            Path(catalog_path).unlink()
+        assert len(chunked) >= 2
 
     def test_text_splitting_strategies(self):
         """Test different text splitting strategies."""
@@ -154,7 +159,7 @@ This is the second section.
         )
 
         sensitive_doc = Document(
-            page_content="My password is secret123",
+            page_content="password=secret123",
             metadata={"artifact_id": "sensitive", "type": "notebook"}
         )
 
@@ -172,41 +177,32 @@ This is the second section.
 
     def test_metadata_enrichment(self):
         """Test metadata enrichment with workspace context."""
-        catalog_data = {
-            "workspaces": {
-                "ws1": {
-                    "id": "ws1",
-                    "name": "Enriched Workspace",
-                    "owner": "testowner",
-                    "path": "/test/path"
-                }
-            },
-            "artifacts": {
-                "art1": {
-                    "id": "art1",
-                    "workspace_id": "ws1",
-                    "type": "notebook",
-                    "path": "test.ipynb",
-                    "content": json.dumps({"cells": []})
-                }
-            }
-        }
+        loader = DocumentLoader(
+            metadata_repository=FakeMetadataRepository(
+                workspaces=[
+                    {
+                        "workspace_id": "ws1",
+                        "owner": "testowner",
+                        "root_path": "/test/path",
+                    }
+                ],
+                artifacts=[
+                    {
+                        "artifact_id": "art1",
+                        "workspace_id": "ws1",
+                        "file_type": "notebook",
+                        "relative_path": "test.ipynb",
+                        "content": json.dumps({"cells": [{"cell_type": "markdown", "source": ["hello"]}]}),
+                        "capture_source": {},
+                    }
+                ],
+            )
+        )
+        documents = loader.load_documents(apply_guardrails=False)
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            json.dump(catalog_data, f)
-            catalog_path = f.name
+        assert len(documents) == 1
+        doc = documents[0]
 
-        try:
-            loader = DocumentLoader(catalog_path)
-            documents = loader.load_documents(apply_guardrails=False)
-
-            assert len(documents) == 1
-            doc = documents[0]
-
-            # Check enriched metadata
-            assert doc.metadata['workspace_name'] == 'Enriched Workspace'
-            assert doc.metadata['workspace_owner'] == 'testowner'
-            assert doc.metadata['artifact_count_in_workspace'] == 1
-
-        finally:
-            Path(catalog_path).unlink()
+        assert doc.metadata["workspace_name"] == "ws1"
+        assert doc.metadata["workspace_owner"] == "testowner"
+        assert doc.metadata["artifact_count_in_workspace"] == 1

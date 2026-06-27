@@ -98,7 +98,7 @@ export default function UserProfilesPage() {
           <Users className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
           <p className="font-medium">No profiles found</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Run the profile indexer to generate user profiles from the catalog.
+            Run the profile indexer to generate user profiles from Postgres metadata.
           </p>
           <code className="mt-3 block text-xs bg-muted rounded px-3 py-2 text-left max-w-md mx-auto">
             python3 -m src.retrieval.profile_indexer

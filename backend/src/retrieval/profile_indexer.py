@@ -1,19 +1,11 @@
-"""
-Profile indexer: generates user profiles from the ingestion catalog and
-stores them in the Qdrant user_profiles collection.
-
-Usage:
-    python -m src.retrieval.profile_indexer \
-        --catalog ../data/workspaces/.ingestion/ingestion_catalog.json
-"""
+"""Profile indexer: generates user profiles from Postgres artifact metadata."""
 
 import argparse
 import logging
-import os
-import sys
 
 from .config import RetrievalConfig
 from .embeddings import EmbeddingService
+from .metadata_repository import MetadataRepository
 from .user_profile_generator import generate_profiles
 from .user_profile_store import UserProfileStore
 
@@ -21,13 +13,13 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 logger = logging.getLogger(__name__)
 
 
-def run_profile_indexing(catalog_path: str) -> dict:
+def run_profile_indexing() -> dict:
     config = RetrievalConfig.from_env()
     store = UserProfileStore(config)
     store.create_collection(drop_if_exists=True)
 
-    logger.info("Generating user profiles from catalog...")
-    profiles = generate_profiles(catalog_path)
+    logger.info("Generating user profiles from Postgres metadata...")
+    profiles = generate_profiles(MetadataRepository().list_artifacts())
     logger.info(f"Generated {len(profiles)} profiles")
 
     embedder = EmbeddingService(config)
@@ -44,20 +36,9 @@ def run_profile_indexing(catalog_path: str) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description="Index user profiles into Qdrant")
-    parser.add_argument(
-        "--catalog",
-        default=os.getenv(
-            "INGESTION_CATALOG_PATH",
-            "../data/workspaces/.ingestion/ingestion_catalog.json",
-        ),
-    )
-    args = parser.parse_args()
+    parser.parse_args()
 
-    if not os.path.exists(args.catalog):
-        print(f"ERROR: catalog not found: {args.catalog}", file=sys.stderr)
-        sys.exit(1)
-
-    result = run_profile_indexing(args.catalog)
+    result = run_profile_indexing()
     print(f"\nDone — inserted: {result['inserted']}, total users: {result['total']}")
 
 

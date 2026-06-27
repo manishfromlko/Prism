@@ -9,7 +9,7 @@ It requires artifact_summaries to be populated first.
 Usage:
     # Step 1 — populate artifact summaries (if not already done):
     python -m src.retrieval.artifact_summary_indexer \\
-        --catalog ../data/workspaces/.ingestion/ingestion_catalog.json --mode full
+        --mode full
 
     # Step 2 — generate and index user profiles:
     python -m src.retrieval.profile_from_summaries_indexer

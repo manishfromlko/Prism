@@ -4,7 +4,7 @@ from src.ingestion.models import FileArtifact, FileType, IngestionAudit, Workspa
 from src.ingestion.storage import Storage
 
 
-def test_storage_write_and_load(tmp_path: Path) -> None:
+def test_storage_write_and_read_without_json_files(tmp_path: Path) -> None:
     base_path = tmp_path / "ingestion"
     storage = Storage(base_path)
 
@@ -37,7 +37,7 @@ def test_storage_write_and_load(tmp_path: Path) -> None:
     storage.write_audit(audit)
     storage.save()
 
-    loaded_storage = Storage(base_path)
-    assert loaded_storage.get_workspace("user1")["file_count"] == 1
-    assert loaded_storage.get_artifact("user1:script.py")["file_name"] == "script.py"
-    assert len(loaded_storage._audit) == 1
+    assert storage.get_workspace("user1")["file_count"] == 1
+    assert storage.get_artifact("user1:script.py")["file_name"] == "script.py"
+    assert len(storage._audit) == 1
+    assert list(base_path.glob("*.json")) == []

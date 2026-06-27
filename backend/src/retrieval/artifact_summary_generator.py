@@ -3,7 +3,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, Iterable, List, Optional, Set
 
 from .config import make_openai_client
 
@@ -70,7 +70,7 @@ def _call_llm(
 
 
 def generate_artifact_summaries(
-    catalog_path: str,
+    artifacts: Iterable[Dict],
     model: str = "gpt-4o-mini",
     temperature: float = 0.0,
     max_tokens: int = 220,
@@ -79,12 +79,8 @@ def generate_artifact_summaries(
     presence_penalty: float = 0.0,
     artifact_ids: Optional[Set[str]] = None,
 ) -> List[Dict]:
-    with open(catalog_path, "r", encoding="utf-8") as f:
-        catalog = json.load(f)
-
     prompt_template = _load_prompt_template()
     client = make_openai_client()
-    artifacts = list(catalog.get("artifacts", {}).values())
 
     summaries: List[Dict] = []
     for artifact in artifacts:

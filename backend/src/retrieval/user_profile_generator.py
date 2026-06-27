@@ -185,20 +185,17 @@ def _call_llm(client, model: str, prompt: str) -> Optional[Dict]:
 
 
 def generate_profiles(
-    catalog_path: str,
+    artifacts: List[Dict],
     model: str = "gpt-4o-mini",
 ) -> List[Dict]:
     """
-    Read catalog, call the LLM once per workspace, and return profile dicts.
+    Read artifact metadata, call the LLM once per workspace, and return profile dicts.
 
     Each dict has: id, user_id, user_profile, tech_tags, data_tags.
     The caller adds 'vector' before indexing into Qdrant.
     """
-    with open(catalog_path) as f:
-        catalog = json.load(f)
-
     artifacts_by_ws: Dict[str, List[Dict]] = {}
-    for art in catalog.get("artifacts", {}).values():
+    for art in artifacts:
         ws = art.get("workspace_id", "")
         if ws:
             artifacts_by_ws.setdefault(ws, []).append(art)
