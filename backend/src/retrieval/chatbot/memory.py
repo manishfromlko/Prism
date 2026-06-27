@@ -62,6 +62,18 @@ def _looks_like_contextual_followup(query: str) -> bool:
     )
 
 
+def is_broad_people_search(query: str) -> bool:
+    """Return True for expertise/people searches that should not reuse last user."""
+    normalized = query.lower()
+    has_group_subject = bool(
+        re.search(r"\b(people|users|experts|colleagues|members|team members|who)\b", normalized)
+    )
+    has_expertise_action = bool(
+        re.search(r"\b(work|working|expert|expertise|skills?|know|knows|experience)\b", normalized)
+    )
+    return has_group_subject and has_expertise_action
+
+
 def resolve_user_from_context(
     query: str,
     history: List[Dict],
@@ -75,6 +87,9 @@ def resolve_user_from_context(
     known_ids = {normalize_user_id_text(uid): uid for uid in all_user_ids}
     if normalized_query in known_ids:
         return known_ids[normalized_query]
+
+    if is_broad_people_search(query):
+        return None
 
     recent_candidates = extract_recent_user_candidates(history, all_user_ids)
     for candidate in recent_candidates:

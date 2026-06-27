@@ -52,6 +52,23 @@ def test_resolves_contextual_followup_from_recent_profile():
     assert memory.resolve_user_from_context("what projects is she working on?", history, user_ids) == "priya2.patel"
 
 
+def test_broad_people_search_does_not_reuse_recent_profile_user():
+    user_ids = ["ravi.verma", "zoya.khan"]
+    history = [
+        {"role": "user", "content": "Who is ravi verma"},
+        {"role": "assistant", "content": "**ravi.verma**\n\nRavi works on ETL."},
+    ]
+
+    assert (
+        memory.resolve_user_from_context(
+            "tell me about people who work on natural language processing?",
+            history,
+            user_ids,
+        )
+        is None
+    )
+
+
 def test_detects_greeting_and_conversation_memory_query():
     assert memory.is_greeting("Hi")
     assert memory.is_self_intro_query("tell me about yourself")
