@@ -199,15 +199,12 @@ def answer_conversation_memory_query(query: str, history: List[Dict[str, str]]) 
         return "I do not have a previous answer in this conversation yet."
 
     asked_questions = _user_messages(history)
-    current_query = query.strip()
-    if current_query:
-        asked_questions = [*asked_questions, current_query]
 
     if not asked_questions:
         return "You have not asked any earlier questions in this conversation yet."
 
     lines = [
-        "So far in this conversation, you asked:",
+        "Before this question, you asked:",
         *[f"{index}. {question}" for index, question in enumerate(asked_questions, start=1)],
     ]
 

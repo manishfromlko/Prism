@@ -90,7 +90,8 @@ def test_answers_conversation_memory_query_from_history():
         history,
     )
 
+    assert "Before this question, you asked:" in answer
     assert "1. Hi" in answer
     assert "2. tell me about ravi.verma?" in answer
-    assert "3. What questions I asked till now?" in answer
+    assert "3. What questions I asked till now?" not in answer
     assert "ravi.verma" in answer
