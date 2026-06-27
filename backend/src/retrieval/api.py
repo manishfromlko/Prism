@@ -23,7 +23,7 @@ from .artifact_summary_indexer import run_artifact_summary_indexing
 from .metadata_repository import MetadataRepository
 from .agents import OrchestratorAgent
 from .chatbot import ChatEngine, DocumentChunkStore, ingest_platform_docs
-from .chatbot.session_memory import ConversationMemoryStore
+from .chatbot.session_memory import ConversationMemoryStore, PostgresConversationMemoryStore
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +96,7 @@ doc_chunk_store: Optional[DocumentChunkStore] = None
 chat_engine: Optional[ChatEngine] = None
 orchestrator_agent: Optional[OrchestratorAgent] = None
 metadata_repository: Optional[MetadataRepository] = None
-conversation_memory = ConversationMemoryStore()
+conversation_memory: Any = ConversationMemoryStore(max_sessions=20)
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -125,10 +125,19 @@ app = create_app()
 
 @app.on_event("startup")
 async def startup_event():
-    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store, doc_chunk_store, chat_engine, orchestrator_agent, metadata_repository
+    global config, vector_store, embedding_service, query_processor, profiler, user_profile_store, artifact_summary_store, doc_chunk_store, chat_engine, orchestrator_agent, metadata_repository, conversation_memory
     try:
         config = RetrievalConfig.from_env()
         metadata_repository = MetadataRepository()
+        try:
+            durable_memory = PostgresConversationMemoryStore.from_env()
+            if durable_memory:
+                durable_memory.initialize()
+                conversation_memory = durable_memory
+                logger.info("Durable Postgres conversation memory initialized")
+        except Exception as e:
+            logger.warning(f"Durable conversation memory unavailable; using in-process memory: {e}")
+
         vector_store = VectorStore(config)
         embedding_service = EmbeddingService(config)
         query_processor = QueryProcessor(config)
@@ -671,6 +680,20 @@ class ChatResponse(BaseModel):
     trace_id: Optional[str] = Field(None, description="Trace ID — use to post feedback/scores")
     session_id: Optional[str] = Field(None, description="Conversation session ID used for memory")
 
+class ConversationSummary(BaseModel):
+    session_id: str
+    title: str
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    message_count: int = 0
+
+class ConversationHistory(BaseModel):
+    session_id: str
+    title: str
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    messages: List[ChatMessage] = Field(default_factory=list)
+
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
@@ -726,6 +749,51 @@ async def chat(request: ChatRequest):
     except Exception as e:
         logger.error(f"Chat endpoint failed: {e}")
         raise HTTPException(status_code=500, detail=f"Chat failed: {e}")
+
+
+@app.get("/chat/conversations")
+async def list_chat_conversations(limit: int = Query(20, ge=1, le=20)):
+    """Return saved conversations, newest first. Retention is capped at 20."""
+    try:
+        conversations = conversation_memory.list_conversations(limit=limit)
+        return {
+            "data": [ConversationSummary(**conversation) for conversation in conversations],
+            "total": len(conversations),
+            "retention_limit": 20,
+        }
+    except Exception as e:
+        logger.error(f"Failed to list chat conversations: {e}")
+        raise HTTPException(status_code=500, detail="Failed to list chat conversations")
+
+
+@app.get("/chat/conversations/{session_id}", response_model=ConversationHistory)
+async def get_chat_conversation(session_id: str):
+    """Return the saved message history for one conversation."""
+    try:
+        conversation = conversation_memory.get_conversation(session_id)
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        return ConversationHistory(**conversation)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to load chat conversation {session_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to load chat conversation")
+
+
+@app.delete("/chat/conversations/{session_id}")
+async def delete_chat_conversation(session_id: str):
+    """Delete a saved conversation."""
+    try:
+        deleted = conversation_memory.delete_conversation(session_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        return {"status": "deleted", "session_id": session_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to delete chat conversation {session_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete chat conversation")
 
 
 # ---------------------------------------------------------------------------

@@ -16,7 +16,7 @@ spec.loader.exec_module(session_memory)
 
 
 def test_remembers_turns_by_session_id():
-    store = session_memory.ConversationMemoryStore(max_messages=4)
+    store = session_memory.ConversationMemoryStore(max_sessions=20, max_messages=4)
 
     store.remember_turn("session-1", "who is priya?", "Top Matches:\n1. priya2.patel")
 
@@ -25,6 +25,22 @@ def test_remembers_turns_by_session_id():
         {"role": "assistant", "content": "Top Matches:\n1. priya2.patel"},
     ]
     assert store.get("other-session") == []
+
+
+def test_lists_and_deletes_saved_conversations():
+    store = session_memory.ConversationMemoryStore(max_sessions=2, max_messages=4)
+
+    store.remember_turn("session-1", "first question", "first answer")
+    store.remember_turn("session-2", "second question", "second answer")
+    store.remember_turn("session-3", "third question", "third answer")
+
+    conversations = store.list_conversations()
+
+    assert [row["session_id"] for row in conversations] == ["session-3", "session-2"]
+    assert conversations[0]["title"] == "third question"
+    assert store.get("session-1") == []
+    assert store.delete_conversation("session-2") is True
+    assert store.get_conversation("session-2") is None
 
 
 def test_merges_stored_and_incoming_history_without_duplicates():

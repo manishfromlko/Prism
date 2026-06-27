@@ -3,7 +3,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
-import { MessageSquare, X, Trash2, Maximize2, Minimize2 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { History, Maximize2, MessageSquare, Minimize2, Plus, Trash2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ChatMessage, ChatMessageData } from './ChatMessage'
 import { ChatInput } from './ChatInput'
@@ -19,11 +27,26 @@ interface ChatPanelProps {
   onClose: () => void
 }
 
+interface ConversationSummary {
+  session_id: string
+  title: string
+  updated_at?: string | null
+  message_count: number
+}
+
+interface ConversationHistory {
+  session_id: string
+  title: string
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>
+}
+
 export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessageData[]>([WELCOME])
+  const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const sessionIdRef = useRef<string>(crypto.randomUUID())
+  const hydratedRef = useRef(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -33,6 +56,45 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   // Collapse back to default width when closed
   useEffect(() => {
     if (!isOpen) setExpanded(false)
+  }, [isOpen])
+
+  const loadConversations = async () => {
+    try {
+      const res = await fetch('/api/chat/conversations', { cache: 'no-store' })
+      if (!res.ok) return []
+      const data = await res.json()
+      const rows = data.data ?? []
+      setConversations(rows)
+      return rows as ConversationSummary[]
+    } catch {
+      return []
+    }
+  }
+
+  const loadConversation = async (sessionId: string) => {
+    const res = await fetch(`/api/chat/conversations/${encodeURIComponent(sessionId)}`, {
+      cache: 'no-store',
+    })
+    if (!res.ok) return
+    const data: ConversationHistory = await res.json()
+    sessionIdRef.current = data.session_id
+    setMessages([
+      WELCOME,
+      ...data.messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+      })),
+    ])
+  }
+
+  useEffect(() => {
+    if (!isOpen || hydratedRef.current) return
+    hydratedRef.current = true
+    loadConversations().then((rows) => {
+      if (rows.length > 0) {
+        loadConversation(rows[0].session_id)
+      }
+    })
   }, [isOpen])
 
   const handleSend = async (query: string) => {
@@ -71,6 +133,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
       }
 
       setMessages((prev) => [...prev.slice(0, -1), assistantMsg])
+      loadConversations()
     } catch (err: any) {
       setMessages((prev) => [
         ...prev.slice(0, -1),
@@ -84,6 +147,19 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const handleClear = () => {
     sessionIdRef.current = crypto.randomUUID()
     setMessages([WELCOME])
+  }
+
+  const handleDeleteCurrent = async () => {
+    const currentSessionId = sessionIdRef.current
+    try {
+      await fetch(`/api/chat/conversations/${encodeURIComponent(currentSessionId)}`, {
+        method: 'DELETE',
+      })
+    } catch {
+      // Non-fatal: starting a fresh local conversation is still useful.
+    }
+    handleClear()
+    loadConversations()
   }
 
   return (
@@ -104,12 +180,48 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
               <span className="text-sm font-semibold">Assistant</span>
             </div>
             <div className="flex items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                    title="Saved conversations"
+                  >
+                    <History className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  <DropdownMenuLabel>Saved conversations</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleClear}>
+                    <Plus className="mr-2 h-3.5 w-3.5" />
+                    New conversation
+                  </DropdownMenuItem>
+                  {conversations.length > 0 && <DropdownMenuSeparator />}
+                  {conversations.map((conversation) => (
+                    <DropdownMenuItem
+                      key={conversation.session_id}
+                      onClick={() => loadConversation(conversation.session_id)}
+                      className="flex-col items-start gap-0.5"
+                    >
+                      <span className="w-full truncate text-sm">{conversation.title}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {conversation.message_count} messages
+                      </span>
+                    </DropdownMenuItem>
+                  ))}
+                  {conversations.length === 0 && (
+                    <DropdownMenuItem disabled>No saved conversations</DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-7 w-7 p-0"
-                onClick={handleClear}
-                title="Clear conversation"
+                onClick={handleDeleteCurrent}
+                title="Delete current conversation"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
