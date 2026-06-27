@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TypewriterText } from '@/components/ui/typewriter-text'
 import { Sparkles } from 'lucide-react'
 import type { UserProfile } from '@/lib/api'
 
@@ -66,7 +67,9 @@ export function UserProfileSummary({ profile, isLoading = false }: UserProfileSu
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-sm leading-relaxed whitespace-pre-line">{profile.user_profile}</p>
+        <p className="text-sm leading-relaxed whitespace-pre-line">
+          <TypewriterText text={profile.user_profile} />
+        </p>
         {profile.tags && profile.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {profile.tags.map((tag) => (
