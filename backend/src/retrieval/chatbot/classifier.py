@@ -1,4 +1,4 @@
-"""Intent classifier: maps user query → DOC_QA | ARTIFACT_SEARCH | USER_SEARCH | HYBRID | OUT_OF_SCOPE."""
+"""Intent classifier for enterprise RAG and chat-control flows."""
 
 import json
 import logging
@@ -6,11 +6,20 @@ from typing import Dict, Optional
 
 from ...observability import trace_extra_body
 from ..config import make_openai_client
+from .memory import is_conversation_memory_query, is_greeting
 from .prompt_loader import load_prompt
 
 logger = logging.getLogger(__name__)
 
-INTENTS = {"DOC_QA", "ARTIFACT_SEARCH", "USER_SEARCH", "HYBRID", "OUT_OF_SCOPE"}
+INTENTS = {
+    "DOC_QA",
+    "ARTIFACT_SEARCH",
+    "USER_SEARCH",
+    "HYBRID",
+    "GREETING",
+    "CONVERSATION_MEMORY",
+    "OUT_OF_SCOPE",
+}
 
 
 class IntentClassifier:
@@ -27,6 +36,20 @@ class IntentClassifier:
         Falls back to DOC_QA with low confidence on failure.
         trace_id is associated with the request-level LangSmith trace.
         """
+        if is_greeting(query):
+            return {
+                "intent": "GREETING",
+                "confidence": 0.99,
+                "reasoning": "Simple conversational greeting.",
+            }
+
+        if is_conversation_memory_query(query):
+            return {
+                "intent": "CONVERSATION_MEMORY",
+                "confidence": 0.99,
+                "reasoning": "User is asking about the current conversation history.",
+            }
+
         try:
             response = self.client.chat.completions.create(
                 model=self.model,

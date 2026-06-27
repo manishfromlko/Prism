@@ -50,3 +50,28 @@ def test_resolves_contextual_followup_from_recent_profile():
     ]
 
     assert memory.resolve_user_from_context("what projects is she working on?", history, user_ids) == "priya2.patel"
+
+
+def test_detects_greeting_and_conversation_memory_query():
+    assert memory.is_greeting("Hi")
+    assert memory.is_conversation_memory_query("What questions I asked till now?")
+    assert not memory.is_conversation_memory_query("tell me about ravi.verma")
+
+
+def test_answers_conversation_memory_query_from_history():
+    history = [
+        {"role": "user", "content": "Hi"},
+        {"role": "assistant", "content": "Hi! How can I help?"},
+        {"role": "user", "content": "tell me about ravi.verma?"},
+        {"role": "assistant", "content": "Ravi Verma works on PySpark ETL."},
+    ]
+
+    answer = memory.answer_conversation_memory_query(
+        "What questions I asked till now?",
+        history,
+    )
+
+    assert "1. Hi" in answer
+    assert "2. tell me about ravi.verma?" in answer
+    assert "3. What questions I asked till now?" in answer
+    assert "ravi.verma" in answer

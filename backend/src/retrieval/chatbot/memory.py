@@ -85,3 +85,86 @@ def resolve_user_from_context(
         return extract_recent_profile_user(history, all_user_ids)
 
     return None
+
+
+def is_greeting(query: str) -> bool:
+    """Return True for simple conversational greetings."""
+    normalized = re.sub(r"[^a-z\s]+", " ", query.lower()).strip()
+    return normalized in {
+        "hi",
+        "hello",
+        "hey",
+        "hi there",
+        "hello there",
+        "good morning",
+        "good afternoon",
+        "good evening",
+    }
+
+
+def is_conversation_memory_query(query: str) -> bool:
+    """Return True when the user is asking about the current chat history."""
+    normalized = query.lower().strip()
+    patterns = [
+        r"\bwhat (questions|queries|things) (have )?i asked\b",
+        r"\bwhat did i ask\b",
+        r"\bwhat have i asked\b",
+        r"\bquestions i asked\b",
+        r"\bwhat did we (talk|discuss) about\b",
+        r"\bsummar(y|ize) (our|this) (chat|conversation)\b",
+        r"\brecap (our|this) (chat|conversation)\b",
+        r"\brepeat (your )?(last|previous) (answer|response)\b",
+        r"\bwhat was (your )?(last|previous) (answer|response)\b",
+    ]
+    return any(re.search(pattern, normalized) for pattern in patterns)
+
+
+def _user_messages(history: List[Dict[str, str]]) -> List[str]:
+    return [
+        str(message.get("content", "")).strip()
+        for message in history
+        if message.get("role") == "user" and str(message.get("content", "")).strip()
+    ]
+
+
+def _assistant_messages(history: List[Dict[str, str]]) -> List[str]:
+    return [
+        str(message.get("content", "")).strip()
+        for message in history
+        if message.get("role") == "assistant" and str(message.get("content", "")).strip()
+    ]
+
+
+def answer_conversation_memory_query(query: str, history: List[Dict[str, str]]) -> str:
+    """Answer chat-history questions directly from the provided conversation."""
+    normalized = query.lower()
+    assistant_messages = _assistant_messages(history)
+
+    if re.search(r"\b(repeat|last|previous).*(answer|response)\b", normalized):
+        if assistant_messages:
+            return f"My previous answer was:\n\n{assistant_messages[-1]}"
+        return "I do not have a previous answer in this conversation yet."
+
+    asked_questions = _user_messages(history)
+    current_query = query.strip()
+    if current_query:
+        asked_questions = [*asked_questions, current_query]
+
+    if not asked_questions:
+        return "You have not asked any earlier questions in this conversation yet."
+
+    lines = [
+        "So far in this conversation, you asked:",
+        *[f"{index}. {question}" for index, question in enumerate(asked_questions, start=1)],
+    ]
+
+    substantive = [
+        question
+        for question in asked_questions
+        if not is_greeting(question) and not is_conversation_memory_query(question)
+    ]
+    if substantive:
+        lines.append("")
+        lines.append(f"The main substantive question was about: {substantive[-1]}")
+
+    return "\n".join(lines)

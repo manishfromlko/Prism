@@ -43,7 +43,12 @@ from ..user_profile_store import UserProfileStore
 from .classifier import IntentClassifier
 from .doc_store import DocumentChunkStore
 from .formatter import format_response
-from .memory import resolve_user_from_context
+from .memory import (
+    answer_conversation_memory_query,
+    is_conversation_memory_query,
+    is_greeting,
+    resolve_user_from_context,
+)
 from .prompts import (
     build_artifact_search_messages,
     build_doc_qa_messages,
@@ -150,7 +155,29 @@ class ChatEngine:
         confidence = classification["confidence"]
         logger.info(f"Intent: {intent} ({confidence:.2f}) — '{query}' [trace={trace_id}]")
 
-        # 2. Short-circuit out-of-scope queries
+        # 2. Short-circuit conversational control flows before RAG/out-of-scope handling.
+        if intent == "GREETING" or is_greeting(query):
+            result = format_response(
+                answer=(
+                    "Hi! I can help with platform docs, artifact discovery, "
+                    "and finding people or expertise. What would you like to explore?"
+                ),
+                intent="GREETING",
+                confidence=max(confidence, 0.95),
+            )
+            result["trace_id"] = trace_id
+            return result
+
+        if intent == "CONVERSATION_MEMORY" or is_conversation_memory_query(query):
+            result = format_response(
+                answer=answer_conversation_memory_query(query, history),
+                intent="CONVERSATION_MEMORY",
+                confidence=max(confidence, 0.95),
+            )
+            result["trace_id"] = trace_id
+            return result
+
+        # 3. Short-circuit out-of-scope queries
         if intent == "OUT_OF_SCOPE":
             result = format_response(
                 answer=_OUT_OF_SCOPE_REPLY,
@@ -160,10 +187,10 @@ class ChatEngine:
             result["trace_id"] = trace_id
             return result
 
-        # 3. Rewrite query for better embedding recall
+        # 4. Rewrite query for better embedding recall
         search_query = self.rewriter.rewrite(query, trace_id=trace_id)
 
-        # 4. USER_SEARCH: name resolution first, vector retrieval only as fallback
+        # 5. USER_SEARCH: name resolution first, vector retrieval only as fallback
         if intent == "USER_SEARCH":
             all_ids = self.user_store.get_all_user_ids()
             contextual_uid = resolve_user_from_context(query, history, all_ids)
@@ -220,7 +247,7 @@ class ChatEngine:
                 result["trace_id"] = trace_id
                 return result
 
-        # 5. Route & retrieve for non-name-lookup paths
+        # 6. Route & retrieve for non-name-lookup paths
         doc_hits: List[Dict] = []
         artifact_hits: List[Dict] = []
         user_hits: List[Dict] = []
@@ -236,7 +263,7 @@ class ChatEngine:
             artifact_hits = self.artifact_retriever.retrieve(search_query, top_k=3)
             user_hits = self.user_retriever.retrieve(search_query, top_k=3)
 
-        # 6. Build prompt
+        # 7. Build prompt
         if intent == "DOC_QA":
             messages = build_doc_qa_messages(doc_hits, query)
         elif intent == "ARTIFACT_SEARCH":
@@ -251,7 +278,7 @@ class ChatEngine:
 
         source_count = len(doc_hits) + len(artifact_hits) + len(user_hits)
 
-        # 7. Generate — OpenAI call is traced by LangSmith's wrapped client
+        # 8. Generate — OpenAI call is traced by LangSmith's wrapped client
         try:
             response = self.client.chat.completions.create(
                 model=self.llm_model,
