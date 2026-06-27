@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useUserProfiles } from '@/hooks/use-api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -68,7 +69,10 @@ function ProfileSkeleton() {
 export default function UserProfilesPage() {
   const { data, isLoading, error } = useUserProfiles()
 
-  const profiles = data?.data ?? []
+  const profiles = useMemo(
+    () => [...(data?.data ?? [])].sort((left, right) => left.user_id.localeCompare(right.user_id)),
+    [data?.data],
+  )
 
   return (
     <div className="space-y-6">
