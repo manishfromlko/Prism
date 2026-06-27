@@ -5,6 +5,7 @@ import { useUserProfiles } from '@/hooks/use-api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TypewriterText } from '@/components/ui/typewriter-text'
 import { Users } from 'lucide-react'
 
 function ProfileCard({ profile }: { profile: { id: string; user_id: string; user_profile: string; tags: string[] } }) {
@@ -23,7 +24,7 @@ function ProfileCard({ profile }: { profile: { id: string; user_id: string; user
 
       <CardContent className="flex flex-col gap-4 flex-1">
         <p className="text-sm text-muted-foreground leading-relaxed">
-          {profile.user_profile}
+          <TypewriterText text={profile.user_profile} />
         </p>
 
         {profile.tags.length > 0 && (
