@@ -5,12 +5,11 @@ import { useUserProfiles } from '@/hooks/use-api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { TypewriterText } from '@/components/ui/typewriter-text'
 import { Users } from 'lucide-react'
 
 function ProfileCard({ profile }: { profile: { id: string; user_id: string; user_profile: string; tags: string[] } }) {
   return (
-    <Card className="flex flex-col h-full">
+    <Card className="flex flex-col h-full animate-in fade-in-0 zoom-in-95 duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm shrink-0">
@@ -24,7 +23,7 @@ function ProfileCard({ profile }: { profile: { id: string; user_id: string; user
 
       <CardContent className="flex flex-col gap-4 flex-1">
         <p className="text-sm text-muted-foreground leading-relaxed">
-          <TypewriterText text={profile.user_profile} />
+          {profile.user_profile}
         </p>
 
         {profile.tags.length > 0 && (
