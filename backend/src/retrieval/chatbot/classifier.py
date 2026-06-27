@@ -7,6 +7,7 @@ from typing import Dict, Optional
 from ...observability import trace_extra_body
 from ..config import make_openai_client
 from .memory import is_conversation_memory_query, is_greeting
+from .memory import is_self_intro_query
 from .prompt_loader import load_prompt
 
 logger = logging.getLogger(__name__)
@@ -17,6 +18,7 @@ INTENTS = {
     "USER_SEARCH",
     "HYBRID",
     "GREETING",
+    "SELF_INTRO",
     "CONVERSATION_MEMORY",
     "OUT_OF_SCOPE",
 }
@@ -41,6 +43,13 @@ class IntentClassifier:
                 "intent": "GREETING",
                 "confidence": 0.99,
                 "reasoning": "Simple conversational greeting.",
+            }
+
+        if is_self_intro_query(query):
+            return {
+                "intent": "SELF_INTRO",
+                "confidence": 0.99,
+                "reasoning": "User is asking about assistant capabilities.",
             }
 
         if is_conversation_memory_query(query):

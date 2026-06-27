@@ -47,7 +47,9 @@ from .memory import (
     answer_conversation_memory_query,
     is_conversation_memory_query,
     is_greeting,
+    is_self_intro_query,
     resolve_user_from_context,
+    self_intro_answer,
 )
 from .prompts import (
     build_artifact_search_messages,
@@ -156,6 +158,15 @@ class ChatEngine:
         logger.info(f"Intent: {intent} ({confidence:.2f}) — '{query}' [trace={trace_id}]")
 
         # 2. Short-circuit conversational control flows before RAG/out-of-scope handling.
+        if intent == "SELF_INTRO" or is_self_intro_query(query):
+            result = format_response(
+                answer=self_intro_answer(),
+                intent="SELF_INTRO",
+                confidence=max(confidence, 0.95),
+            )
+            result["trace_id"] = trace_id
+            return result
+
         if intent == "GREETING" or is_greeting(query):
             result = format_response(
                 answer=(

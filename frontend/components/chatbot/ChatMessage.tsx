@@ -39,6 +39,7 @@ const INTENT_COLORS: Record<string, string> = {
   USER_SEARCH: 'bg-green-100 text-green-800',
   HYBRID: 'bg-orange-100 text-orange-800',
   GREETING: 'bg-sky-100 text-sky-800',
+  SELF_INTRO: 'bg-cyan-100 text-cyan-800',
   CONVERSATION_MEMORY: 'bg-indigo-100 text-indigo-800',
 }
 

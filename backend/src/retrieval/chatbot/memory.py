@@ -119,6 +119,28 @@ def is_conversation_memory_query(query: str) -> bool:
     return any(re.search(pattern, normalized) for pattern in patterns)
 
 
+def is_self_intro_query(query: str) -> bool:
+    """Return True when the user asks what this assistant is or can do."""
+    normalized = query.lower().strip()
+    patterns = [
+        r"\btell me about yourself\b",
+        r"\bwho are you\b",
+        r"\bwhat are you\b",
+        r"\bwhat can you do\b",
+        r"\bwhat do you do\b",
+        r"\bintroduce yourself\b",
+    ]
+    return any(re.search(pattern, normalized) for pattern in patterns)
+
+
+def self_intro_answer() -> str:
+    return (
+        "I am your workspace intelligence assistant. I can help you search platform "
+        "docs, discover notebooks and code artifacts, find people by expertise, "
+        "summarize workspace profiles, and recall saved conversation history."
+    )
+
+
 def _user_messages(history: List[Dict[str, str]]) -> List[str]:
     return [
         str(message.get("content", "")).strip()
