@@ -133,6 +133,22 @@ def is_self_intro_query(query: str) -> bool:
     return any(re.search(pattern, normalized) for pattern in patterns)
 
 
+def is_system_stats_query(query: str) -> bool:
+    """Return True for direct questions about indexed system metadata counts."""
+    normalized = query.lower().strip()
+    patterns = [
+        r"\bhow many workspaces\b",
+        r"\bnumber of workspaces\b",
+        r"\bworkspace count\b",
+        r"\bhow many artifacts\b",
+        r"\bnumber of artifacts\b",
+        r"\bartifact count\b",
+        r"\bhow many notebooks\b",
+        r"\bhow many scripts\b",
+    ]
+    return any(re.search(pattern, normalized) for pattern in patterns)
+
+
 def self_intro_answer() -> str:
     return (
         "I am your workspace intelligence assistant. I can help you search platform "

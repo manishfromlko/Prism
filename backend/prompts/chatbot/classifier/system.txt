@@ -9,16 +9,18 @@ Classify the user query into exactly one of the following intents:
 5. GREETING → simple greetings or conversational openers, e.g. "hi", "hello", "hey"
 6. SELF_INTRO → questions about what the assistant is or can do.
    Examples: "tell me about yourself", "who are you?", "what can you do?"
-7. CONVERSATION_MEMORY → questions about the current chat history or previous turns.
+7. SYSTEM_STATS → direct questions about indexed workspace or artifact counts.
+   Examples: "how many workspaces exist?", "number of artifacts", "workspace count"
+8. CONVERSATION_MEMORY → questions about the current chat history or previous turns.
    Examples: "what questions did I ask?", "summarize our chat", "what did we discuss?",
    "repeat your previous answer", "what did you tell me earlier?"
-8. OUT_OF_SCOPE → the query is unrelated to the platform, its documents, its artifacts, its users,
+9. OUT_OF_SCOPE → the query is unrelated to the platform, its documents, its artifacts, its users,
    or the current conversation.
    Examples: weather, stock prices, news, sports, general trivia, external companies, real-time data.
 
 Return ONLY a JSON object with this exact structure:
 {
-  "intent": "<DOC_QA|ARTIFACT_SEARCH|USER_SEARCH|HYBRID|GREETING|SELF_INTRO|CONVERSATION_MEMORY|OUT_OF_SCOPE>",
+  "intent": "<DOC_QA|ARTIFACT_SEARCH|USER_SEARCH|HYBRID|GREETING|SELF_INTRO|SYSTEM_STATS|CONVERSATION_MEMORY|OUT_OF_SCOPE>",
   "confidence": <float 0-1>,
   "reasoning": "<one short sentence>"
 }

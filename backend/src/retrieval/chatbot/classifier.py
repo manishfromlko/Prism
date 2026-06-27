@@ -6,8 +6,12 @@ from typing import Dict, Optional
 
 from ...observability import trace_extra_body
 from ..config import make_openai_client
-from .memory import is_conversation_memory_query, is_greeting
-from .memory import is_self_intro_query
+from .memory import (
+    is_conversation_memory_query,
+    is_greeting,
+    is_self_intro_query,
+    is_system_stats_query,
+)
 from .prompt_loader import load_prompt
 
 logger = logging.getLogger(__name__)
@@ -19,6 +23,7 @@ INTENTS = {
     "HYBRID",
     "GREETING",
     "SELF_INTRO",
+    "SYSTEM_STATS",
     "CONVERSATION_MEMORY",
     "OUT_OF_SCOPE",
 }
@@ -50,6 +55,13 @@ class IntentClassifier:
                 "intent": "SELF_INTRO",
                 "confidence": 0.99,
                 "reasoning": "User is asking about assistant capabilities.",
+            }
+
+        if is_system_stats_query(query):
+            return {
+                "intent": "SYSTEM_STATS",
+                "confidence": 0.99,
+                "reasoning": "User is asking for indexed workspace metadata counts.",
             }
 
         if is_conversation_memory_query(query):

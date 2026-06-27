@@ -39,6 +39,7 @@ from ...observability import (
 from ..artifact_summary_store import ArtifactSummaryStore
 from ..config import RetrievalConfig, make_openai_client
 from ..embeddings import EmbeddingService
+from ..metadata_repository import MetadataRepository
 from ..user_profile_store import UserProfileStore
 from .classifier import IntentClassifier
 from .doc_store import DocumentChunkStore
@@ -48,6 +49,7 @@ from .memory import (
     is_conversation_memory_query,
     is_greeting,
     is_self_intro_query,
+    is_system_stats_query,
     resolve_user_from_context,
     self_intro_answer,
 )
@@ -103,6 +105,7 @@ class ChatEngine:
         user_store: UserProfileStore,
         embedding_service: EmbeddingService,
         llm_model: str = "gpt-4o-mini",
+        metadata_repository: Optional[MetadataRepository] = None,
     ):
         self.config = config
         self.llm_model = llm_model
@@ -115,6 +118,29 @@ class ChatEngine:
         self.artifact_retriever = ArtifactRetriever(artifact_store, embedding_service)
         self.user_retriever = UserRetriever(user_store, embedding_service)
         self.user_resolver = UserNameResolver(user_store, model=llm_model)
+        self.metadata_repository = metadata_repository or MetadataRepository()
+
+    def _system_stats_answer(self, query: str) -> str:
+        if not self.metadata_repository.enabled:
+            return "Workspace metadata is not available right now."
+
+        workspaces = self.metadata_repository.list_workspaces()
+        artifacts = self.metadata_repository.list_artifacts()
+        notebooks = [artifact for artifact in artifacts if artifact.get("file_type") == "notebook"]
+        scripts = [
+            artifact
+            for artifact in artifacts
+            if artifact.get("file_type") == "script"
+        ]
+
+        normalized = query.lower()
+        if "artifact" in normalized:
+            return f"There are {len(artifacts)} artifacts currently indexed across {len(workspaces)} workspaces."
+        if "notebook" in normalized:
+            return f"There are {len(notebooks)} notebooks currently indexed across {len(workspaces)} workspaces."
+        if "script" in normalized:
+            return f"There are {len(scripts)} scripts currently indexed across {len(workspaces)} workspaces."
+        return f"There are {len(workspaces)} workspaces currently indexed in the system."
 
     def chat(
         self,
@@ -183,6 +209,15 @@ class ChatEngine:
             result = format_response(
                 answer=answer_conversation_memory_query(query, history),
                 intent="CONVERSATION_MEMORY",
+                confidence=max(confidence, 0.95),
+            )
+            result["trace_id"] = trace_id
+            return result
+
+        if intent == "SYSTEM_STATS" or is_system_stats_query(query):
+            result = format_response(
+                answer=self._system_stats_answer(query),
+                intent="SYSTEM_STATS",
                 confidence=max(confidence, 0.95),
             )
             result["trace_id"] = trace_id

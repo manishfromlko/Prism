@@ -55,6 +55,7 @@ def test_resolves_contextual_followup_from_recent_profile():
 def test_detects_greeting_and_conversation_memory_query():
     assert memory.is_greeting("Hi")
     assert memory.is_self_intro_query("tell me about yourself")
+    assert memory.is_system_stats_query("How many workspaces exist in the system?")
     assert memory.is_conversation_memory_query("What questions I asked till now?")
     assert not memory.is_conversation_memory_query("tell me about ravi.verma")
 
