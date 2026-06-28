@@ -45,6 +45,7 @@ observability_module.make_llm_client = lambda *args, **kwargs: None
 observability_module.mlflow_chat_trace = noop_trace
 observability_module.record_mlflow_chat_output = lambda *args, **kwargs: None
 observability_module.trace_extra_body = lambda *args, **kwargs: {}
+observability_module.evaluate_in_background = lambda *args, **kwargs: None
 sys.modules["src.observability"] = observability_module
 
 engine_module = pytypes.ModuleType("src.retrieval.chatbot.engine")
@@ -92,6 +93,7 @@ class StubChatEngine:
     user_resolver = object()
     metadata_repository = None
     user_retriever = object()
+    artifact_retriever = object()
     client = None
     llm_model = "gpt-4o-mini"
 

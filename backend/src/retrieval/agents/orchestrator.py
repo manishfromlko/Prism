@@ -8,6 +8,7 @@ from typing import Dict, Optional
 
 from ...observability import mlflow_chat_trace, record_mlflow_chat_output
 from ..chatbot.engine import ChatEngine
+from .artifacts import ArtifactAgent
 from .memory import MemoryAgent
 from .metadata import MetadataAgent
 from .people import PeopleProfileAgent
@@ -38,6 +39,11 @@ class OrchestratorAgent:
         self.planner_enabled = planner_enabled
         self.memory_agent = MemoryAgent()
         self.metadata_agent = MetadataAgent(chat_engine.metadata_repository)
+        self.artifact_agent = ArtifactAgent(
+            artifact_retriever=chat_engine.artifact_retriever,
+            llm_client=chat_engine.client,
+            llm_model=chat_engine.llm_model,
+        )
         self.people_agent = PeopleProfileAgent(
             user_store=chat_engine.user_store,
             user_resolver=chat_engine.user_resolver,
@@ -106,6 +112,16 @@ class OrchestratorAgent:
             people_result = self.people_agent.run(context)
             if people_result:
                 return self._finalize_agent_result(people_result, context)
+
+        if intent == "ARTIFACT_SEARCH":
+            context.search_query = self.chat_engine.rewriter.rewrite(
+                context.query,
+                trace_id=context.trace_id,
+            )
+            context.add_step(self.name, "rewrite_query", search_query=context.search_query)
+            artifact_result = self.artifact_agent.run(context)
+            if artifact_result:
+                return self._finalize_agent_result(artifact_result, context)
 
             context.search_query = self.chat_engine.rewriter.rewrite(
                 context.query,
