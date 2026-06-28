@@ -11,6 +11,7 @@ from ..chatbot.engine import ChatEngine
 from .artifacts import ArtifactAgent
 from .critic import CriticAgent
 from .docs import DocsAgent
+from .hybrid import HybridAgent
 from .memory import MemoryAgent
 from .metadata import MetadataAgent
 from .people import PeopleProfileAgent
@@ -50,6 +51,12 @@ class OrchestratorAgent:
         )
         self.docs_agent = DocsAgent(
             doc_retriever=chat_engine.doc_retriever,
+            synthesis_agent=self.synthesis_agent,
+        )
+        self.hybrid_agent = HybridAgent(
+            doc_retriever=chat_engine.doc_retriever,
+            artifact_retriever=chat_engine.artifact_retriever,
+            user_retriever=chat_engine.user_retriever,
             synthesis_agent=self.synthesis_agent,
         )
         self.people_agent = PeopleProfileAgent(
@@ -139,6 +146,16 @@ class OrchestratorAgent:
             docs_result = self.docs_agent.run(context)
             if docs_result:
                 return self._finalize_agent_result(docs_result, context)
+
+        if intent == "HYBRID":
+            context.search_query = self.chat_engine.rewriter.rewrite(
+                context.query,
+                trace_id=context.trace_id,
+            )
+            context.add_step(self.name, "rewrite_query", search_query=context.search_query)
+            hybrid_result = self.hybrid_agent.run(context)
+            if hybrid_result:
+                return self._finalize_agent_result(hybrid_result, context)
 
             context.search_query = self.chat_engine.rewriter.rewrite(
                 context.query,

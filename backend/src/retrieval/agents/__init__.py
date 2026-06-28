@@ -4,6 +4,7 @@ from .orchestrator import OrchestratorAgent
 from .artifacts import ArtifactAgent
 from .critic import CriticAgent
 from .docs import DocsAgent
+from .hybrid import HybridAgent
 from .memory import MemoryAgent
 from .metadata import MetadataAgent
 from .people import PeopleProfileAgent
@@ -19,6 +20,7 @@ __all__ = [
     "ArtifactAgent",
     "CriticAgent",
     "DocsAgent",
+    "HybridAgent",
     "MemoryAgent",
     "MetadataAgent",
     "OrchestratorAgent",
