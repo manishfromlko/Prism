@@ -21,6 +21,13 @@ export interface SourceResult {
   doc_id: string
 }
 
+export interface AgentStepResult {
+  agent: string
+  action: string
+  status: string
+  details?: Record<string, unknown>
+}
+
 export interface ChatMessageData {
   role: 'user' | 'assistant'
   content: string
@@ -30,6 +37,8 @@ export interface ChatMessageData {
   artifacts?: ArtifactResult[]
   users?: UserResult[]
   sources?: SourceResult[]
+  agent_mode?: string
+  agent_steps?: AgentStepResult[]
   isLoading?: boolean
 }
 
@@ -84,6 +93,11 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
           {message.confidence !== undefined && (
             <span className="text-[10px] text-muted-foreground">
               {Math.round(message.confidence * 100)}% confidence
+            </span>
+          )}
+          {message.agent_mode === 'orchestrated' && message.agent_steps && (
+            <span className="text-[10px] text-muted-foreground">
+              orchestrated • {message.agent_steps.length} steps
             </span>
           )}
         </div>

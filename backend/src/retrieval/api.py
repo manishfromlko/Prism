@@ -669,6 +669,12 @@ class SourceResult(BaseModel):
     file: str
     doc_id: str
 
+class AgentStepResult(BaseModel):
+    agent: str
+    action: str
+    status: str = "completed"
+    details: Dict[str, Any] = Field(default_factory=dict)
+
 class ChatResponse(BaseModel):
     answer: str
     intent: str
@@ -679,6 +685,8 @@ class ChatResponse(BaseModel):
     sources: List[SourceResult] = Field(default_factory=list)
     trace_id: Optional[str] = Field(None, description="Trace ID — use to post feedback/scores")
     session_id: Optional[str] = Field(None, description="Conversation session ID used for memory")
+    agent_mode: Optional[str] = Field(None, description="Runtime mode used to answer this turn")
+    agent_steps: List[AgentStepResult] = Field(default_factory=list)
 
 class ConversationSummary(BaseModel):
     session_id: str
@@ -745,6 +753,8 @@ async def chat(request: ChatRequest):
             sources=[SourceResult(**s) for s in result.get("sources", [])],
             trace_id=result.get("trace_id"),
             session_id=request.session_id,
+            agent_mode=result.get("agent_mode"),
+            agent_steps=[AgentStepResult(**s) for s in result.get("agent_steps", [])],
         )
     except Exception as e:
         logger.error(f"Chat endpoint failed: {e}")

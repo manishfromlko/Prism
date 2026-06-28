@@ -130,6 +130,8 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
         artifacts: data.artifacts,
         users: data.users,
         sources: data.sources,
+        agent_mode: data.agent_mode,
+        agent_steps: data.agent_steps,
       }
 
       setMessages((prev) => [...prev.slice(0, -1), assistantMsg])
