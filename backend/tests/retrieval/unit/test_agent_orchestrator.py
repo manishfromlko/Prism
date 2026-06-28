@@ -86,12 +86,15 @@ orchestrator_module = load_module(
 class StubChatEngine:
     user_store = object()
     user_resolver = object()
+    metadata_repository = None
 
     class classifier:
         @staticmethod
         def classify(query, trace_id=None):
             if query == "tell me about yourself":
                 return {"intent": "SELF_INTRO", "confidence": 0.99}
+            if query == "How many workspaces exist in the system?":
+                return {"intent": "SYSTEM_STATS", "confidence": 0.99}
             return {"intent": "USER_SEARCH", "confidence": 0.92}
 
     def chat(self, query, history, session_id=None):
@@ -102,6 +105,20 @@ class StubChatEngine:
             "exact_match": True,
             "trace_id": "trace-1",
         }
+
+
+class StubMetadataRepository:
+    enabled = True
+
+    def list_workspaces(self):
+        return [{"workspace_id": "a"}, {"workspace_id": "b"}]
+
+    def list_artifacts(self):
+        return [
+            {"file_type": "notebook"},
+            {"file_type": "script"},
+            {"file_type": "script"},
+        ]
 
 
 def test_agent_context_records_steps():
@@ -146,6 +163,7 @@ def test_orchestrator_routes_user_search_to_people_agent():
         "start",
         "classify_intent",
         "pass",
+        "pass",
         "return_profile",
     ]
 
@@ -165,4 +183,25 @@ def test_orchestrator_routes_memory_turn_to_memory_agent():
         "start",
         "classify_intent",
         "answer_self_intro",
+    ]
+
+
+def test_orchestrator_routes_system_stats_to_metadata_agent():
+    chat_engine = StubChatEngine()
+    chat_engine.metadata_repository = StubMetadataRepository()
+    orchestrator = orchestrator_module.OrchestratorAgent(
+        chat_engine=chat_engine,
+        max_steps=3,
+        planner_enabled=False,
+    )
+
+    result = orchestrator.run("How many workspaces exist in the system?", [])
+
+    assert result["intent"] == "SYSTEM_STATS"
+    assert result["answer"] == "There are 2 workspaces currently indexed in the system."
+    assert [step["action"] for step in result["agent_steps"]] == [
+        "start",
+        "classify_intent",
+        "pass",
+        "load_system_metadata",
     ]

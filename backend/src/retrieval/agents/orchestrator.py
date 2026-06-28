@@ -9,6 +9,7 @@ from typing import Dict, Optional
 from ...observability import mlflow_chat_trace, record_mlflow_chat_output
 from ..chatbot.engine import ChatEngine
 from .memory import MemoryAgent
+from .metadata import MetadataAgent
 from .people import PeopleProfileAgent
 from .types import AgentContext
 
@@ -36,6 +37,7 @@ class OrchestratorAgent:
         self.max_steps = max_steps
         self.planner_enabled = planner_enabled
         self.memory_agent = MemoryAgent()
+        self.metadata_agent = MetadataAgent(chat_engine.metadata_repository)
         self.people_agent = PeopleProfileAgent(
             user_store=chat_engine.user_store,
             user_resolver=chat_engine.user_resolver,
@@ -92,6 +94,10 @@ class OrchestratorAgent:
         memory_result = self.memory_agent.run(context)
         if memory_result:
             return self._finalize_agent_result(memory_result.to_response(), context)
+
+        metadata_result = self.metadata_agent.run(context)
+        if metadata_result:
+            return self._finalize_agent_result(metadata_result.to_response(), context)
 
         if intent == "USER_SEARCH":
             people_result = self.people_agent.run(context)
