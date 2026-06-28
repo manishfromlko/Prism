@@ -1,5 +1,13 @@
-from src.retrieval.agents.people import PeopleProfileAgent
+import sys
+
 from src.retrieval.agents.types import AgentContext
+
+
+def people_agent_class():
+    sys.modules.pop("src.retrieval.agents.people", None)
+    from src.retrieval.agents.people import PeopleProfileAgent
+
+    return PeopleProfileAgent
 
 
 class StubUserStore:
@@ -22,6 +30,7 @@ class StubUserRetriever:
 
 
 def test_people_agent_semantic_search_returns_empty_answer_without_legacy_fallback():
+    PeopleProfileAgent = people_agent_class()
     retriever = StubUserRetriever([])
     agent = PeopleProfileAgent(
         user_store=StubUserStore(),
@@ -44,6 +53,7 @@ def test_people_agent_semantic_search_returns_empty_answer_without_legacy_fallba
 
 
 def test_people_agent_semantic_search_formats_user_hits():
+    PeopleProfileAgent = people_agent_class()
     agent = PeopleProfileAgent(
         user_store=StubUserStore(),
         user_resolver=StubUserResolver(),

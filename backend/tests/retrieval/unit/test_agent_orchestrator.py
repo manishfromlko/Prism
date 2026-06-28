@@ -5,6 +5,8 @@ import types as pytypes
 from contextlib import contextmanager
 from pathlib import Path
 
+import pytest
+
 
 os.environ["MLFLOW_TRACING"] = "false"
 
@@ -86,6 +88,12 @@ orchestrator_module = load_module(
     AGENTS_ROOT / "orchestrator.py",
     package="src.retrieval.agents",
 )
+
+
+@pytest.fixture(autouse=True)
+def restore_people_module():
+    yield
+    sys.modules.pop("src.retrieval.agents.people", None)
 
 
 class StubChatEngine:
