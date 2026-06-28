@@ -9,6 +9,7 @@ from typing import Dict, Optional
 from ...observability import mlflow_chat_trace, record_mlflow_chat_output
 from ..chatbot.engine import ChatEngine
 from .artifacts import ArtifactAgent
+from .docs import DocsAgent
 from .memory import MemoryAgent
 from .metadata import MetadataAgent
 from .people import PeopleProfileAgent
@@ -41,6 +42,11 @@ class OrchestratorAgent:
         self.metadata_agent = MetadataAgent(chat_engine.metadata_repository)
         self.artifact_agent = ArtifactAgent(
             artifact_retriever=chat_engine.artifact_retriever,
+            llm_client=chat_engine.client,
+            llm_model=chat_engine.llm_model,
+        )
+        self.docs_agent = DocsAgent(
+            doc_retriever=chat_engine.doc_retriever,
             llm_client=chat_engine.client,
             llm_model=chat_engine.llm_model,
         )
@@ -122,6 +128,16 @@ class OrchestratorAgent:
             artifact_result = self.artifact_agent.run(context)
             if artifact_result:
                 return self._finalize_agent_result(artifact_result, context)
+
+        if intent == "DOC_QA":
+            context.search_query = self.chat_engine.rewriter.rewrite(
+                context.query,
+                trace_id=context.trace_id,
+            )
+            context.add_step(self.name, "rewrite_query", search_query=context.search_query)
+            docs_result = self.docs_agent.run(context)
+            if docs_result:
+                return self._finalize_agent_result(docs_result, context)
 
             context.search_query = self.chat_engine.rewriter.rewrite(
                 context.query,

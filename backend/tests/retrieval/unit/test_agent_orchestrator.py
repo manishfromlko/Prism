@@ -94,6 +94,7 @@ class StubChatEngine:
     metadata_repository = None
     user_retriever = object()
     artifact_retriever = object()
+    doc_retriever = object()
     client = None
     llm_model = "gpt-4o-mini"
 

@@ -2,6 +2,7 @@
 
 from .orchestrator import OrchestratorAgent
 from .artifacts import ArtifactAgent
+from .docs import DocsAgent
 from .memory import MemoryAgent
 from .metadata import MetadataAgent
 from .people import PeopleProfileAgent
@@ -14,6 +15,7 @@ __all__ = [
     "AgentStep",
     "AgentToolResult",
     "ArtifactAgent",
+    "DocsAgent",
     "MemoryAgent",
     "MetadataAgent",
     "OrchestratorAgent",
