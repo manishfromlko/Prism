@@ -90,6 +90,8 @@ class StubChatEngine:
     class classifier:
         @staticmethod
         def classify(query, trace_id=None):
+            if query == "tell me about yourself":
+                return {"intent": "SELF_INTRO", "confidence": 0.99}
             return {"intent": "USER_SEARCH", "confidence": 0.92}
 
     def chat(self, query, history, session_id=None):
@@ -143,5 +145,24 @@ def test_orchestrator_routes_user_search_to_people_agent():
     assert [step["action"] for step in result["agent_steps"]] == [
         "start",
         "classify_intent",
+        "pass",
         "return_profile",
+    ]
+
+
+def test_orchestrator_routes_memory_turn_to_memory_agent():
+    orchestrator = orchestrator_module.OrchestratorAgent(
+        chat_engine=StubChatEngine(),
+        max_steps=3,
+        planner_enabled=False,
+    )
+
+    result = orchestrator.run("tell me about yourself", [])
+
+    assert result["intent"] == "SELF_INTRO"
+    assert result["agent_mode"] == "orchestrated"
+    assert [step["action"] for step in result["agent_steps"]] == [
+        "start",
+        "classify_intent",
+        "answer_self_intro",
     ]

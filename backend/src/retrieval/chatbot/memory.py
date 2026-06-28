@@ -172,6 +172,13 @@ def self_intro_answer() -> str:
     )
 
 
+def greeting_answer() -> str:
+    return (
+        "Hi! I can help with platform docs, artifact discovery, "
+        "and finding people or expertise. What would you like to explore?"
+    )
+
+
 def _user_messages(history: List[Dict[str, str]]) -> List[str]:
     return [
         str(message.get("content", "")).strip()

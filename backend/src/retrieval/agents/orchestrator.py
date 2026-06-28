@@ -8,6 +8,7 @@ from typing import Dict, Optional
 
 from ...observability import mlflow_chat_trace, record_mlflow_chat_output
 from ..chatbot.engine import ChatEngine
+from .memory import MemoryAgent
 from .people import PeopleProfileAgent
 from .types import AgentContext
 
@@ -34,6 +35,7 @@ class OrchestratorAgent:
         self.chat_engine = chat_engine
         self.max_steps = max_steps
         self.planner_enabled = planner_enabled
+        self.memory_agent = MemoryAgent()
         self.people_agent = PeopleProfileAgent(
             user_store=chat_engine.user_store,
             user_resolver=chat_engine.user_resolver,
@@ -78,6 +80,8 @@ class OrchestratorAgent:
         )
         intent = classification["intent"]
         confidence = classification["confidence"]
+        context.intent = intent
+        context.confidence = confidence
         context.add_step(
             self.name,
             "classify_intent",
@@ -85,13 +89,14 @@ class OrchestratorAgent:
             confidence=round(confidence, 4),
         )
 
+        memory_result = self.memory_agent.run(context)
+        if memory_result:
+            return self._finalize_agent_result(memory_result.to_response(), context)
+
         if intent == "USER_SEARCH":
             people_result = self.people_agent.run(context)
             if people_result:
-                people_result["trace_id"] = context.trace_id
-                people_result["agent_mode"] = "orchestrated"
-                people_result["agent_steps"] = self._serialize_steps(context)
-                return people_result
+                return self._finalize_agent_result(people_result, context)
 
             context.add_step(
                 self.name,
@@ -121,6 +126,12 @@ class OrchestratorAgent:
             result.get("intent"),
             len(context.steps),
         )
+        return result
+
+    def _finalize_agent_result(self, result: Dict, context: AgentContext) -> Dict:
+        result["trace_id"] = context.trace_id
+        result["agent_mode"] = "orchestrated"
+        result["agent_steps"] = self._serialize_steps(context)
         return result
 
     @staticmethod
