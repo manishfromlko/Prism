@@ -6,6 +6,7 @@ from .docs import DocsAgent
 from .memory import MemoryAgent
 from .metadata import MetadataAgent
 from .people import PeopleProfileAgent
+from .synthesis import SynthesisAgent
 from .tools import RetrievalToolbelt
 from .types import AgentContext, AgentResult, AgentStep, AgentToolResult
 
@@ -21,4 +22,5 @@ __all__ = [
     "OrchestratorAgent",
     "PeopleProfileAgent",
     "RetrievalToolbelt",
+    "SynthesisAgent",
 ]

@@ -13,6 +13,7 @@ from .docs import DocsAgent
 from .memory import MemoryAgent
 from .metadata import MetadataAgent
 from .people import PeopleProfileAgent
+from .synthesis import SynthesisAgent
 from .types import AgentContext
 
 logger = logging.getLogger(__name__)
@@ -38,24 +39,22 @@ class OrchestratorAgent:
         self.chat_engine = chat_engine
         self.max_steps = max_steps
         self.planner_enabled = planner_enabled
+        self.synthesis_agent = SynthesisAgent(chat_engine.client, chat_engine.llm_model)
         self.memory_agent = MemoryAgent()
         self.metadata_agent = MetadataAgent(chat_engine.metadata_repository)
         self.artifact_agent = ArtifactAgent(
             artifact_retriever=chat_engine.artifact_retriever,
-            llm_client=chat_engine.client,
-            llm_model=chat_engine.llm_model,
+            synthesis_agent=self.synthesis_agent,
         )
         self.docs_agent = DocsAgent(
             doc_retriever=chat_engine.doc_retriever,
-            llm_client=chat_engine.client,
-            llm_model=chat_engine.llm_model,
+            synthesis_agent=self.synthesis_agent,
         )
         self.people_agent = PeopleProfileAgent(
             user_store=chat_engine.user_store,
             user_resolver=chat_engine.user_resolver,
             user_retriever=chat_engine.user_retriever,
-            llm_client=chat_engine.client,
-            llm_model=chat_engine.llm_model,
+            synthesis_agent=self.synthesis_agent,
         )
 
     def run(

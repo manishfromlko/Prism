@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from ...observability import evaluate_in_background
 from ..chatbot.memory import resolve_user_from_context
 from ..chatbot.prompts import build_user_search_messages
 from ..chatbot.user_resolver import UserNameResolver, retrieve_candidates
 from ..user_profile_store import UserProfileStore
+from .synthesis import SynthesisAgent
 from .types import AgentContext, AgentResult
 
 
@@ -22,14 +23,12 @@ class PeopleProfileAgent:
         user_store: UserProfileStore,
         user_resolver: UserNameResolver,
         user_retriever: Optional[Any] = None,
-        llm_client: Optional[Any] = None,
-        llm_model: str = "gpt-4o-mini",
+        synthesis_agent: Optional[SynthesisAgent] = None,
     ):
         self.user_store = user_store
         self.user_resolver = user_resolver
         self.user_retriever = user_retriever
-        self.llm_client = llm_client
-        self.llm_model = llm_model
+        self.synthesis_agent = synthesis_agent or SynthesisAgent()
 
     def run(self, context: AgentContext) -> Optional[Dict]:
         all_ids = self.user_store.get_all_user_ids()
@@ -88,7 +87,13 @@ class PeopleProfileAgent:
                 raw_users=[],
             ).to_response()
 
-        answer = self._generate_people_answer(context, user_hits)
+        answer = self.synthesis_agent.synthesize(
+            context,
+            evidence=user_hits,
+            prompt_builder=build_user_search_messages,
+            fallback_builder=self._fallback_people_answer,
+            empty_answer="I couldn't find any matching users for this query in the knowledge base.",
+        )
         result = AgentResult(
             answer=answer,
             intent="USER_SEARCH",
@@ -104,23 +109,10 @@ class PeopleProfileAgent:
         )
         return result
 
-    def _generate_people_answer(self, context: AgentContext, user_hits: List[Dict]) -> str:
-        if not self.llm_client:
-            names = ", ".join(hit.get("user_id", "unknown") for hit in user_hits[:3])
-            return f"Relevant people I found: {names}."
-
-        messages = build_user_search_messages(user_hits, context.query)
-        try:
-            response = self.llm_client.chat.completions.create(
-                model=self.llm_model,
-                messages=messages,
-                temperature=0.2,
-                max_tokens=600,
-            )
-            return response.choices[0].message.content.strip()
-        except Exception:
-            names = ", ".join(hit.get("user_id", "unknown") for hit in user_hits[:3])
-            return f"Relevant people I found: {names}."
+    @staticmethod
+    def _fallback_people_answer(user_hits: list[Dict]) -> str:
+        names = ", ".join(hit.get("user_id", "unknown") for hit in user_hits[:3])
+        return f"Relevant people I found: {names}."
 
     def _profile_response(self, context: AgentContext, user_id: str) -> Optional[Dict]:
         profile = self.user_store.get_profile(user_id)

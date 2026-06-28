@@ -27,7 +27,6 @@ def test_people_agent_semantic_search_returns_empty_answer_without_legacy_fallba
         user_store=StubUserStore(),
         user_resolver=StubUserResolver(),
         user_retriever=retriever,
-        llm_client=None,
     )
     context = AgentContext(
         query="tell me about people who work on natural language processing",
@@ -41,7 +40,7 @@ def test_people_agent_semantic_search_returns_empty_answer_without_legacy_fallba
     assert result["intent"] == "USER_SEARCH"
     assert result["answer"] == "I couldn't find any matching users for this query in the knowledge base."
     assert retriever.calls == [("natural language processing expertise", 5)]
-    assert context.steps[-1].action == "semantic_people_search"
+    assert any(step.action == "semantic_people_search" for step in context.steps)
 
 
 def test_people_agent_semantic_search_formats_user_hits():
@@ -51,7 +50,6 @@ def test_people_agent_semantic_search_formats_user_hits():
         user_retriever=StubUserRetriever(
             [{"user_id": "meera.iyer", "tags": "NLP, Python", "user_profile": "Works on NLP"}]
         ),
-        llm_client=None,
     )
     context = AgentContext(
         query="who works on natural language processing",

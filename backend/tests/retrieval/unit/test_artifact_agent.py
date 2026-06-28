@@ -14,7 +14,7 @@ class StubArtifactRetriever:
 
 def test_artifact_agent_returns_empty_answer_for_no_hits():
     retriever = StubArtifactRetriever([])
-    agent = ArtifactAgent(artifact_retriever=retriever, llm_client=None)
+    agent = ArtifactAgent(artifact_retriever=retriever)
     context = AgentContext(
         query="find spark notebooks",
         intent="ARTIFACT_SEARCH",
@@ -27,7 +27,7 @@ def test_artifact_agent_returns_empty_answer_for_no_hits():
     assert result["intent"] == "ARTIFACT_SEARCH"
     assert result["answer"] == "I couldn't find matching notebooks, scripts, or artifacts for this query."
     assert retriever.calls == [("spark notebooks", 5)]
-    assert context.steps[-1].action == "search_artifacts"
+    assert any(step.action == "search_artifacts" for step in context.steps)
 
 
 def test_artifact_agent_formats_hits_without_llm():
@@ -35,7 +35,6 @@ def test_artifact_agent_formats_hits_without_llm():
         artifact_retriever=StubArtifactRetriever(
             [{"artifact_id": "etl/orders.py", "user_id": "ravi.verma"}]
         ),
-        llm_client=None,
     )
     context = AgentContext(
         query="find order ETL",

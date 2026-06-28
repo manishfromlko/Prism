@@ -14,7 +14,7 @@ class StubDocRetriever:
 
 def test_docs_agent_returns_empty_answer_for_no_hits():
     retriever = StubDocRetriever([])
-    agent = DocsAgent(doc_retriever=retriever, llm_client=None)
+    agent = DocsAgent(doc_retriever=retriever)
     context = AgentContext(
         query="how do I submit a spark job",
         intent="DOC_QA",
@@ -34,7 +34,6 @@ def test_docs_agent_formats_sources_without_llm():
         doc_retriever=StubDocRetriever(
             [{"doc_id": "d1", "source_file": "Kubeflow_Spark_Job_Guide.docx"}]
         ),
-        llm_client=None,
     )
     context = AgentContext(
         query="how do I submit a spark job",
