@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from ...observability import evaluate_in_background
-from ..chatbot.formatter import format_response
 from ..chatbot.memory import resolve_user_from_context
+from ..chatbot.prompts import build_user_search_messages
 from ..chatbot.user_resolver import UserNameResolver, retrieve_candidates
 from ..user_profile_store import UserProfileStore
-from .types import AgentContext
+from .types import AgentContext, AgentResult
 
 
 class PeopleProfileAgent:
@@ -17,9 +17,19 @@ class PeopleProfileAgent:
 
     name = "people_profile"
 
-    def __init__(self, user_store: UserProfileStore, user_resolver: UserNameResolver):
+    def __init__(
+        self,
+        user_store: UserProfileStore,
+        user_resolver: UserNameResolver,
+        user_retriever: Optional[Any] = None,
+        llm_client: Optional[Any] = None,
+        llm_model: str = "gpt-4o-mini",
+    ):
         self.user_store = user_store
         self.user_resolver = user_resolver
+        self.user_retriever = user_retriever
+        self.llm_client = llm_client
+        self.llm_model = llm_model
 
     def run(self, context: AgentContext) -> Optional[Dict]:
         all_ids = self.user_store.get_all_user_ids()
@@ -51,11 +61,66 @@ class PeopleProfileAgent:
             return self._profile_response(context, resolved["exact_uid"])
 
         context.add_step(self.name, "ask_user_to_disambiguate")
-        return format_response(
+        return AgentResult(
             answer=resolved["answer"],
             intent="USER_SEARCH",
             confidence=0.5,
+        ).to_response()
+
+    def semantic_search(self, context: AgentContext, top_k: int = 5) -> Optional[Dict]:
+        if not self.user_retriever:
+            context.add_step(self.name, "semantic_search_unavailable")
+            return None
+
+        query = context.search_query or context.query
+        user_hits = self.user_retriever.retrieve(query, top_k=top_k)
+        context.add_step(
+            self.name,
+            "semantic_people_search",
+            hit_count=len(user_hits),
+            query=query,
         )
+        if not user_hits:
+            return AgentResult(
+                answer="I couldn't find any matching users for this query in the knowledge base.",
+                intent="USER_SEARCH",
+                confidence=0.9,
+                raw_users=[],
+            ).to_response()
+
+        answer = self._generate_people_answer(context, user_hits)
+        result = AgentResult(
+            answer=answer,
+            intent="USER_SEARCH",
+            confidence=max(context.confidence, 0.75),
+            raw_users=user_hits,
+        ).to_response()
+        evaluate_in_background(
+            context.trace_id or "",
+            context.query,
+            answer,
+            intent="USER_SEARCH",
+            user_hits=user_hits,
+        )
+        return result
+
+    def _generate_people_answer(self, context: AgentContext, user_hits: List[Dict]) -> str:
+        if not self.llm_client:
+            names = ", ".join(hit.get("user_id", "unknown") for hit in user_hits[:3])
+            return f"Relevant people I found: {names}."
+
+        messages = build_user_search_messages(user_hits, context.query)
+        try:
+            response = self.llm_client.chat.completions.create(
+                model=self.llm_model,
+                messages=messages,
+                temperature=0.2,
+                max_tokens=600,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception:
+            names = ", ".join(hit.get("user_id", "unknown") for hit in user_hits[:3])
+            return f"Relevant people I found: {names}."
 
     def _profile_response(self, context: AgentContext, user_id: str) -> Optional[Dict]:
         profile = self.user_store.get_profile(user_id)
@@ -64,13 +129,13 @@ class PeopleProfileAgent:
             return None
 
         answer = f"**{user_id}**\n\n{profile['user_profile']}"
-        result = format_response(
+        result = AgentResult(
             answer=answer,
             intent="USER_SEARCH",
             confidence=1.0,
-            raw_users=[profile],
             exact_match=True,
-        )
+            raw_users=[profile],
+        ).to_response()
         evaluate_in_background(
             context.trace_id or "",
             context.query,

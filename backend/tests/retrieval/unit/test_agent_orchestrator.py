@@ -53,7 +53,7 @@ sys.modules["src.retrieval.chatbot.engine"] = engine_module
 
 
 class FakePeopleProfileAgent:
-    def __init__(self, user_store, user_resolver):
+    def __init__(self, user_store, user_resolver, **kwargs):
         self.user_store = user_store
         self.user_resolver = user_resolver
 
@@ -65,6 +65,10 @@ class FakePeopleProfileAgent:
             "confidence": 1.0,
             "exact_match": True,
         }
+
+    def semantic_search(self, context):
+        context.add_step("people_profile", "semantic_people_search", hit_count=0)
+        return None
 
 
 people_module = pytypes.ModuleType("src.retrieval.agents.people")
@@ -87,6 +91,14 @@ class StubChatEngine:
     user_store = object()
     user_resolver = object()
     metadata_repository = None
+    user_retriever = object()
+    client = None
+    llm_model = "gpt-4o-mini"
+
+    class rewriter:
+        @staticmethod
+        def rewrite(query, trace_id=None):
+            return query
 
     class classifier:
         @staticmethod

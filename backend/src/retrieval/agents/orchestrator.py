@@ -41,6 +41,9 @@ class OrchestratorAgent:
         self.people_agent = PeopleProfileAgent(
             user_store=chat_engine.user_store,
             user_resolver=chat_engine.user_resolver,
+            user_retriever=chat_engine.user_retriever,
+            llm_client=chat_engine.client,
+            llm_model=chat_engine.llm_model,
         )
 
     def run(
@@ -104,11 +107,14 @@ class OrchestratorAgent:
             if people_result:
                 return self._finalize_agent_result(people_result, context)
 
-            context.add_step(
-                self.name,
-                "fallback_to_legacy_chat_engine",
-                reason="people_agent_no_result",
+            context.search_query = self.chat_engine.rewriter.rewrite(
+                context.query,
+                trace_id=context.trace_id,
             )
+            context.add_step(self.name, "rewrite_query", search_query=context.search_query)
+            people_result = self.people_agent.semantic_search(context)
+            if people_result:
+                return self._finalize_agent_result(people_result, context)
 
         result = self.chat_engine.chat(
             query=context.query,
