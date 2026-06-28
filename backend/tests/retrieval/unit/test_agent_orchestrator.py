@@ -111,6 +111,24 @@ def test_agent_context_records_steps():
     assert context.steps[0].details["mode"] == "test"
 
 
+def test_agent_result_formats_canonical_response():
+    result = types.AgentResult(
+        answer="Found Priya",
+        intent="USER_SEARCH",
+        confidence=0.91,
+        exact_match=True,
+        raw_users=[{"user_id": "priya.patel", "tags": "Python, NLP"}],
+    )
+
+    response = result.to_response()
+
+    assert response["answer"] == "Found Priya"
+    assert response["intent"] == "USER_SEARCH"
+    assert response["confidence"] == 0.91
+    assert response["exact_match"] is True
+    assert response["users"][0]["name"] == "priya.patel"
+
+
 def test_orchestrator_routes_user_search_to_people_agent():
     orchestrator = orchestrator_module.OrchestratorAgent(
         chat_engine=StubChatEngine(),
