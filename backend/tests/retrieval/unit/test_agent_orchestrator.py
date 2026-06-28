@@ -180,6 +180,7 @@ def test_orchestrator_routes_user_search_to_people_agent():
         "pass",
         "pass",
         "return_profile",
+        "approve",
     ]
 
 
@@ -198,6 +199,7 @@ def test_orchestrator_routes_memory_turn_to_memory_agent():
         "start",
         "classify_intent",
         "answer_self_intro",
+        "skip",
     ]
 
 
@@ -219,4 +221,5 @@ def test_orchestrator_routes_system_stats_to_metadata_agent():
         "classify_intent",
         "pass",
         "load_system_metadata",
+        "skip",
     ]

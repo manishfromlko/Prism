@@ -9,6 +9,7 @@ from typing import Dict, Optional
 from ...observability import mlflow_chat_trace, record_mlflow_chat_output
 from ..chatbot.engine import ChatEngine
 from .artifacts import ArtifactAgent
+from .critic import CriticAgent
 from .docs import DocsAgent
 from .memory import MemoryAgent
 from .metadata import MetadataAgent
@@ -40,6 +41,7 @@ class OrchestratorAgent:
         self.max_steps = max_steps
         self.planner_enabled = planner_enabled
         self.synthesis_agent = SynthesisAgent(chat_engine.client, chat_engine.llm_model)
+        self.critic_agent = CriticAgent()
         self.memory_agent = MemoryAgent()
         self.metadata_agent = MetadataAgent(chat_engine.metadata_repository)
         self.artifact_agent = ArtifactAgent(
@@ -172,6 +174,7 @@ class OrchestratorAgent:
         return result
 
     def _finalize_agent_result(self, result: Dict, context: AgentContext) -> Dict:
+        result = self.critic_agent.review(context, result)
         result["trace_id"] = context.trace_id
         result["agent_mode"] = "orchestrated"
         result["agent_steps"] = self._serialize_steps(context)
