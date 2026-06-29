@@ -41,12 +41,24 @@ Select experiment `rag-chatbot-legacy-agent-traces`, then open the latest
 
 - tag `agent_mode`, usually `orchestrated`
 - tag `agent_path`, for example `orchestrator.start -> memory.pass -> ...`
+- tag `conversation_id`, matching the chat `session_id`
 - metric `agent_step_count`
+- a trace span graph with one child span per agent step
 - artifact `agent_trace.json` with the full ordered `agent_steps` payload
 - artifact `chat_response_summary.json` with the answer preview and retrieval counts
 
 The `agent_trace.json` artifact is the canonical MLflow record for which agents
 ran, which actions they took, and the details captured for each step.
+
+To see all turns for one conversation, filter runs or traces by:
+
+```text
+tags.conversation_id = '<session_id>'
+```
+
+Each chat turn is still stored as its own MLflow run/trace so latency, intent,
+retrieval counts, and agent path stay turn-specific. The shared
+`conversation_id`/`session_id` tags are the grouping key.
 
 Older local runs may exist under experiment `rag-chatbot-legacy`. That
 experiment used a container-local artifact path before proxied artifacts were

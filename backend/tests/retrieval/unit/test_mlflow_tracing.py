@@ -30,9 +30,22 @@ def test_mlflow_chat_trace_noops_when_disabled(monkeypatch):
 
 
 class FakeSpan:
-    def __init__(self):
+    def __init__(self, name="span", attributes=None):
+        self.name = name
         self.attributes = {}
+        if attributes:
+            self.attributes.update(attributes)
+        self.inputs = {}
         self.outputs = {}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+    def set_inputs(self, inputs):
+        self.inputs.update(inputs)
 
     def set_attributes(self, attributes):
         self.attributes.update(attributes)
@@ -46,6 +59,8 @@ class FakeMlflow:
         self.tags = {}
         self.metrics = {}
         self.artifacts = {}
+        self.spans = []
+        self.trace_updates = []
 
     def set_tag(self, key, value):
         self.tags[key] = value
@@ -55,6 +70,14 @@ class FakeMlflow:
 
     def log_dict(self, payload, artifact_file):
         self.artifacts[artifact_file] = payload
+
+    def start_span(self, name="span", span_type=None, attributes=None, **kwargs):
+        span = FakeSpan(name=name, attributes=attributes)
+        self.spans.append(span)
+        return span
+
+    def update_current_trace(self, **kwargs):
+        self.trace_updates.append(kwargs)
 
 
 def test_record_mlflow_chat_output_logs_agent_trace(monkeypatch):
@@ -89,5 +112,12 @@ def test_record_mlflow_chat_output_logs_agent_trace(monkeypatch):
     assert "people_profile.semantic_people_search" in fake_mlflow.tags["agent_path"]
     assert fake_mlflow.metrics["agent_step_count"] == 3.0
     assert fake_mlflow.artifacts["agent_trace.json"]["agent_steps"][1]["agent"] == "people_profile"
+    assert [span.name for span in fake_mlflow.spans] == [
+        "orchestrator.start",
+        "people_profile.semantic_people_search",
+        "critic.lower_confidence",
+    ]
+    assert fake_mlflow.spans[1].attributes["detail.hit_count"] == 0
+    assert fake_mlflow.trace_updates[-1]["tags"]["agent_mode"] == "orchestrated"
     assert span.attributes["agent_step_count"] == 3
     assert span.outputs["agent_steps"][2]["action"] == "lower_confidence"

@@ -88,6 +88,15 @@ def _safe_log_metric(key: str, value: float) -> None:
         logger.debug("Failed to log MLflow metric %s: %s", key, exc)
 
 
+def _safe_update_current_trace(**kwargs: object) -> None:
+    if mlflow is None or not hasattr(mlflow, "update_current_trace"):
+        return
+    try:
+        mlflow.update_current_trace(**kwargs)
+    except Exception as exc:
+        logger.debug("Failed to update MLflow trace metadata: %s", exc)
+
+
 def _safe_log_dict(payload: Dict, artifact_file: str) -> None:
     if mlflow is None or not hasattr(mlflow, "log_dict"):
         return
@@ -102,6 +111,35 @@ def _agent_path(agent_steps: List[Dict]) -> str:
         f"{step.get('agent', 'unknown')}.{step.get('action', 'unknown')}"
         for step in agent_steps
     )
+
+
+def _record_agent_step_spans(agent_steps: List[Dict]) -> None:
+    if mlflow is None or not hasattr(mlflow, "start_span"):
+        return
+
+    for index, step in enumerate(agent_steps, start=1):
+        agent = str(step.get("agent", "unknown"))
+        action = str(step.get("action", "unknown"))
+        status = str(step.get("status", "completed"))
+        details = step.get("details", {}) or {}
+        try:
+            with mlflow.start_span(
+                name=f"{agent}.{action}",
+                span_type="TOOL",
+                attributes={
+                    "agent": agent,
+                    "action": action,
+                    "status": status,
+                    "step_index": index,
+                    **{f"detail.{key}": value for key, value in details.items()},
+                },
+            ) as step_span:
+                if step_span is not None and hasattr(step_span, "set_inputs"):
+                    step_span.set_inputs({"agent": agent, "action": action, "details": details})
+                if step_span is not None and hasattr(step_span, "set_outputs"):
+                    step_span.set_outputs({"status": status})
+        except Exception as exc:
+            logger.debug("Failed to record MLflow agent span %s.%s: %s", agent, action, exc)
 
 
 @contextmanager
@@ -123,6 +161,7 @@ def mlflow_chat_trace(
         ) as run:
             _safe_set_tag("trace_backend", "mlflow")
             _safe_set_tag("session_id", session_id or "")
+            _safe_set_tag("conversation_id", session_id or "")
             _safe_set_tag("run_id", run.info.run_id)
             _safe_log_param("query", query[:500])
             _safe_log_param("history_turns", len(history))
@@ -146,9 +185,21 @@ def mlflow_chat_trace(
                         {
                             "query": query,
                             "session_id": session_id,
+                            "conversation_id": session_id,
                             "history_turns": len(history),
                         }
                     )
+                _safe_update_current_trace(
+                    session_id=session_id or "",
+                    tags={
+                        "session_id": session_id or "",
+                        "conversation_id": session_id or "",
+                    },
+                    metadata={
+                        "history_turns": str(len(history)),
+                    },
+                    request_preview=query[:500],
+                )
                 yield span
     except Exception as exc:
         logger.warning("MLflow chat tracing failed; continuing without MLflow trace: %s", exc)
@@ -203,6 +254,20 @@ def record_mlflow_chat_output(span: object, result: Dict) -> None:
                 "user_count": user_count,
             },
             "chat_response_summary.json",
+        )
+        _record_agent_step_spans(agent_steps)
+        _safe_update_current_trace(
+            tags={
+                "trace_id": trace_id,
+                "intent": intent,
+                "agent_mode": str(agent_mode),
+                "agent_path": agent_path[:500],
+            },
+            metadata={
+                "agent_step_count": str(len(agent_steps)),
+                "confidence": str(confidence),
+            },
+            response_preview=(result.get("answer") or "")[:500],
         )
 
         if span is not None:
