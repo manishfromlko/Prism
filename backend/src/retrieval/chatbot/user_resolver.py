@@ -6,8 +6,7 @@ User name resolver — three-stage pipeline:
                          (no vector search, no LLM, deterministic)
   2. Exact match       — single high-confidence hit → return uid, caller fetches
                          raw profile (zero LLM calls on this path)
-  3. Disambiguation    — multiple/ambiguous hits → LLM name-resolution prompt
-                         with top-5 candidates as context
+  3. Disambiguation    — multiple/ambiguous hits → natural clarification
 """
 
 import logging
@@ -16,10 +15,7 @@ from typing import Dict, List, Optional, Tuple
 
 from rapidfuzz import fuzz
 
-from ...observability import trace_extra_body
-from ..config import make_openai_client
 from ..user_profile_store import UserProfileStore
-from .prompt_loader import load_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -115,11 +111,8 @@ class UserNameResolver:
     """
 
     def __init__(self, user_store: UserProfileStore, model: str = "gpt-4o-mini"):
-        self.client = make_openai_client()
         self.model = model
         self.user_store = user_store
-        self._system_prompt = load_prompt("chatbot/user_resolution/system.txt")
-        self._user_template = load_prompt("chatbot/user_resolution/user.txt")
 
     def resolve(
         self,
@@ -129,10 +122,10 @@ class UserNameResolver:
     ) -> Dict:
         """
         Returns one of:
-          {"exact_uid": "<user_id>", "answer": None}
+          {"exact_uid": "<user_id>", "answer": None, "confidence": 1.0}
               → single unambiguous match; caller fetches the profile (no LLM)
-          {"exact_uid": None, "answer": "<text>"}
-              → LLM disambiguation message to show the user
+          {"exact_uid": None, "answer": "<text>", "confidence": <float>}
+              → natural clarification message to show the user
         """
         if candidates is None:
             all_ids = self.user_store.get_all_user_ids()
@@ -146,6 +139,7 @@ class UserNameResolver:
                     "I couldn't find any users matching that name. "
                     "Please check the spelling and try again."
                 ),
+                "confidence": 0.0,
             }
 
         # ── Stage 2: unambiguous match — no LLM needed ───────────────────────
@@ -161,36 +155,25 @@ class UserNameResolver:
             logger.info(
                 f"Exact name match: '{top_uid}' (score={top_score:.0f}, next={next_score:.0f})"
             )
-            return {"exact_uid": top_uid, "answer": None}
+            return {"exact_uid": top_uid, "answer": None, "confidence": 1.0}
 
-        # ── Stage 3: ambiguous — LLM disambiguation with top-5 as context ────
-        top_names = "\n".join(f"- {uid}" for uid, _ in candidates)
-        user_message = self._user_template.format(
-            user_query=query,
-            available_names=top_names,
-        )
-        logger.info(
-            f"Ambiguous name query '{query}' — "
-            f"passing {len(candidates)} candidates to LLM"
-        )
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": self._system_prompt},
-                    {"role": "user", "content": user_message},
-                ],
-                temperature=0.0,
-                max_tokens=250,
-                extra_body=trace_extra_body(trace_id, "name_resolve") if trace_id else None,
-            )
-            answer = response.choices[0].message.content.strip()
-        except Exception as e:
-            logger.error(f"UserNameResolver LLM call failed: {e}")
-            answer = (
-                "I found several users that might match — could you provide "
-                "the last name or more context?\n\n"
-                + "\n".join(f"• {uid}" for uid, _ in candidates)
-            )
+        # ── Stage 3: ambiguous — ask for a natural clarification ────────────
+        if len(candidates) == 1:
+            return {
+                "exact_uid": None,
+                "answer": f"I found one possible match: **{top_uid}**. Are you asking about this person?",
+                "confidence": 0.75,
+            }
 
-        return {"exact_uid": None, "answer": answer}
+        close_matches = [uid for uid, _ in candidates[:3]]
+        if len(close_matches) == 2:
+            names = f"**{close_matches[0]}** or **{close_matches[1]}**"
+        else:
+            names = ", ".join(f"**{uid}**" for uid in close_matches[:-1])
+            names = f"{names}, or **{close_matches[-1]}**"
+
+        return {
+            "exact_uid": None,
+            "answer": f"I found a few similar people: {names}. Which one did you mean?",
+            "confidence": 0.6,
+        }

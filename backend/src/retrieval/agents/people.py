@@ -63,7 +63,7 @@ class PeopleProfileAgent:
         return AgentResult(
             answer=resolved["answer"],
             intent="USER_SEARCH",
-            confidence=0.5,
+            confidence=resolved.get("confidence", 0.5),
         ).to_response()
 
     def semantic_search(self, context: AgentContext, top_k: int = 5) -> Optional[Dict]:
