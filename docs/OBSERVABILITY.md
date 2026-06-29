@@ -24,7 +24,8 @@ Relevant environment values:
 ```text
 MLFLOW_TRACING=true
 MLFLOW_TRACKING_URI=http://mlflow:5000
-MLFLOW_EXPERIMENT_NAME=rag-chatbot-legacy
+MLFLOW_EXPERIMENT_NAME=rag-chatbot-legacy-agent-traces
+MLFLOW_ARTIFACT_LOCATION=mlflow-artifacts:/
 ```
 
 ### Verifying Agent Traces
@@ -35,8 +36,8 @@ After sending a chat request, open:
 http://localhost:5001
 ```
 
-Select experiment `rag-chatbot-legacy`, then open the latest `chat_pipeline`
-run. For orchestrated chat turns, the run includes:
+Select experiment `rag-chatbot-legacy-agent-traces`, then open the latest
+`chat_pipeline` run. For orchestrated chat turns, the run includes:
 
 - tag `agent_mode`, usually `orchestrated`
 - tag `agent_path`, for example `orchestrator.start -> memory.pass -> ...`
@@ -46,6 +47,11 @@ run. For orchestrated chat turns, the run includes:
 
 The `agent_trace.json` artifact is the canonical MLflow record for which agents
 ran, which actions they took, and the details captured for each step.
+
+Older local runs may exist under experiment `rag-chatbot-legacy`. That
+experiment used a container-local artifact path before proxied artifacts were
+enabled, so use `rag-chatbot-legacy-agent-traces` for full agent trace
+artifacts.
 
 ## LangSmith
 

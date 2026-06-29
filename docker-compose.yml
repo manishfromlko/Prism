@@ -32,6 +32,8 @@ services:
       - --backend-store-uri
       - sqlite:////mlflow/mlflow.db
       - --default-artifact-root
+      - mlflow-artifacts:/
+      - --artifacts-destination
       - /mlflow/artifacts
       - --allowed-hosts
       - localhost,localhost:5001,127.0.0.1,127.0.0.1:5001,mlflow,mlflow:5000,kubeflow-mlflow,kubeflow-mlflow:5000
@@ -73,7 +75,8 @@ services:
       - QDRANT_COLLECTION=kubeflow_artifacts
       - MLFLOW_TRACING=${MLFLOW_TRACING:-true}
       - MLFLOW_TRACKING_URI=http://mlflow:5000
-      - MLFLOW_EXPERIMENT_NAME=${MLFLOW_EXPERIMENT_NAME:-rag-chatbot-legacy}
+      - MLFLOW_EXPERIMENT_NAME=${MLFLOW_EXPERIMENT_NAME:-rag-chatbot-legacy-agent-traces}
+      - MLFLOW_ARTIFACT_LOCATION=${MLFLOW_ARTIFACT_LOCATION:-mlflow-artifacts:/}
       - METADATA_DATABASE_URL=postgresql://${POSTGRES_USER:-rag_user}:${POSTGRES_PASSWORD:-rag_password}@postgres:5432/${POSTGRES_DB:-rag_chatbot}
       - EMBEDDING_MODEL=text-embedding-3-small
       - EMBEDDING_DIMENSION=1536

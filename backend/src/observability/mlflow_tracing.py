@@ -25,6 +25,24 @@ def is_mlflow_enabled() -> bool:
     return _MLFLOW_AVAILABLE and enabled.lower() in {"1", "true", "yes", "on"} and bool(tracking_uri)
 
 
+def _ensure_experiment() -> str:
+    experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "rag-chatbot")
+    artifact_location = os.getenv("MLFLOW_ARTIFACT_LOCATION", "mlflow-artifacts:/")
+    if mlflow is None:
+        return experiment_name
+    try:
+        client = mlflow.tracking.MlflowClient()
+        experiment = client.get_experiment_by_name(experiment_name)
+        if experiment is None:
+            client.create_experiment(
+                experiment_name,
+                artifact_location=artifact_location,
+            )
+    except Exception as exc:
+        logger.debug("Failed to ensure MLflow experiment %s: %s", experiment_name, exc)
+    return experiment_name
+
+
 def _configure_mlflow() -> bool:
     global _CONFIGURED
     if not is_mlflow_enabled() or mlflow is None:
@@ -35,7 +53,7 @@ def _configure_mlflow() -> bool:
         os.environ.setdefault("MLFLOW_HTTP_REQUEST_TIMEOUT", "2")
         os.environ.setdefault("MLFLOW_HTTP_REQUEST_MAX_RETRIES", "0")
         mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
-        mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT_NAME", "rag-chatbot"))
+        mlflow.set_experiment(_ensure_experiment())
         _CONFIGURED = True
         return True
     except Exception as exc:
