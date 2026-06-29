@@ -61,6 +61,9 @@ class FakePeopleProfileAgent:
         self.user_resolver = user_resolver
 
     def run(self, context):
+        if "people who work" in context.query:
+            context.add_step("people_profile", "no_name_candidates")
+            return None
         context.add_step("people_profile", "return_profile", user_id="priya2.patel")
         return {
             "answer": "**priya2.patel**\n\nProfile",
@@ -71,7 +74,15 @@ class FakePeopleProfileAgent:
 
     def semantic_search(self, context):
         context.add_step("people_profile", "semantic_people_search", hit_count=0)
-        return None
+        return {
+            "answer": "I couldn't find any matching users for this query in the knowledge base.",
+            "intent": "USER_SEARCH",
+            "confidence": 0.9,
+            "exact_match": False,
+            "artifacts": [],
+            "users": [],
+            "sources": [],
+        }
 
 
 people_module = pytypes.ModuleType("src.retrieval.agents.people")
@@ -189,6 +200,28 @@ def test_orchestrator_routes_user_search_to_people_agent():
         "pass",
         "return_profile",
         "approve",
+    ]
+
+
+def test_orchestrator_routes_broad_people_search_to_semantic_people_agent():
+    orchestrator = orchestrator_module.OrchestratorAgent(
+        chat_engine=StubChatEngine(),
+        max_steps=3,
+        planner_enabled=False,
+    )
+
+    result = orchestrator.run("tell me about people who work on NLP?", [])
+
+    assert result["intent"] == "USER_SEARCH"
+    assert [step["action"] for step in result["agent_steps"]] == [
+        "start",
+        "classify_intent",
+        "pass",
+        "pass",
+        "no_name_candidates",
+        "rewrite_query",
+        "semantic_people_search",
+        "lower_confidence",
     ]
 
 

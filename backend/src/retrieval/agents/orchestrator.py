@@ -127,6 +127,15 @@ class OrchestratorAgent:
             if people_result:
                 return self._finalize_agent_result(people_result, context)
 
+            context.search_query = self.chat_engine.rewriter.rewrite(
+                context.query,
+                trace_id=context.trace_id,
+            )
+            context.add_step(self.name, "rewrite_query", search_query=context.search_query)
+            people_result = self.people_agent.semantic_search(context)
+            if people_result:
+                return self._finalize_agent_result(people_result, context)
+
         if intent == "ARTIFACT_SEARCH":
             context.search_query = self.chat_engine.rewriter.rewrite(
                 context.query,
@@ -156,13 +165,6 @@ class OrchestratorAgent:
             hybrid_result = self.hybrid_agent.run(context)
             if hybrid_result:
                 return self._finalize_agent_result(hybrid_result, context)
-
-            context.search_query = self.chat_engine.rewriter.rewrite(
-                context.query,
-                trace_id=context.trace_id,
-            )
-            context.add_step(self.name, "rewrite_query", search_query=context.search_query)
-            people_result = self.people_agent.semantic_search(context)
             if people_result:
                 return self._finalize_agent_result(people_result, context)
 
