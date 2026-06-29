@@ -70,6 +70,22 @@ def _safe_log_metric(key: str, value: float) -> None:
         logger.debug("Failed to log MLflow metric %s: %s", key, exc)
 
 
+def _safe_log_dict(payload: Dict, artifact_file: str) -> None:
+    if mlflow is None or not hasattr(mlflow, "log_dict"):
+        return
+    try:
+        mlflow.log_dict(payload, artifact_file)
+    except Exception as exc:
+        logger.debug("Failed to log MLflow artifact %s: %s", artifact_file, exc)
+
+
+def _agent_path(agent_steps: List[Dict]) -> str:
+    return " -> ".join(
+        f"{step.get('agent', 'unknown')}.{step.get('action', 'unknown')}"
+        for step in agent_steps
+    )
+
+
 @contextmanager
 def mlflow_chat_trace(
     query: str,
@@ -132,14 +148,44 @@ def record_mlflow_chat_output(span: object, result: Dict) -> None:
         source_count = len(result.get("sources", []))
         artifact_count = len(result.get("artifacts", []))
         user_count = len(result.get("users", []))
+        agent_mode = result.get("agent_mode", "")
+        agent_steps = result.get("agent_steps", []) or []
+        agent_path = _agent_path(agent_steps)
 
         _safe_set_tag("trace_id", trace_id)
         _safe_set_tag("intent", intent)
         _safe_set_tag("exact_match", result.get("exact_match", False))
+        _safe_set_tag("agent_mode", agent_mode)
+        if agent_path:
+            _safe_set_tag("agent_path", agent_path[:500])
         _safe_log_metric("intent_confidence", confidence)
         _safe_log_metric("source_count", source_count)
         _safe_log_metric("artifact_count", artifact_count)
         _safe_log_metric("user_count", user_count)
+        _safe_log_metric("agent_step_count", len(agent_steps))
+        _safe_log_dict(
+            {
+                "trace_id": trace_id,
+                "agent_mode": agent_mode,
+                "agent_step_count": len(agent_steps),
+                "agent_path": agent_path,
+                "agent_steps": agent_steps,
+            },
+            "agent_trace.json",
+        )
+        _safe_log_dict(
+            {
+                "trace_id": trace_id,
+                "intent": intent,
+                "confidence": confidence,
+                "exact_match": bool(result.get("exact_match", False)),
+                "answer_preview": (result.get("answer") or "")[:1000],
+                "source_count": source_count,
+                "artifact_count": artifact_count,
+                "user_count": user_count,
+            },
+            "chat_response_summary.json",
+        )
 
         if span is not None:
             if hasattr(span, "set_attributes"):
@@ -149,6 +195,9 @@ def record_mlflow_chat_output(span: object, result: Dict) -> None:
                         "intent": intent,
                         "confidence": confidence,
                         "exact_match": bool(result.get("exact_match", False)),
+                        "agent_mode": agent_mode,
+                        "agent_step_count": len(agent_steps),
+                        "agent_path": agent_path,
                     }
                 )
             if hasattr(span, "set_outputs"):
@@ -158,6 +207,8 @@ def record_mlflow_chat_output(span: object, result: Dict) -> None:
                         "intent": intent,
                         "confidence": confidence,
                         "answer_preview": (result.get("answer") or "")[:500],
+                        "agent_mode": agent_mode,
+                        "agent_steps": agent_steps,
                     }
                 )
     except Exception as exc:

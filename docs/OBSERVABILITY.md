@@ -27,6 +27,26 @@ MLFLOW_TRACKING_URI=http://mlflow:5000
 MLFLOW_EXPERIMENT_NAME=rag-chatbot-legacy
 ```
 
+### Verifying Agent Traces
+
+After sending a chat request, open:
+
+```text
+http://localhost:5001
+```
+
+Select experiment `rag-chatbot-legacy`, then open the latest `chat_pipeline`
+run. For orchestrated chat turns, the run includes:
+
+- tag `agent_mode`, usually `orchestrated`
+- tag `agent_path`, for example `orchestrator.start -> memory.pass -> ...`
+- metric `agent_step_count`
+- artifact `agent_trace.json` with the full ordered `agent_steps` payload
+- artifact `chat_response_summary.json` with the answer preview and retrieval counts
+
+The `agent_trace.json` artifact is the canonical MLflow record for which agents
+ran, which actions they took, and the details captured for each step.
+
 ## LangSmith
 
 LangSmith is optional:
@@ -39,4 +59,3 @@ LANGSMITH_PROJECT=rag-chatbot-legacy
 ```
 
 Enable it only when you have credentials and want hosted traces.
-
