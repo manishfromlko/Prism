@@ -31,53 +31,12 @@ flowchart LR
 
 ## Multi-Agent Runtime
 
-```mermaid
-flowchart TD
-    chat[POST /chat] --> memory_store[(Conversation memory)]
-    chat --> orchestrator[OrchestratorAgent]
-    orchestrator --> classifier[IntentClassifier]
-    classifier --> memory[MemoryAgent]
-    classifier --> metadata[MetadataAgent]
-    classifier --> people[PeopleProfileAgent]
-    classifier --> docs_agent[DocsAgent]
-    classifier --> artifact_agent[ArtifactAgent]
-    classifier --> hybrid[HybridAgent]
-    people --> synthesis[SynthesisAgent]
-    docs_agent --> synthesis
-    artifact_agent --> synthesis
-    hybrid --> synthesis
-    synthesis --> critic[CriticAgent]
-    memory --> critic
-    metadata --> critic
-    critic --> response[ChatResponse with agent_steps]
+The assistant runtime is orchestrated by `OrchestratorAgent`, which routes each
+chat turn through specialist agents for memory, metadata, people, docs,
+artifacts, hybrid retrieval, answer synthesis, and response review.
 
-    people --> qdrant_users[(Qdrant user_profiles)]
-    docs_agent --> qdrant_docs[(Qdrant platform_docs)]
-    artifact_agent --> qdrant_artifacts[(Qdrant artifact_summaries)]
-    hybrid --> qdrant_docs
-    hybrid --> qdrant_artifacts
-    hybrid --> qdrant_users
-    metadata --> postgres[(Postgres metadata)]
-```
-
-The orchestrator is the entry point for assistant reasoning. It creates one
-`AgentContext` per turn, classifies the query, routes to the right specialist,
-and returns `agent_steps` so the UI and traces can show which agents ran.
-
-| Agent | Responsibility |
-| --- | --- |
-| `MemoryAgent` | Handles greetings, assistant self-introduction, and questions about the current conversation history. |
-| `MetadataAgent` | Answers workspace/artifact/notebook/script counts from Postgres. |
-| `PeopleProfileAgent` | Resolves exact/similar user names and searches people by expertise. |
-| `DocsAgent` | Retrieves platform docs and answers how-to questions. |
-| `ArtifactAgent` | Retrieves notebooks, Python files, Scala files, and artifact summaries. |
-| `HybridAgent` | Coordinates docs, artifacts, and people retrieval for mixed questions. |
-| `SynthesisAgent` | Composes final grounded answers from retrieved evidence. |
-| `CriticAgent` | Performs deterministic response review before the answer is returned. |
-
-Legacy `ChatEngine` remains available as a fallback runtime path, but in
-`CHAT_AGENT_MODE=orchestrated` the common chat intents are handled by specialist
-agents before fallback is considered.
+See [Multi-Agent Architecture](./MULTI_AGENT_ARCHITECTURE.md) for the dedicated
+runtime diagram, sequence diagram, routing table, and agent responsibilities.
 
 ## Metadata Source Of Truth
 
